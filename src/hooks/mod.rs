@@ -1,6 +1,5 @@
 use dotenv::dotenv;
 use rocket::{
-    get,
     http::Status,
     request::{FromRequest, Outcome},
     Request,
@@ -8,20 +7,19 @@ use rocket::{
 use std::{collections::HashMap, env};
 
 pub mod messages;
-pub mod response_models;
 
 #[derive(Debug)]
 pub enum FbRequestError {
     VerificationFailed,
-    ArgsNotEnought,
+    ArgsNotEnough,
 }
 
-pub struct FacebookRequest(String);
+pub struct FacebookRequest(pub String);
 
 #[rocket::async_trait]
 impl<'a> FromRequest<'a> for FacebookRequest {
     type Error = FbRequestError;
-    
+
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
         let query = request
             .uri()
@@ -46,12 +44,7 @@ impl<'a> FromRequest<'a> for FacebookRequest {
                     Outcome::Failure((Status::Unauthorized, FbRequestError::VerificationFailed))
                 }
             }
-            _ => Outcome::Failure((Status::Unauthorized, FbRequestError::ArgsNotEnought)),
+            _ => Outcome::Failure((Status::Unauthorized, FbRequestError::ArgsNotEnough)),
         }
     }
-}
-
-#[get("/")]
-pub fn hooks_verify(request: FacebookRequest) -> String {
-    request.0
 }

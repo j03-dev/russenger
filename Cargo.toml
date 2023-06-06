@@ -15,3 +15,4 @@ rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", branch = "mast
 reqwest = { version = "0.11.18", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 dotenv = "0.15.0"
+rusqlite = "0.29.0"

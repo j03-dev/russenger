@@ -1,6 +1,7 @@
+use std::env::var;
+
 use dotenv::dotenv;
 use rusqlite::Connection;
-use std::env::var;
 
 fn database_connection() -> Connection {
     dotenv().ok();
@@ -22,14 +23,16 @@ impl Default for User {
 }
 
 impl User {
-    fn is_alredy_exist() -> bool {
-        let _sql = "select * from user where facebook_user_id=?";
-        todo!()
+    fn is_already_exist(&self, facebook_user: &str) -> bool {
+        let sql = "select * from user where facebook_user_id=?";
+        self.connection
+            .query_row(sql, [facebook_user], |_row| Ok(()))
+            .is_ok()
     }
 
     pub fn create(&self, facebook_user_id: &str) -> bool {
-        if !Self::is_alredy_exist() {
-            let sql = "insert user (facebook_user_id, action) values (?, ?)";
+        if !self.is_already_exist(facebook_user_id) {
+            let sql = "insert into user (facebook_user_id, action) values (?, ?)";
             self.connection
                 .execute(sql, [facebook_user_id, "/"])
                 .is_ok()
@@ -46,7 +49,7 @@ impl User {
     }
 
     pub fn get_action(&self, facebook_user_id: &str) -> Option<String> {
-        let sql = "select action where facebook_user_id=?";
+        let sql = "select action from user where facebook_user_id=?";
         if let Ok(action) = self
             .connection
             .query_row(sql, [facebook_user_id], |row| Ok(row.get(0).unwrap()))

@@ -6,9 +6,9 @@ use crate::response_models::media::{MediaAttachment, MediaModel};
 use crate::response_models::quick_replies::{QuickMessage, QuickReplieModel};
 
 use self::{
-    generic::{GenericElement, GenericMessage, GenericModel, Recipient},
+    generic::{GenericElement, GenericMessage, GenericModel},
     quick_replies::QuickReplie,
-    text::{Text, TextModel},
+    text::TextModel,
 };
 
 pub mod generic;
@@ -34,12 +34,7 @@ impl<'l> Response<'l> {
 
         match &self {
             Response::TextMessage(text) => {
-                let text = TextModel {
-                    recipient: Recipient { id: sender },
-                    message: Text {
-                        text: text.as_str(),
-                    },
-                };
+                let text = TextModel::new(sender, text);
                 client.post(facebook_api).json(&text).send().await.is_ok()
             }
             Response::QuickReply(text, quick_replies) => {
@@ -47,7 +42,7 @@ impl<'l> Response<'l> {
                     text,
                     quick_replies,
                 };
-                let quick_repilie = QuickReplieModel::new(Recipient { id: sender }, message);
+                let quick_repilie = QuickReplieModel::new(sender, message);
                 client
                     .post(facebook_api)
                     .json(&quick_repilie)
@@ -56,8 +51,7 @@ impl<'l> Response<'l> {
                     .is_ok()
             }
             Response::Generic(elements) => {
-                let generic_model =
-                    GenericModel::new(Recipient { id: sender }, GenericMessage::new(elements));
+                let generic_model = GenericModel::new(sender, GenericMessage::new(elements));
                 client
                     .post(facebook_api)
                     .json(&generic_model)
@@ -67,7 +61,7 @@ impl<'l> Response<'l> {
             }
             Response::Media(r#type, url) => {
                 let message = &MediaAttachment::new(r#type, url);
-                let media_model = MediaModel::new(Recipient { id: sender }, message);
+                let media_model = MediaModel::new(sender, message);
                 client
                     .post(facebook_api)
                     .json(&media_model)

@@ -5,44 +5,43 @@ use super::generic::Recipient;
 #[derive(Serialize)]
 pub struct MediaPayload<'p> {
     url: &'p str,
-    is_resuable: bool
+    is_resuable: bool,
 }
 
 impl<'p> MediaPayload<'p> {
     pub fn new(url: &'p str) -> Self {
-        Self { url, is_resuable: true }
+        Self {
+            url,
+            is_resuable: true,
+        }
     }
 }
-
 
 #[derive(Serialize)]
 pub struct MediaAttachment<'a> {
     #[serde(rename = "type")]
     r#type: &'a str,
-    payload: MediaPayload<'a> 
+    payload: MediaPayload<'a>,
 }
 
 impl<'a> MediaAttachment<'a> {
     pub fn new(r#type: &'a str, url: &'a str) -> Self {
         MediaAttachment {
             r#type,
-            payload: MediaPayload::new(url)
+            payload: MediaPayload::new(url),
         }
     }
 }
 
-
 #[derive(Serialize)]
 pub struct MediaModel<'m> {
     recipient: Recipient,
-    message: &'m MediaAttachment<'m>
+    message: &'m MediaAttachment<'m>,
 }
 
 impl<'m> MediaModel<'m> {
-    pub fn new(recipient: Recipient, message: &'m MediaAttachment<'m>) -> Self {
-        Self {
-            recipient,
-            message,
-        }
+    pub fn new(sender: String, message: &'m MediaAttachment<'m>) -> Self {
+        let recipient = Recipient { id: sender };
+        Self { recipient, message }
     }
 }

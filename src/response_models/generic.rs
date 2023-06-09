@@ -70,7 +70,8 @@ pub struct GenericModel<'g> {
 }
 
 impl<'g> GenericModel<'g> {
-    pub fn new(recipient: Recipient, message: GenericMessage<'g>) -> Self {
+    pub fn new(sender: String, message: GenericMessage<'g>) -> Self {
+        let recipient = Recipient { id: sender };
         Self { recipient, message }
     }
 }

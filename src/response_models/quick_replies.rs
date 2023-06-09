@@ -35,7 +35,8 @@ pub struct QuickReplieModel<'q> {
 }
 
 impl<'q> QuickReplieModel<'q> {
-    pub fn new(recipient: Recipient, message: QuickMessage<'q>) -> Self {
+    pub fn new(sender: String, message: QuickMessage<'q>) -> Self {
+        let recipient = Recipient { id: sender };
         Self {
             recipient,
             messaging_type: "RESPONSE",

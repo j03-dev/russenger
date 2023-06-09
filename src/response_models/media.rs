@@ -35,11 +35,11 @@ impl<'a> MediaAttachment<'a> {
 #[derive(Serialize)]
 pub struct MediaModel<'m> {
     recipient: Recipient,
-    message: MediaAttachment<'m>
+    message: &'m MediaAttachment<'m>
 }
 
 impl<'m> MediaModel<'m> {
-    pub fn new(recipient: Recipient, message: MediaAttachment<'m>) -> Self {
+    pub fn new(recipient: Recipient, message: &'m MediaAttachment<'m>) -> Self {
         Self {
             recipient,
             message,

@@ -24,7 +24,7 @@ impl<'c> QuickReplie<'c> {
 #[derive(Serialize)]
 pub struct QuickMessage<'m> {
     pub text: &'m str,
-    pub quick_replies: Vec<QuickReplie<'m>>,
+    pub quick_replies: &'m Vec<QuickReplie<'m>>,
 }
 
 #[derive(Serialize)]

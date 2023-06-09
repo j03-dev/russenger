@@ -29,7 +29,7 @@ pub struct GenericElement<'e> {
 #[derive(Serialize)]
 pub struct Payload<'p> {
     pub template_type: String,
-    pub elements: Vec<GenericElement<'p>>,
+    pub elements: &'p Vec<GenericElement<'p>>,
 }
 
 #[derive(Serialize)]
@@ -45,7 +45,7 @@ pub struct GenericMessage<'m> {
 }
 
 impl<'m> GenericMessage<'m> {
-    pub fn new(elements: Vec<GenericElement<'m>>) -> Self {
+    pub fn new(elements: &'m Vec<GenericElement<'m>>) -> Self {
         Self {
             attachment: Attachment {
                 r#type: "template",

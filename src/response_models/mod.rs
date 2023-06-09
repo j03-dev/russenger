@@ -8,13 +8,13 @@ use crate::response_models::quick_replies::{QuickMessage, QuickReplieModel};
 use self::{
     generic::{GenericElement, GenericMessage, GenericModel, Recipient},
     quick_replies::QuickReplie,
-    simple_model::{SimpleModel, Text},
+    text::{Text, TextModel},
 };
 
 pub mod generic;
 pub mod media;
 pub mod quick_replies;
-pub mod simple_model;
+pub mod text;
 
 pub enum Response<'l> {
     TextMessage(String),
@@ -34,7 +34,7 @@ pub async fn send(sender: String, response: Response<'_>) -> bool {
 
     match response {
         Response::TextMessage(text) => {
-            let text = SimpleModel {
+            let text = TextModel {
                 recipient: Recipient { id: sender },
                 message: Text {
                     text: text.as_str(),

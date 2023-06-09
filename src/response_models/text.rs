@@ -8,7 +8,7 @@ pub struct Text<'t> {
 }
 
 #[derive(Serialize)]
-pub struct SimpleModel<'s> {
+pub struct TextModel<'s> {
     pub recipient: Recipient,
     pub message: Text<'s>,
 }

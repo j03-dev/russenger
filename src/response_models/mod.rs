@@ -38,10 +38,7 @@ impl<'l> Response<'l> {
                 client.post(facebook_api).json(&text).send().await.is_ok()
             }
             Response::QuickReply(text, quick_replies) => {
-                let message = QuickMessage {
-                    text,
-                    quick_replies,
-                };
+                let message = QuickMessage::new(text, quick_replies);
                 let quick_repilie = QuickReplieModel::new(sender, message);
                 client
                     .post(facebook_api)

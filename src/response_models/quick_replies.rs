@@ -27,6 +27,15 @@ pub struct QuickMessage<'m> {
     pub quick_replies: &'m Vec<QuickReplie<'m>>,
 }
 
+impl<'m> QuickMessage<'m> {
+    pub fn new(text: &'m str, quick_replies: &'m Vec<QuickReplie>) -> Self {
+        Self {
+            text,
+            quick_replies,
+        }
+    }
+}
+
 #[derive(Serialize)]
 pub struct QuickReplieModel<'q> {
     pub recipient: Recipient,

@@ -1,15 +1,12 @@
 use std::env;
 
-use dotenv::dotenv;
-
-use crate::response_models::media::{MediaAttachment, MediaModel};
-use crate::response_models::quick_replies::{QuickMessage, QuickReplieModel};
-
 use self::{
     generic::{GenericElement, GenericMessage, GenericModel},
-    quick_replies::QuickReplie,
+    media::{MediaAttachment, MediaModel},
+    quick_replies::{QuickMessage, QuickReplie, QuickReplieModel},
     text::TextModel,
 };
+use dotenv::dotenv;
 
 pub mod generic;
 pub mod media;

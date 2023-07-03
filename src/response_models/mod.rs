@@ -1,12 +1,13 @@
 use std::env;
 
+use dotenv::dotenv;
+
 use self::{
     generic::{GenericElement, GenericMessage, GenericModel},
     media::{MediaAttachment, MediaModel},
     quick_replies::{QuickMessage, QuickReplie, QuickReplieModel},
     text::TextModel,
 };
-use dotenv::dotenv;
 
 pub mod generic;
 pub mod media;
@@ -16,9 +17,10 @@ pub mod text;
 pub enum Response<'l> {
     TextMessage(String),
     QuickReply(&'l str, Vec<QuickReplie<'l>>),
-    Generic(Vec<GenericElement<'l>>),
+    Generic(Vec<GenericElement>),
     Media(&'l str, &'l str),
 }
+
 impl<'l> Response<'l> {
     pub async fn send(&self, sender: String) -> bool {
         dotenv().ok();

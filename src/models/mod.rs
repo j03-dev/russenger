@@ -27,6 +27,7 @@ impl User {
         let sql = "insert into user (facebook_user_id, action) values (?, ?)";
         sqlx::query(sql)
             .bind(facebook_user_id)
+            .bind("/")
             .execute(&self.connection)
             .await
             .is_ok()

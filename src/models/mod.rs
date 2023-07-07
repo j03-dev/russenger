@@ -56,7 +56,7 @@ impl User {
     }
 
     pub async fn reset_action(&self, facebook_user_id: &str) -> bool {
-        let sql = "update set action=? where faceboook_user_id=?";
+        let sql = "update user set action=? where faceboook_user_id=?";
         sqlx::query(sql)
             .bind("/")
             .bind(facebook_user_id)

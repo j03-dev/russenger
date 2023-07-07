@@ -5,8 +5,13 @@ pub struct Sender {
     pub id: String,
 }
 
+fn text_default() -> String {
+    "like".to_string()
+}
+
 #[derive(Deserialize)]
 pub struct Message {
+    #[serde(default = "text_default")]
     pub text: String,
 }
 

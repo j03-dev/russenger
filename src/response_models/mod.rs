@@ -22,7 +22,7 @@ pub enum Response<'l> {
 }
 
 impl<'l> Response<'l> {
-    pub async fn send(&self, sender: String) -> bool {
+    pub async fn send(&self, sender: String) -> Result<reqwest::Response, reqwest::Error> {
         dotenv().ok();
         let api = env::var("API").expect("please check your .env file (api)");
         let page_access_token =
@@ -34,7 +34,7 @@ impl<'l> Response<'l> {
         match &self {
             Response::TextMessage(text) => {
                 let text = TextModel::new(sender, text);
-                client.post(facebook_api).json(&text).send().await.is_ok()
+                client.post(facebook_api).json(&text).send().await
             }
             Response::QuickReply(text, quick_replies) => {
                 let message = QuickMessage::new(text, quick_replies);
@@ -44,7 +44,7 @@ impl<'l> Response<'l> {
                     .json(&quick_repilie)
                     .send()
                     .await
-                    .is_ok()
+                    
             }
             Response::Generic(elements) => {
                 let generic_model = GenericModel::new(sender, GenericMessage::new(elements));
@@ -53,7 +53,6 @@ impl<'l> Response<'l> {
                     .json(&generic_model)
                     .send()
                     .await
-                    .is_ok()
             }
             Response::Media(r#type, url) => {
                 let message = &MediaAttachment::new(r#type, url);
@@ -63,7 +62,6 @@ impl<'l> Response<'l> {
                     .json(&media_model)
                     .send()
                     .await
-                    .is_ok()
             }
         }
     }

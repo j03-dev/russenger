@@ -64,4 +64,37 @@ impl User {
             .await
             .is_ok()
     }
+
+    pub async fn insert_anime(&self, facebook_user_id: &str, anime_name: &str, url: &str) -> bool {
+        let sql = "insert into anime(name, url, user_id) values(?, ?, ?)";
+        sqlx::query(sql)
+            .bind(anime_name)
+            .bind(url)
+            .bind(facebook_user_id)
+            .execute(&self.connection)
+            .await
+            .is_ok()
+    }
+
+    pub async fn delete_all_anime(&self, facebook_user_id: &str) -> bool {
+        let sql = "delete from anime where user_id=?";
+        sqlx::query(sql)
+            .bind(facebook_user_id)
+            .execute(&self.connection)
+            .await
+            .is_ok()
+    }
+
+    pub async fn get_url_anime_by(&self, facebook_user_id: &str, name: &str) -> Option<String> {
+        let sql = "select url from anime where name=? and user_id=?";
+        match sqlx::query(sql)
+            .bind(name)
+            .bind(facebook_user_id)
+            .fetch_one(&self.connection)
+            .await
+        {
+            Ok(row) => Some(row.get(0)),
+            Err(_) => None,
+        }
+    }
 }

@@ -65,19 +65,19 @@ impl User {
             .is_ok()
     }
 
-    pub async fn insert_anime(&self, facebook_user_id: &str, anime_name: &str, url: &str) -> bool {
-        let sql = "insert into anime(name, url, user_id) values(?, ?, ?)";
+    pub async fn set_choices(&self, facebook_user_id: &str, choice_name: &str, content: &str) -> bool {
+        let sql = "insert into choices(choice_name, content, facebook_user_id) values(?, ?, ?)";
         sqlx::query(sql)
-            .bind(anime_name)
-            .bind(url)
+            .bind(choice_name)
+            .bind(content)
             .bind(facebook_user_id)
             .execute(&self.connection)
             .await
             .is_ok()
     }
 
-    pub async fn delete_all_anime(&self, facebook_user_id: &str) -> bool {
-        let sql = "delete from anime where user_id=?";
+    pub async fn delete_all_choices(&self, facebook_user_id: &str) -> bool {
+        let sql = "delete from choices where facebook_user_id=?";
         sqlx::query(sql)
             .bind(facebook_user_id)
             .execute(&self.connection)
@@ -85,10 +85,10 @@ impl User {
             .is_ok()
     }
 
-    pub async fn get_url_anime_by(&self, facebook_user_id: &str, name: &str) -> Option<String> {
-        let sql = "select url from anime where name=? and user_id=?";
+    pub async fn get_choices_content(&self, facebook_user_id: &str, choice_name: &str) -> Option<String> {
+        let sql = "select content from choices where choice_name=? and facebook_user_id=?";
         match sqlx::query(sql)
-            .bind(name)
+            .bind(choice_name)
             .bind(facebook_user_id)
             .fetch_one(&self.connection)
             .await

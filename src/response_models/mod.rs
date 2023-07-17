@@ -22,46 +22,51 @@ pub enum Response<'l> {
 }
 
 impl<'l> Response<'l> {
-    pub async fn send(&self, sender: String) -> Result<reqwest::Response, reqwest::Error> {
+    pub async fn send(&self, sender: String) -> bool {
         dotenv().ok();
         let api = env::var("API").expect("please check your .env file (api)");
         let page_access_token =
             env::var("PAGE_ACCESS_TOKEN").expect("please check your .env file (page access token)");
         let facebook_api = api + &page_access_token;
 
-        let client = reqwest::Client::new();
-
         match &self {
             Response::TextMessage(text) => {
                 let text = TextModel::new(sender, text);
-                client.post(facebook_api).json(&text).send().await
+                reqwest::Client::new()
+                    .post(facebook_api)
+                    .json(&text)
+                    .send()
+                    .await
+                    .is_ok()
             }
             Response::QuickReply(text, quick_replies) => {
                 let message = QuickMessage::new(text, quick_replies);
                 let quick_repilie = QuickReplieModel::new(sender, message);
-                client
+                reqwest::Client::new()
                     .post(facebook_api)
                     .json(&quick_repilie)
                     .send()
                     .await
-                    
+                    .is_ok()
             }
             Response::Generic(elements) => {
                 let generic_model = GenericModel::new(sender, GenericMessage::new(elements));
-                client
+                reqwest::Client::new()
                     .post(facebook_api)
                     .json(&generic_model)
                     .send()
                     .await
+                    .is_ok()
             }
             Response::Media(r#type, url) => {
                 let message = &MediaAttachment::new(r#type, url);
                 let media_model = MediaModel::new(sender, message);
-                client
+                reqwest::Client::new()
                     .post(facebook_api)
                     .json(&media_model)
                     .send()
                     .await
+                    .is_ok()
             }
         }
     }

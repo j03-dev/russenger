@@ -30,7 +30,7 @@ impl User {
                         action varchar(20)
                     );
                     create table choices(
-                        choices_name varchar(20),
+                        choice_name varchar(20),
                         content varchar(255),
                         facebook_user_id varchar(40),
                         foreign key(facebook_user_id) references user(facebook_user_id)

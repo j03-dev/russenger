@@ -23,6 +23,29 @@ impl User {
         }
     }
 
+    pub async fn migrate(&self) {
+        let model_sql = "
+                    create table user (
+                        facebook_user_id varchar(40) primary key,
+                        action varchar(20)
+                    );
+                    create table choices(
+                        choices_name varchar(20),
+                        content varchar(255),
+                        facebook_user_id varchar(40),
+                        foreign key(facebook_user_id) references user(facebook_user_id)
+                    )";
+        if sqlx::query(model_sql)
+            .execute(&self.connection)
+            .await
+            .is_ok()
+        {
+            println!("migrate succes");
+        } else {
+            println!("failde to migrate");
+        }
+    }
+
     pub async fn create(&self, facebook_user_id: &str) -> bool {
         let sql = "insert into user (facebook_user_id, action) values (?, ?)";
         sqlx::query(sql)
@@ -65,7 +88,12 @@ impl User {
             .is_ok()
     }
 
-    pub async fn set_choices(&self, facebook_user_id: &str, choice_name: &str, content: &str) -> bool {
+    pub async fn set_choices(
+        &self,
+        facebook_user_id: &str,
+        choice_name: &str,
+        content: &str,
+    ) -> bool {
         let sql = "insert into choices(choice_name, content, facebook_user_id) values(?, ?, ?)";
         sqlx::query(sql)
             .bind(choice_name)
@@ -85,7 +113,11 @@ impl User {
             .is_ok()
     }
 
-    pub async fn get_choices_content(&self, facebook_user_id: &str, choice_name: &str) -> Option<String> {
+    pub async fn get_choices_content(
+        &self,
+        facebook_user_id: &str,
+        choice_name: &str,
+    ) -> Option<String> {
         let sql = "select content from choices where choice_name=? and facebook_user_id=?";
         match sqlx::query(sql)
             .bind(choice_name)

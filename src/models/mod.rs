@@ -95,13 +95,20 @@ impl User {
         content: &str,
     ) -> bool {
         let sql = "insert into choices(choice_name, content, facebook_user_id) values(?, ?, ?)";
-        sqlx::query(sql)
+        let result = sqlx::query(sql)
             .bind(choice_name)
             .bind(content)
             .bind(facebook_user_id)
             .execute(&self.connection)
-            .await
-            .is_ok()
+            .await;
+
+        match result {
+            Ok(_) => true,
+            Err(err) => {
+                eprintln!("Why it's panic! {err}");
+                false
+            }
+        }
     }
 
     pub async fn delete_all_choices(&self, facebook_user_id: &str) -> bool {

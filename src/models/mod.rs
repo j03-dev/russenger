@@ -3,7 +3,7 @@ use std::env::var;
 use dotenv::dotenv;
 use sqlx::{Pool, Row, Sqlite, SqlitePool};
 
-async fn database_connection() -> Pool<Sqlite> {
+pub async fn database_connection() -> Pool<Sqlite> {
     dotenv().ok();
     let database_url =
         var("DATABASE").expect("check your .env file \n pls spécifie your database name");

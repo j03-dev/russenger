@@ -6,7 +6,7 @@ pub struct Sender {
 }
 
 fn text_default() -> String {
-    "like".to_string()
+    "".to_string()
 }
 
 #[derive(Deserialize)]

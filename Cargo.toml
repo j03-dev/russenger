@@ -1,6 +1,6 @@
 [package]
 name = "potato"
-version = "0.1.4-dev"
+version = "0.1.4-dev-c"
 edition = "2021"
 
 [lib]

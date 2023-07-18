@@ -26,7 +26,7 @@ impl User {
     pub async fn migrate(&self) {
         let model_sql = "
                     create table user (
-                        facebook_user_id varchar(40) primary key,
+                        facebook_user_id varchar(40) primary key unique,
                         action varchar(20)
                     );
                     create table choices(

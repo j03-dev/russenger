@@ -13,7 +13,7 @@ impl GenericButton {
         Self {
             r#type: "postback".to_string(),
             title,
-            payload: "DEVELOPER_DEFINED_PAYLOAD".to_string(),
+            payload: "<POSTBACK_PAYLOAD>".to_string(),
         }
     }
 }

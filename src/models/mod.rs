@@ -68,7 +68,7 @@ impl User {
     }
 
     pub async fn set_action(&self, facebook_user_id: &str, action: &str) -> bool {
-        let sql = "update botouser set action=? where facebook_user_id=$1";
+        let sql = "update botouser set action=$1 where facebook_user_id=$2";
         sqlx::query(sql)
             .bind(action)
             .bind(facebook_user_id)
@@ -146,6 +146,9 @@ impl User {
 async fn test() {
     use self::User;
     let user = User::new().await;
-    println!("test_migration {}", user.migrate().await);
-    // println!("test_insert {}", user.create("test").await);
+    // println!("test_migration {}", user.migrate().await);
+    println!(
+        "get_action {:?}",
+        user.get_action("5557815397586928").await.unwrap()
+    );
 }

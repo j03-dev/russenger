@@ -1,17 +1,19 @@
 use std::env::var;
 
 use dotenv::dotenv;
-use sqlx::{Pool, Postgres, Row};
+use rocket::tokio;
 use sqlx::postgres::PgPoolOptions;
+use sqlx::{Pool, Postgres, Row};
 
-pub async fn database_connection() -> Pool<Postgres> {
+async fn database_connection() -> Pool<Postgres> {
     dotenv().ok();
     let database_url =
         var("DATABASE").expect("check your .env file \n pls spécifie your database name");
 
     PgPoolOptions::new()
         .connect(&database_url)
-        .await.expect("Database connection failed")
+        .await
+        .expect("Database connection failed")
 }
 
 pub struct User {
@@ -25,31 +27,38 @@ impl User {
         }
     }
 
-    pub async fn migrate(&self) {
-        let model_sql = "
-                    create table user (
+    pub async fn migrate(&self) -> bool {
+        let create_table_user = "
+                    create table botouser ( 
                         facebook_user_id varchar(40) primary key unique,
                         action varchar(20)
-                    );
+                    );";
+        let create_table_choices = "
                     create table choices(
                         choice_name varchar(20),
                         content varchar(255),
                         facebook_user_id varchar(40),
-                        foreign key(facebook_user_id) references user(facebook_user_id)
-                    )";
-        if sqlx::query(model_sql)
+                        foreign key(facebook_user_id) references botouser(facebook_user_id)
+                    );";
+        if sqlx::query(create_table_user)
             .execute(&self.connection)
             .await
-            .is_ok()
+            .is_err()
         {
-            println!("migrate success");
-        } else {
-            println!("Failed to migrate");
+            return false;
         }
+        if sqlx::query(create_table_choices)
+            .execute(&self.connection)
+            .await
+            .is_err()
+        {
+            return false;
+        }
+        true
     }
 
     pub async fn create(&self, facebook_user_id: &str) -> bool {
-        let sql = "insert into user (facebook_user_id, action) values (?, ?)";
+        let sql = "insert into botouser (facebook_user_id, action) values ($1, $2)";
         sqlx::query(sql)
             .bind(facebook_user_id)
             .bind("/")
@@ -59,7 +68,7 @@ impl User {
     }
 
     pub async fn set_action(&self, facebook_user_id: &str, action: &str) -> bool {
-        let sql = "update user set action=? where facebook_user_id=?";
+        let sql = "update botouser set action=? where facebook_user_id=$1";
         sqlx::query(sql)
             .bind(action)
             .bind(facebook_user_id)
@@ -69,7 +78,7 @@ impl User {
     }
 
     pub async fn get_action(&self, facebook_user_id: &str) -> Option<String> {
-        let sql = "select action from user where facebook_user_id=?";
+        let sql = "select action from botouser where facebook_user_id=$1";
         match sqlx::query(sql)
             .bind(facebook_user_id)
             .fetch_one(&self.connection)
@@ -81,7 +90,7 @@ impl User {
     }
 
     pub async fn reset_action(&self, facebook_user_id: &str) -> bool {
-        let sql = "update user set action=? where facebook_user_id=?";
+        let sql = "update botouser set action=$1 where facebook_user_id=$2";
         sqlx::query(sql)
             .bind("/")
             .bind(facebook_user_id)
@@ -96,25 +105,18 @@ impl User {
         choice_name: &str,
         content: &str,
     ) -> bool {
-        let sql = "insert into choices(choice_name, content, facebook_user_id) values(?, ?, ?)";
-        let result = sqlx::query(sql)
+        let sql = "insert into choices(choice_name, content, facebook_user_id) values($1, $2, $3)";
+        sqlx::query(sql)
             .bind(choice_name)
             .bind(content)
             .bind(facebook_user_id)
             .execute(&self.connection)
-            .await;
-
-        match result {
-            Ok(_) => true,
-            Err(err) => {
-                eprintln!("Why it's panic! {err}");
-                false
-            }
-        }
+            .await
+            .is_ok()
     }
 
     pub async fn delete_all_choices(&self, facebook_user_id: &str) -> bool {
-        let sql = "delete from choices where facebook_user_id=?";
+        let sql = "delete from choices where facebook_user_id=$1";
         sqlx::query(sql)
             .bind(facebook_user_id)
             .execute(&self.connection)
@@ -127,7 +129,7 @@ impl User {
         facebook_user_id: &str,
         choice_name: &str,
     ) -> Option<String> {
-        let sql = "select content from choices where choice_name=? and facebook_user_id=?";
+        let sql = "select content from choices where choice_name=$1 and facebook_user_id=$2";
         match sqlx::query(sql)
             .bind(choice_name)
             .bind(facebook_user_id)
@@ -138,4 +140,12 @@ impl User {
             Err(_) => None,
         }
     }
+}
+
+#[tokio::test]
+async fn test() {
+    use self::User;
+    let user = User::new().await;
+    println!("test_migration {}", user.migrate().await);
+    // println!("test_insert {}", user.create("test").await);
 }

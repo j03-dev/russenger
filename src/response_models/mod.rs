@@ -40,10 +40,10 @@ impl<'l> Response<'l> {
             }
             Response::QuickReply(text, quick_replies) => {
                 let message = QuickMessage::new(text, quick_replies);
-                let quick_repilie = QuickReplieModel::new(sender, message);
+                let quick_replie = QuickReplieModel::new(sender, message);
                 reqwest::Client::new()
                     .post(facebook_api)
-                    .json(&quick_repilie)
+                    .json(&quick_replie)
                     .send()
                     .await
             }

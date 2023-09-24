@@ -1,19 +1,21 @@
 use std::env::var;
 
 use dotenv::dotenv;
-use sqlx::{Pool, Row, Sqlite, SqlitePool};
+use sqlx::{Pool, Postgres, Row};
+use sqlx::postgres::PgPoolOptions;
 
-pub async fn database_connection() -> Pool<Sqlite> {
+pub async fn database_connection() -> Pool<Postgres> {
     dotenv().ok();
     let database_url =
         var("DATABASE").expect("check your .env file \n pls spécifie your database name");
-    SqlitePool::connect(&database_url)
-        .await
-        .expect("failed to open database")
+
+    PgPoolOptions::new()
+        .connect(&database_url)
+        .await.expect("Database connection failed")
 }
 
 pub struct User {
-    pub connection: Pool<Sqlite>,
+    pub connection: Pool<Postgres>,
 }
 
 impl User {
@@ -40,9 +42,9 @@ impl User {
             .await
             .is_ok()
         {
-            println!("migrate succes");
+            println!("migrate success");
         } else {
-            println!("failde to migrate");
+            println!("Failed to migrate");
         }
     }
 
@@ -79,7 +81,7 @@ impl User {
     }
 
     pub async fn reset_action(&self, facebook_user_id: &str) -> bool {
-        let sql = "update user set action=? where faceboook_user_id=?";
+        let sql = "update user set action=? where facebook_user_id=?";
         sqlx::query(sql)
             .bind("/")
             .bind(facebook_user_id)

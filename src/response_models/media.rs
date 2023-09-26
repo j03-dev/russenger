@@ -3,45 +3,35 @@ use rocket::serde::Serialize;
 use super::generic::Recipient;
 
 #[derive(Serialize)]
-pub struct MediaPayload<'p> {
+struct MediaPayload<'p> {
     url: &'p str,
     is_resuable: bool,
 }
 
-impl<'p> MediaPayload<'p> {
-    pub fn new(url: &'p str) -> Self {
-        Self {
-            url,
-            is_resuable: true,
-        }
-    }
-}
-
 #[derive(Serialize)]
-pub struct MediaAttachment<'a> {
+struct MediaAttachment<'a> {
     #[serde(rename = "type")]
     r#type: &'a str,
     payload: MediaPayload<'a>,
 }
 
-impl<'a> MediaAttachment<'a> {
-    pub fn new(r#type: &'a str, url: &'a str) -> Self {
-        MediaAttachment {
-            r#type,
-            payload: MediaPayload::new(url),
-        }
-    }
-}
-
 #[derive(Serialize)]
 pub struct MediaModel<'m> {
-    recipient: Recipient,
-    message: &'m MediaAttachment<'m>,
+    recipient: Recipient<'m>,
+    message: MediaAttachment<'m>,
 }
 
 impl<'m> MediaModel<'m> {
-    pub fn new(sender: String, message: &'m MediaAttachment<'m>) -> Self {
-        let recipient = Recipient { id: sender };
-        Self { recipient, message }
+    pub fn new(sender: &'m str, media_type: &'m str, image_url: &'m str) -> Self {
+        Self {
+            recipient: Recipient { id: sender },
+            message: MediaAttachment {
+                r#type: media_type,
+                payload: MediaPayload {
+                    url: image_url,
+                    is_resuable: true,
+                },
+            },
+        }
     }
 }

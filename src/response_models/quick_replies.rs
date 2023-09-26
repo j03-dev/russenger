@@ -22,34 +22,27 @@ impl<'c> QuickReplie<'c> {
 }
 
 #[derive(Serialize)]
-pub struct QuickMessage<'m> {
+struct QuickMessage<'m> {
     pub text: &'m str,
     pub quick_replies: &'m Vec<QuickReplie<'m>>,
 }
 
-impl<'m> QuickMessage<'m> {
-    pub fn new(text: &'m str, quick_replies: &'m Vec<QuickReplie>) -> Self {
-        Self {
-            text,
-            quick_replies,
-        }
-    }
-}
-
 #[derive(Serialize)]
 pub struct QuickReplieModel<'q> {
-    pub recipient: Recipient,
+    pub recipient: Recipient<'q>,
     pub messaging_type: &'q str,
-    pub message: QuickMessage<'q>,
+    message: QuickMessage<'q>,
 }
 
 impl<'q> QuickReplieModel<'q> {
-    pub fn new(sender: String, message: QuickMessage<'q>) -> Self {
-        let recipient = Recipient { id: sender };
+    pub fn new(sender: &'q str, message: &'q str, quick_replies: &'q Vec<QuickReplie>) -> Self {
         Self {
-            recipient,
+            recipient: Recipient { id: sender },
             messaging_type: "RESPONSE",
-            message,
+            message: QuickMessage {
+                text: message,
+                quick_replies,
+            },
         }
     }
 }

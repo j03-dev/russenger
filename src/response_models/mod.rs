@@ -1,13 +1,12 @@
 use std::env;
 
-use dotenv::dotenv;
-
 use self::{
-    generic::{GenericElement, GenericMessage, GenericModel},
-    media::{MediaAttachment, MediaModel},
-    quick_replies::{QuickMessage, QuickReplie, QuickReplieModel},
+    generic::{GenericElement, GenericModel},
+    media::MediaModel,
+    quick_replies::{QuickReplie, QuickReplieModel},
     text::TextModel,
 };
+use dotenv::dotenv;
 
 pub mod generic;
 pub mod media;
@@ -22,48 +21,39 @@ pub enum Response<'l> {
 }
 
 impl<'l> Response<'l> {
-    pub async fn send(&self, sender: String) -> Result<reqwest::Response, reqwest::Error> {
+    pub async fn send(&self, sender: &'l str) -> Result<reqwest::Response, reqwest::Error> {
+        // Load environment variables from a .env file if present.
         dotenv().ok();
-        let api = env::var("API").expect("please check your .env file (api)");
-        let page_access_token =
-            env::var("PAGE_ACCESS_TOKEN").expect("please check your .env file (page access token)");
-        let facebook_api = api + &page_access_token;
 
-        match &self {
+        let api = env::var("API").expect("Please check your .env file (api)");
+        let page_access_token =
+            env::var("PAGE_ACCESS_TOKEN").expect("Please check your .env file (page access token)");
+        let facebook_api = format!("{}{}", api, page_access_token);
+
+        let client = reqwest::Client::new();
+        let response = match &self {
             Response::TextMessage(text) => {
-                let text = TextModel::new(sender, text);
-                reqwest::Client::new()
-                    .post(facebook_api)
-                    .json(&text)
-                    .send()
-                    .await
+                let text_model = TextModel::new(sender, text);
+                client.post(&facebook_api).json(&text_model).send().await
             }
-            Response::QuickReply(text, quick_replies) => {
-                let message = QuickMessage::new(text, quick_replies);
-                let quick_replie = QuickReplieModel::new(sender, message);
-                reqwest::Client::new()
-                    .post(facebook_api)
-                    .json(&quick_replie)
+            Response::QuickReply(message, quick_replies) => {
+                let quick_reply_model = QuickReplieModel::new(sender, message, quick_replies);
+                client
+                    .post(&facebook_api)
+                    .json(&quick_reply_model)
                     .send()
                     .await
             }
             Response::Generic(elements) => {
-                let generic_model = GenericModel::new(sender, GenericMessage::new(elements));
-                reqwest::Client::new()
-                    .post(facebook_api)
-                    .json(&generic_model)
-                    .send()
-                    .await
+                let generic_model = GenericModel::new(sender, elements);
+                client.post(&facebook_api).json(&generic_model).send().await
             }
             Response::Media(r#type, url) => {
-                let message = &MediaAttachment::new(r#type, url);
-                let media_model = MediaModel::new(sender, message);
-                reqwest::Client::new()
-                    .post(facebook_api)
-                    .json(&media_model)
-                    .send()
-                    .await
+                let media_model = MediaModel::new(sender, r#type, url);
+                client.post(&facebook_api).json(&media_model).send().await
             }
-        }
+        };
+
+        response
     }
 }

@@ -9,16 +9,16 @@ use std::{collections::HashMap, env};
 pub mod messages;
 
 #[derive(Debug)]
-pub enum FbRequestError {
-    VerificationFailed,
+pub enum MessengerRequestError<'m> {
+    VerificationFailed(&'m str), // Provide a reason for the verification failure.
     ArgsNotEnough,
 }
 
-pub struct FacebookRequest(pub String);
+pub struct MessengerWebhookRequest(pub String);
 
 #[rocket::async_trait]
-impl<'a> FromRequest<'a> for FacebookRequest {
-    type Error = FbRequestError;
+impl<'a> FromRequest<'a> for MessengerWebhookRequest {
+    type Error = MessengerRequestError<'a>;
 
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
         let query = request
@@ -41,10 +41,13 @@ impl<'a> FromRequest<'a> for FacebookRequest {
                 if hub_mode.eq("subscribe") && env::var("VERIFY_TOKEN").unwrap().eq(token) {
                     Outcome::Success(Self(hub_challenge.to_string()))
                 } else {
-                    Outcome::Failure((Status::Unauthorized, FbRequestError::VerificationFailed))
+                    Outcome::Failure((
+                        Status::Unauthorized,
+                        MessengerRequestError::VerificationFailed("Token mismatch"),
+                    ))
                 }
             }
-            _ => Outcome::Failure((Status::Unauthorized, FbRequestError::ArgsNotEnough)),
+            _ => Outcome::Failure((Status::Unauthorized, MessengerRequestError::ArgsNotEnough)),
         }
     }
 }

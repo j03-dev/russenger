@@ -27,51 +27,47 @@ pub struct GenericElement {
 }
 
 #[derive(Serialize)]
-pub struct Payload<'p> {
+struct Payload<'p> {
     pub template_type: String,
     pub elements: &'p Vec<GenericElement>,
 }
 
 #[derive(Serialize)]
-pub struct Attachment<'a> {
+struct Attachment<'a> {
     #[serde(rename = "type")]
     pub r#type: &'a str,
     pub payload: Payload<'a>,
 }
 
 #[derive(Serialize)]
-pub struct GenericMessage<'m> {
+struct GenericMessage<'m> {
     pub attachment: Attachment<'m>,
 }
 
-impl<'m> GenericMessage<'m> {
-    pub fn new(elements: &'m Vec<GenericElement>) -> Self {
-        Self {
-            attachment: Attachment {
-                r#type: "template",
-                payload: Payload {
-                    template_type: "generic".to_string(),
-                    elements,
-                },
-            },
-        }
-    }
-}
-
 #[derive(Serialize)]
-pub struct Recipient {
-    pub id: String,
+pub struct Recipient<'r> {
+    pub id: &'r str,
 }
 
 #[derive(Serialize)]
 pub struct GenericModel<'g> {
-    pub recipient: Recipient,
-    pub message: GenericMessage<'g>,
+    pub recipient: Recipient<'g>,
+    message: GenericMessage<'g>,
 }
 
 impl<'g> GenericModel<'g> {
-    pub fn new(sender: String, message: GenericMessage<'g>) -> Self {
-        let recipient = Recipient { id: sender };
-        Self { recipient, message }
+    pub fn new(sender: &'g str, elements: &'g Vec<GenericElement>) -> Self {
+        Self {
+            recipient: Recipient { id: sender },
+            message: GenericMessage {
+                attachment: Attachment {
+                    r#type: "template",
+                    payload: Payload {
+                        template_type: "generic".into(),
+                        elements,
+                    },
+                },
+            },
+        }
     }
 }

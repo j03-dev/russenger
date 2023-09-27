@@ -16,7 +16,7 @@ pub mod text;
 pub enum Response<'l> {
     TextMessage(&'l str),
     QuickReply(&'l str, Vec<QuickReplie<'l>>),
-    Generic(Vec<GenericElement>),
+    Generic(Vec<GenericElement<'l>>),
     Media(&'l str, &'l str),
 }
 

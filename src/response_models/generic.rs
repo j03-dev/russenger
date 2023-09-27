@@ -1,35 +1,35 @@
 use rocket::serde::Serialize;
 
 #[derive(Serialize)]
-pub struct GenericButton {
+pub struct GenericButton<'b> {
     #[serde(rename = "type")]
-    pub r#type: String,
-    pub title: String,
-    pub payload: String,
+    pub r#type: &'b str,
+    pub title: &'b str,
+    pub payload: &'b str,
 }
 
-impl GenericButton {
-    pub fn new(title: String) -> Self {
+impl<'b> GenericButton<'b> {
+    pub fn new(title: &'b str) -> Self {
         Self {
-            r#type: "postback".to_string(),
+            r#type: "postback",
             title,
-            payload: "<POSTBACK_PAYLOAD>".to_string(),
+            payload: "<POSTBACK_PAYLOAD>",
         }
     }
 }
 
 #[derive(Serialize)]
-pub struct GenericElement {
-    pub title: String,
-    pub image_url: String,
-    pub subtitle: String,
-    pub buttons: Vec<GenericButton>,
+pub struct GenericElement<'e> {
+    pub title: &'e str,
+    pub image_url: &'e str,
+    pub subtitle:  &'e str,
+    pub buttons: Vec<GenericButton<'e>>,
 }
 
 #[derive(Serialize)]
 struct Payload<'p> {
-    pub template_type: String,
-    pub elements: &'p Vec<GenericElement>,
+    pub template_type: &'p str,
+    pub elements: &'p Vec<GenericElement<'p>>,
 }
 
 #[derive(Serialize)]
@@ -63,7 +63,7 @@ impl<'g> GenericModel<'g> {
                 attachment: Attachment {
                     r#type: "template",
                     payload: Payload {
-                        template_type: "generic".into(),
+                        template_type: "generic",
                         elements,
                     },
                 },

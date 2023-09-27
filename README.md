@@ -1,14 +1,20 @@
-Certainly! Here's an improved version of your README file with corrections and enhancements for clarity and readability:
-
-```markdown
 # Potato - Facebook Messenger Webhook Handling in Rust
 
 Potato is a Rust library designed to simplify the handling of Facebook Messenger webhook responses. It offers a convenient way to construct and send various types of responses, including text messages, quick replies, generic templates, and media attachments.
 
+## Features
+
+Potato provides the following features:
+
+- **Text messages:** Send text messages to users.
+- **Quick replies:** Send quick replies with buttons to users.
+- **Generic templates:** Send generic templates with images, titles, and buttons to users.
+- **Media attachments:** Send media attachments such as images, audio, and video to users.
+- **Webhook verification:** Verify incoming webhook requests from Facebook.
+
 ## Installation
 
 To include the Potato library in your Rust project, add the following line to your `Cargo.toml` file:
-
 ```toml
 [dependencies]
 potato = "0.1.7"
@@ -31,6 +37,7 @@ use potato::{
 ### Creating and Sending Responses
 
 You can create different types of responses using the `Response` enum and send them using the `send` method. Here's an example:
+Replace `<sender_id>` with the actual sender ID to which you want to send the responses.
 
 ```rust
 #[tokio::main]
@@ -71,8 +78,43 @@ async fn main() {
 }
 ```
 
-Replace `<sender_id>` with the actual sender ID to which you want to send the responses.
+### Example Application
+```rust
+#[macro_use]
+extern crate rocket;
 
+use potato::{
+    Response,
+    generic::{GenericElement, GenericModel, GenericButton},
+    media::MediaModel,
+    quick_replies::{QuickMessage, QuickReplie, QuickReplieModel},
+    text::TextModel,
+};
+use potato::hooks::messages::FacebookMessage;
+use potato::hooks::MessengerWebhookRequest;
+
+#[get("/webhook")]
+pub fn webhook_verify(request: MessengerWebhookRequest) -> String {
+    request.0
+}
+
+#[post("/webhook", format = "json", data = "<facebook_message>")]
+pub async fn webhook_core(facebook_message: Json<FacebookMessage>) -> &'static str {
+    let message = &facebook_message.get_message();
+    let user_id = &facebook_message.get_sender();
+    Response::TextMessage("Hello, world!").send(user_id).await;
+    "ok"
+}
+
+#[rocket::main]
+async fn main() -> Result<(), Box<dyn Error>> {
+    rocket::build()
+        .mount("/", routes![webhook_verify, webhook_core])
+        .launch()
+        .await?;
+    Ok(())
+}
+```
 ## Configuration
 
 Potato relies on specific environment variables defined in a `.env` file. Ensure that you set the following variables before running your application:

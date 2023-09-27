@@ -13,7 +13,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 #[rocket::async_trait]
-trait Action: Send + Sync {
+pub trait Action: Send + Sync {
     async fn execute(&self, user_id: &str, message: &str, user_conn: &User);
 }
 

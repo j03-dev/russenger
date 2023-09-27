@@ -1,2 +1,2 @@
-pub mod core;
+pub mod app;
 pub mod app_state;

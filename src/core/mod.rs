@@ -20,7 +20,7 @@ pub trait Action: Send + Sync {
 type ActionRegisterType = Arc<Mutex<HashMap<String, Box<dyn Action>>>>;
 
 lazy_static::lazy_static! {
-    static ref ACTION_REGISTRY: ActionRegisterType = Arc::new(Mutex::new(HashMap::new()));
+    pub static ref ACTION_REGISTRY: ActionRegisterType = Arc::new(Mutex::new(HashMap::new()));
 }
 
 #[get("/webhook")]

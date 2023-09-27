@@ -7,7 +7,7 @@ use crate::models::User;
 
 use rocket::serde::json::Json;
 use rocket::tokio::sync::Mutex;
-use rocket::State;
+use rocket::{catch, State};
 use rocket::{get, post};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -17,10 +17,30 @@ pub trait Action: Send + Sync {
     async fn execute(&self, user_id: &str, message: &str, user_conn: &User);
 }
 
-type ActionRegisterType = Arc<Mutex<HashMap<String, Box<dyn Action>>>>;
+type ActionRegisterType = Arc<Mutex<HashMap<&'static str, Box<dyn Action>>>>;
 
 lazy_static::lazy_static! {
     pub static ref ACTION_REGISTRY: ActionRegisterType = Arc::new(Mutex::new(HashMap::new()));
+}
+
+#[macro_export]
+macro_rules! register_action {
+    ($path:expr, $action:expr) => {
+        ACTION_REGISTRY
+            .lock()
+            .await
+            .insert($path, Box::new($action));
+    };
+}
+
+#[catch(404)]
+pub fn general_not_found() -> &'static str {
+    "Page not found: 404"
+}
+
+#[catch(500)]
+pub fn server_panic() -> &'static str {
+    "Server panic: 500"
 }
 
 #[get("/webhook")]
@@ -44,10 +64,11 @@ pub async fn webhook_core(
         .await
         .expect("failed to get action");
 
-    if let Some(action_fn) = ACTION_REGISTRY.lock().await.get(action.as_str()) {
-        action_fn.execute(user_id, message, user_conn).await;
-    } else {
-        user_conn.reset_action(user_id).await;
+    if action.ne("lock") {
+        if let Some(action_fn) = ACTION_REGISTRY.lock().await.get(action.as_str()) {
+            user_conn.set_action(user_id, "lock").await;
+            action_fn.execute(user_id, message, user_conn).await;
+        }
     }
 
     "Ok"

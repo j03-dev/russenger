@@ -17,7 +17,7 @@ Potato provides the following features:
 To include the Potato library in your Rust project, add the following line to your `Cargo.toml` file:
 ```toml
 [dependencies]
-potato = "0.1.7"
+potato = "0.2.0-rc.3"
 ```
 
 ## Usage
@@ -124,5 +124,3 @@ Please make sure you have a valid `.env` file with these variables configured pr
 
 This project is licensed under the [MIT License](LICENSE).
 ```
-
-In this updated README, I've made corrections, improved code formatting, added headings for sections, and provided clearer explanations to make it more helpful for users.

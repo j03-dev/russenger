@@ -3,44 +3,44 @@ use rocket::serde::Serialize;
 use super::{generic::Recipient, SendResponse};
 
 #[derive(Serialize)]
-pub struct QuickReplie<'c> {
-    pub content_type: &'c str,
-    pub title: &'c str,
-    pub payload: &'c str,
-    pub image_url: &'c str,
+pub struct QuickReplie {
+    pub content_type: String,
+    pub title: String,
+    pub payload: String,
+    pub image_url: String,
 }
 
-impl<'c> QuickReplie<'c> {
-    pub fn new(title: &'c str, image_url: &'c str) -> Self {
+impl QuickReplie {
+    pub fn new(title: &str, image_url: &str) -> Self {
         Self {
-            content_type: "text",
-            title,
-            payload: "<POSTBACK_PAYLOAD>",
-            image_url,
+            content_type: "text".into(),
+            title: title.into(),
+            payload: "<POSTBACK_PAYLOAD>".into(),
+            image_url: image_url.into(),
         }
     }
 }
 
 #[derive(Serialize)]
-struct QuickMessage<'m> {
-    pub text: &'m str,
-    pub quick_replies: &'m Vec<QuickReplie<'m>>,
+struct QuickMessage {
+    pub text: String,
+    pub quick_replies: Vec<QuickReplie>,
 }
 
 #[derive(Serialize)]
 pub struct QuickReplieModel<'q> {
     pub recipient: Recipient<'q>,
-    pub messaging_type: &'q str,
-    message: QuickMessage<'q>,
+    pub messaging_type: String,
+    message: QuickMessage,
 }
 
 impl<'q> QuickReplieModel<'q> {
-    pub fn new(sender: &'q str, message: &'q str, quick_replies: &'q Vec<QuickReplie>) -> Self {
+    pub fn new(sender: &'q str, message: &str, quick_replies:  Vec<QuickReplie>) -> Self {
         Self {
             recipient: Recipient { id: sender },
-            messaging_type: "RESPONSE",
+            messaging_type: "RESPONSE".into(),
             message: QuickMessage {
-                text: message,
+                text: message.into(),
                 quick_replies,
             },
         }

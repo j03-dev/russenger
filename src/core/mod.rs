@@ -73,3 +73,45 @@ pub async fn webhook_core(
 
     "Ok"
 }
+
+#[macro_export]
+macro_rules! potato_app {
+    ($($path:expr => $action:expr),* $(,)?) => {{
+        // Include necessary imports
+        use potato::core::app_state::AppState;
+        use potato::core::{
+            general_not_found, server_panic, webhook_core, webhook_verify, ACTION_REGISTRY,
+        };
+        use potato::register_action;
+
+        use std::str::FromStr;
+        use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins};
+
+        $(register_action!($path, $action);)*
+
+        let allowed_origins = AllowedOrigins::all();
+        let allowed_methods: AllowedMethods = ["Get", "Post"]
+            .iter()
+            .map(|s| FromStr::from_str(s).unwrap())
+            .collect();
+
+        let cors = rocket_cors::CorsOptions {
+            allowed_origins,
+            allowed_methods,
+            allowed_headers: AllowedHeaders::all(),
+            allow_credentials: true,
+            ..Default::default()
+        }
+        .to_cors()?;
+
+        rocket::build()
+            .attach(cors)
+            .manage(AppState::init().await)
+            .mount("/", routes![webhook_verify, webhook_core])
+            .register("/", catchers![general_not_found, server_panic])
+            .launch()
+            .await?;
+
+        Ok(())
+    }};
+}

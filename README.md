@@ -49,7 +49,7 @@ use russenger::models::User;
 use russenger::response_models::SendResponse;
 use russenger::response_models::text::TextModel;
 
-pub struct HelloBot {}
+struct HelloBot {}
 
 #[rocket::async_trait]
 impl Action for HelloBot {
@@ -58,7 +58,30 @@ impl Action for HelloBot {
             .send()
             .await
             .unwrap();
-        user_conn.set_action(user, "/search").await;
+
+        TextModel::new(user, "Enter your name: ")
+            .send()
+            .await
+            .unwrap();
+
+        user_conn.set_action(user, "/next_action").await;
+    }
+}
+
+
+struct NextAction {}
+
+#[rocket::async_trait]
+impl Action for NextAction {
+    async fn execute(&self, user: &str, message: &str, user_conn: &User) {
+        let response = format!("Hello {message}");
+
+        TextModel::new(user, &response)
+            .send()
+            .await
+            .unwrap();
+
+        user_conn.set_action(user, "/").await;
     }
 }
 
@@ -66,7 +89,7 @@ impl Action for HelloBot {
 async fn main() -> Result<(), Box<dyn Error>> {
     russenger_app!(
         "/" => HelloBot {},
-        // add more acton here
+        "/next_action" => NextAction {}
     )
 }
 ```

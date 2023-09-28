@@ -1,6 +1,6 @@
 use rocket::serde::Serialize;
 
-use super::generic::Recipient;
+use super::{generic::Recipient, SendResponse};
 
 #[derive(Serialize)]
 pub struct QuickReplie<'c> {
@@ -46,3 +46,6 @@ impl<'q> QuickReplieModel<'q> {
         }
     }
 }
+
+#[rocket::async_trait]
+impl<'q> SendResponse for QuickReplieModel<'q> {}

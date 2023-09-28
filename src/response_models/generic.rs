@@ -1,5 +1,7 @@
 use rocket::serde::Serialize;
 
+use super::SendResponse;
+
 #[derive(Serialize)]
 pub struct GenericButton<'b> {
     #[serde(rename = "type")]
@@ -22,7 +24,7 @@ impl<'b> GenericButton<'b> {
 pub struct GenericElement<'e> {
     pub title: &'e str,
     pub image_url: &'e str,
-    pub subtitle:  &'e str,
+    pub subtitle: &'e str,
     pub buttons: Vec<GenericButton<'e>>,
 }
 
@@ -71,3 +73,7 @@ impl<'g> GenericModel<'g> {
         }
     }
 }
+
+
+#[rocket::async_trait]
+impl<'g> SendResponse for GenericModel<'g> {}

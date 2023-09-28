@@ -11,7 +11,7 @@ pub struct GenericButton<'b> {
 }
 
 impl<'b> GenericButton<'b> {
-    pub fn new(title: &'b str) -> Self {
+    pub fn new(title: &'static str) -> Self {
         Self {
             r#type: "postback",
             title,

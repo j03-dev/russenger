@@ -69,6 +69,8 @@ pub async fn webhook_core(
             user_conn.set_action(user_id, "lock").await;
             action_fn.execute(user_id, message, user_conn).await;
         }
+    }else {
+        user_conn.reset_action(user_id).await;
     }
 
     "Ok"

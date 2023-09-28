@@ -93,3 +93,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     )
 }
 ```
+
+### End-point
+- GET `/webhook`
+- POST `/webhook`

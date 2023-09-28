@@ -83,36 +83,32 @@ async fn main() {
 #[macro_use]
 extern crate rocket;
 
-use potato::{
-    Response,
-    generic::{GenericElement, GenericModel, GenericButton},
-    media::MediaModel,
-    quick_replies::{QuickMessage, QuickReplie, QuickReplieModel},
-    text::TextModel,
-};
-use potato::hooks::messages::FacebookMessage;
-use potato::hooks::MessengerWebhookRequest;
+use std::error::Error;
 
-#[get("/webhook")]
-pub fn webhook_verify(request: MessengerWebhookRequest) -> String {
-    request.0
-}
+use potato::potato_app;
+use potato::core::Action;
+use potato::models::User;
+use potato::response_models::Response;
 
-#[post("/webhook", format = "json", data = "<facebook_message>")]
-pub async fn webhook_core(facebook_message: Json<FacebookMessage>) -> &'static str {
-    let message = &facebook_message.get_message();
-    let user_id = &facebook_message.get_sender();
-    Response::TextMessage("Hello, world!").send(user_id).await;
-    "ok"
+pub struct HelloBot {}
+
+#[rocket::async_trait]
+impl Action for HelloBot {
+    async fn execute(&self, user: &str, _message: &str, user_conn: &User) {
+        Response::TextMessage("Hello, From Potato")
+            .send(user)
+            .await
+            .unwrap();
+        user_conn.set_action(user, "/search").await;
+    }
 }
 
 #[rocket::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    rocket::build()
-        .mount("/", routes![webhook_verify, webhook_core])
-        .launch()
-        .await?;
-    Ok(())
+    potato_app!(
+        "/" => HelloBot {},
+        // add more acton here
+    )
 }
 ```
 ## Configuration

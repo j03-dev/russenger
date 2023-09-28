@@ -17,10 +17,10 @@ pub trait Action: Send + Sync {
     async fn execute(&self, user_id: &str, message: &str, user_conn: &User);
 }
 
-type ActionRegisterType = Arc<Mutex<HashMap<&'static str, Box<dyn Action>>>>;
+type ActionRegistryType = Arc<Mutex<HashMap<&'static str, Box<dyn Action>>>>;
 
 lazy_static::lazy_static! {
-    pub static ref ACTION_REGISTRY: ActionRegisterType = Arc::new(Mutex::new(HashMap::new()));
+    pub static ref ACTION_REGISTRY: ActionRegistryType = Arc::new(Mutex::new(HashMap::new()));
 }
 
 #[macro_export]
@@ -69,7 +69,7 @@ pub async fn webhook_core(
             user_conn.set_action(user_id, "lock").await;
             action_fn.execute(user_id, message, user_conn).await;
         }
-    }else {
+    } else {
         user_conn.reset_action(user_id).await;
     }
 

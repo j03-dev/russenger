@@ -10,7 +10,7 @@ pub struct QuickReplie<'r> {
     pub image_url: String,
 }
 
-impl QuickReplie<'r> {
+impl<'r> QuickReplie<'r> {
     pub fn new(title: &str, image_url: &str) -> Self {
         Self {
             content_type: "text",

@@ -11,31 +11,31 @@ pub struct QuickReplie {
 }
 
 impl QuickReplie {
-    pub fn new(title: &str, image_url: &str) -> Self {
+    pub fn new(title: String, image_url: String) -> Self {
         Self {
             content_type: "text".into(),
-            title: title.into(),
+            title,
             payload: "<POSTBACK_PAYLOAD>".into(),
-            image_url: image_url.into(),
+            image_url,
         }
     }
 }
 
 #[derive(Serialize)]
-struct QuickMessage {
+struct QuickMessage<'m> {
     pub text: String,
-    pub quick_replies: Vec<QuickReplie>,
+    pub quick_replies: &'m Vec<QuickReplie>,
 }
 
 #[derive(Serialize)]
 pub struct QuickReplieModel<'q> {
-    pub recipient: Recipient<'q>,
-    pub messaging_type: String,
-    message: QuickMessage,
+    recipient: Recipient<'q>,
+    messaging_type: String,
+    message: QuickMessage<'q>,
 }
 
 impl<'q> QuickReplieModel<'q> {
-    pub fn new(sender: &'q str, message: &str, quick_replies:  Vec<QuickReplie>) -> Self {
+    pub fn new(sender: &'q str, message: &str, quick_replies: &'q Vec<QuickReplie>) -> Self {
         Self {
             recipient: Recipient { id: sender },
             messaging_type: "RESPONSE".into(),

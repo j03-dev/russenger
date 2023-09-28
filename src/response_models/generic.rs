@@ -6,15 +6,15 @@ use super::SendResponse;
 pub struct GenericButton<'b> {
     #[serde(rename = "type")]
     pub r#type: &'b str,
-    pub title: &'b str,
+    pub title: String,
     pub payload: &'b str,
 }
 
 impl<'b> GenericButton<'b> {
-    pub fn new(title: &'static str) -> Self {
+    pub fn new(title: &str) -> Self {
         Self {
             r#type: "postback",
-            title,
+            title: title.into(),
             payload: "<POSTBACK_PAYLOAD>",
         }
     }

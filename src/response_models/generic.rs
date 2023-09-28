@@ -53,7 +53,7 @@ pub struct Recipient<'r> {
 
 #[derive(Serialize)]
 pub struct GenericModel<'g> {
-    pub recipient: Recipient<'g>,
+    recipient: Recipient<'g>,
     message: GenericMessage<'g>,
 }
 
@@ -73,7 +73,6 @@ impl<'g> GenericModel<'g> {
         }
     }
 }
-
 
 #[rocket::async_trait]
 impl<'g> SendResponse for GenericModel<'g> {}

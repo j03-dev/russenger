@@ -7,8 +7,7 @@ use crate::models::User;
 
 use rocket::serde::json::Json;
 use rocket::tokio::sync::Mutex;
-use rocket::{catch, State};
-use rocket::{get, post};
+use rocket::{catch, get, post, State};
 use std::collections::HashMap;
 use std::sync::Arc;
 

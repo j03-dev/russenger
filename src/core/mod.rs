@@ -77,17 +77,16 @@ pub async fn webhook_core(
 }
 
 #[macro_export]
-macro_rules! potato_app {
+macro_rules! russenger_app {
     ($($path:expr => $action:expr),* $(,)?) => {{
-        // Include necessary imports
-        use potato::core::app_state::AppState;
-        use potato::core::{
-            general_not_found, server_panic, webhook_core, webhook_verify, ACTION_REGISTRY,
-        };
-        use potato::register_action;
-
         use std::str::FromStr;
         use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins};
+
+        use russenger::core::app_state::AppState;
+        use russenger::core::{
+            general_not_found, server_panic, webhook_core, webhook_verify, ACTION_REGISTRY,
+        };
+        use russenger::register_action;
 
         $(register_action!($path, $action);)*
 

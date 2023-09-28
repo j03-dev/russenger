@@ -29,7 +29,7 @@ impl User {
 
     pub async fn migrate(&self) -> bool {
         let create_table_user = "
-                    create table botouser ( 
+                    create table russenger_user ( 
                         facebook_user_id varchar(40) primary key unique,
                         action varchar(20)
                     );";
@@ -38,7 +38,7 @@ impl User {
                         choice_name varchar(20),
                         content varchar(255),
                         facebook_user_id varchar(40),
-                        foreign key(facebook_user_id) references botouser(facebook_user_id)
+                        foreign key(facebook_user_id) references russenger_user(facebook_user_id)
                     );";
         if sqlx::query(create_table_user)
             .execute(&self.connection)
@@ -58,7 +58,7 @@ impl User {
     }
 
     pub async fn create(&self, facebook_user_id: &str) -> bool {
-        let sql = "insert into botouser (facebook_user_id, action) values ($1, $2)";
+        let sql = "insert into russenger_user (facebook_user_id, action) values ($1, $2)";
         sqlx::query(sql)
             .bind(facebook_user_id)
             .bind("/")
@@ -68,7 +68,7 @@ impl User {
     }
 
     pub async fn set_action(&self, facebook_user_id: &str, action: &str) -> bool {
-        let sql = "update botouser set action=$1 where facebook_user_id=$2";
+        let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
         sqlx::query(sql)
             .bind(action)
             .bind(facebook_user_id)
@@ -78,7 +78,7 @@ impl User {
     }
 
     pub async fn get_action(&self, facebook_user_id: &str) -> Option<String> {
-        let sql = "select action from botouser where facebook_user_id=$1";
+        let sql = "select action from russenger_user where facebook_user_id=$1";
         match sqlx::query(sql)
             .bind(facebook_user_id)
             .fetch_one(&self.connection)
@@ -90,7 +90,7 @@ impl User {
     }
 
     pub async fn reset_action(&self, facebook_user_id: &str) -> bool {
-        let sql = "update botouser set action=$1 where facebook_user_id=$2";
+        let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
         sqlx::query(sql)
             .bind("/")
             .bind(facebook_user_id)

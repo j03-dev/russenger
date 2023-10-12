@@ -7,15 +7,15 @@ pub struct GenericButton<'b> {
     #[serde(rename = "type")]
     pub r#type: &'b str,
     pub title: String,
-    pub payload: &'b str,
+    pub payload: String,
 }
 
 impl<'b> GenericButton<'b> {
-    pub fn new(title: &str) -> Self {
+    pub fn new(title: &str, payload: &str) -> Self {
         Self {
             r#type: "postback",
             title: title.into(),
-            payload: "<POSTBACK_PAYLOAD>",
+            payload: payload.into(),
         }
     }
 }

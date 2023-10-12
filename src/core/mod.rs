@@ -2,7 +2,7 @@ pub mod action;
 pub mod app_state;
 
 use crate::core::app_state::AppState;
-use crate::hooks::messages::FacebookMessage;
+use crate::hooks::messages::MsgFromFb;
 use crate::hooks::MessengerWebhookRequest;
 use action::ACTION_REGISTRY;
 
@@ -24,17 +24,10 @@ pub async fn webhook_verify(request: MessengerWebhookRequest) -> String {
     request.0
 }
 
-#[post("/webhook", format = "json", data = "<facebook_message>")]
-pub async fn webhook_core(
-    facebook_message: Json<FacebookMessage>,
-    state: &State<AppState>,
-) -> &'static str {
-    let message = &facebook_message.get_message();
-    let user_id = &facebook_message.get_sender();
-
+#[post("/webhook", format = "json", data = "<data>")]
+pub async fn webhook_core(data: Json<MsgFromFb>, state: &State<AppState>) -> &'static str {
+    let user_id = &data.get_sender();
     let user_conn = &state.user_conn;
-    user_conn.create(user_id).await;
-
     let action = user_conn
         .get_action(user_id)
         .await
@@ -42,8 +35,17 @@ pub async fn webhook_core(
 
     if action.ne("lock") {
         if let Some(action_fn) = ACTION_REGISTRY.lock().await.get(action.as_str()) {
-            user_conn.set_action(user_id, "lock").await;
-            action_fn.execute(user_id, message, user_conn).await;
+            if let Some(message) = data.get_message() {
+                user_conn.create(user_id).await;
+                let text = &message.text.clone();
+
+                user_conn.set_action(user_id, "lock").await;
+                action_fn.execute(user_id, text, user_conn).await;
+            } else if let Some(postback) = data.get_postback() {
+                let payload = postback.payload.clone();
+
+                action_fn.execute(user_id, &payload, user_conn).await;
+            }
         }
     } else {
         user_conn.reset_action(user_id).await;

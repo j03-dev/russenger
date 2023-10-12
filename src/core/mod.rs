@@ -1,39 +1,16 @@
+pub mod action;
 pub mod app_state;
 
 use crate::core::app_state::AppState;
 use crate::hooks::messages::FacebookMessage;
 use crate::hooks::MessengerWebhookRequest;
-use crate::models::User;
+use action::ACTION_REGISTRY;
 
 use rocket::serde::json::Json;
-use rocket::tokio::sync::Mutex;
 use rocket::{catch, get, post, State};
-use std::collections::HashMap;
-use std::sync::Arc;
-
-#[rocket::async_trait]
-pub trait Action: Send + Sync {
-    async fn execute(&self, user_id: &str, message: &str, user_conn: &User);
-}
-
-type ActionRegistryType = Arc<Mutex<HashMap<&'static str, Box<dyn Action>>>>;
-
-lazy_static::lazy_static! {
-    pub static ref ACTION_REGISTRY: ActionRegistryType = Arc::new(Mutex::new(HashMap::new()));
-}
-
-#[macro_export]
-macro_rules! register_action {
-    ($path:expr, $action:expr) => {
-        ACTION_REGISTRY
-            .lock()
-            .await
-            .insert($path, Box::new($action));
-    };
-}
 
 #[catch(404)]
-pub fn general_not_found() -> &'static str {
+pub fn page_not_found() -> &'static str {
     "Page not found: 404"
 }
 
@@ -73,45 +50,4 @@ pub async fn webhook_core(
     }
 
     "Ok"
-}
-
-#[macro_export]
-macro_rules! russenger_app {
-    ($($path:expr => $action:expr),* $(,)?) => {{
-        use std::str::FromStr;
-        use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins};
-
-        use russenger::core::app_state::AppState;
-        use russenger::core::{
-            general_not_found, server_panic, webhook_core, webhook_verify, ACTION_REGISTRY,
-        };
-        use russenger::register_action;
-
-        $(register_action!($path, $action);)*
-
-        let allowed_origins = AllowedOrigins::all();
-        let allowed_methods: AllowedMethods = ["Get", "Post"]
-            .iter()
-            .map(|s| FromStr::from_str(s).unwrap())
-            .collect();
-
-        let cors = rocket_cors::CorsOptions {
-            allowed_origins,
-            allowed_methods,
-            allowed_headers: AllowedHeaders::all(),
-            allow_credentials: true,
-            ..Default::default()
-        }
-        .to_cors()?;
-
-        rocket::build()
-            .attach(cors)
-            .manage(AppState::init().await)
-            .mount("/", routes![webhook_verify, webhook_core])
-            .register("/", catchers![general_not_found, server_panic])
-            .launch()
-            .await?;
-
-        Ok(())
-    }};
 }

@@ -38,13 +38,8 @@ DATABASE=postgres://<user>:<password>@<host>/<db_name>
 
 ### Example Application
 ```rust
-#[macro_use]
-extern crate rocket;
-
-use std::error::Error;
-
 use russenger::russenger_app;
-use russenger::core::Action;
+use russenger::core::action::Action;
 use russenger::models::User;
 use russenger::response_models::SendResponse;
 use russenger::response_models::text::TextModel;
@@ -85,13 +80,10 @@ impl Action for NextAction {
     }
 }
 
-#[rocket::main]
-async fn main() -> Result<(), Box<dyn Error>> {
-    russenger_app!(
-        "/" => HelloBot {},
-        "/next_action" => NextAction {}
-    )
-}
+russenger_app!(
+    "/" => HelloBot {},
+    "/next_action" => NextAction {}
+);
 ```
 
 ### End-point

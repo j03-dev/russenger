@@ -15,7 +15,7 @@ macro_rules! register_action {
 
 #[macro_export]
 macro_rules! russenger_app {
-    ($($path:expr => $action:expr),* $(,)?) => {{
+    ($($path:expr => $action:expr),* $(,)?) => {
         #[macro_use]
         extern crate rocket;
 
@@ -65,5 +65,5 @@ macro_rules! russenger_app {
 
             Ok(())
         }
-    }};
+    };
 }

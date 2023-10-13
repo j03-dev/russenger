@@ -58,7 +58,7 @@ pub async fn webhook_core(data: Json<MsgFromFb>, state: &State<AppState>) -> &'s
                     .get(payload.get_action().as_str())
                 {
                     action_fn
-                        .execute(user_id, payload.get_value(), user_conn)
+                        .execute(user_id, &payload.get_value(), user_conn)
                         .await;
                 }
             }

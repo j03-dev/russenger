@@ -41,7 +41,7 @@ pub async fn webhook_core(data: Json<MsgFromFb>, state: &State<AppState>) -> &'s
             if let Some(action_fn) = ACTION_REGISTRY.lock().await.get(action.as_str()) {
                 user_conn.set_action(user_id, "lock").await;
                 action_fn
-                    .execute(user_id, message.get_text(), user_conn)
+                    .execute(user_id, &message.get_text(), user_conn)
                     .await;
             }
         } else {

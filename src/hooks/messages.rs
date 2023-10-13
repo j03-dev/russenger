@@ -17,7 +17,7 @@ pub struct Message {
 
 impl Message {
     pub fn get_text(&self) -> String {
-        self.text.unwrap_or("".into())
+        self.text.clone().unwrap_or("".into())
     }
 }
 

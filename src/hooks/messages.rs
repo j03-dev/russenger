@@ -12,12 +12,12 @@ pub struct Recipient {
 
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct Message {
-    text: String,
+    text: Option<String>,
 }
 
 impl Message {
-    pub fn get_text(&self) -> &String {
-        &self.text
+    pub fn get_text(&self) -> String {
+        self.text.unwrap_or("".into())
     }
 }
 

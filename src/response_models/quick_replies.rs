@@ -4,10 +4,10 @@ use super::{generic::Recipient, SendResponse};
 
 #[derive(Serialize)]
 pub struct QuickReplie<'r> {
-    pub content_type: &'r str,
-    pub title: String,
-    pub payload: &'r str,
-    pub image_url: String,
+    content_type: &'r str,
+    title: String,
+    payload: &'r str,
+    image_url: String,
 }
 
 impl<'r> QuickReplie<'r> {
@@ -23,19 +23,19 @@ impl<'r> QuickReplie<'r> {
 
 #[derive(Serialize)]
 struct QuickMessage<'m> {
-    pub text: String,
-    pub quick_replies: &'m Vec<QuickReplie<'m>>,
+    text: String,
+    quick_replies: &'m Vec<QuickReplie<'m>>,
 }
 
 #[derive(Serialize)]
 pub struct QuickReplieModel<'q> {
-    pub recipient: Recipient<'q>,
-    pub messaging_type: String,
+    recipient: Recipient<'q>,
+    messaging_type: String,
     message: QuickMessage<'q>,
 }
 
 impl<'q> QuickReplieModel<'q> {
-    pub fn new(sender: &'q str, message: &str, quick_replies:  &'q Vec<QuickReplie>) -> Self {
+    pub fn new(sender: &'q str, message: &str, quick_replies: &'q Vec<QuickReplie>) -> Self {
         Self {
             recipient: Recipient { id: sender },
             messaging_type: "RESPONSE".into(),

@@ -2,7 +2,7 @@ use rocket::serde::Deserialize;
 
 #[derive(Debug, Default, Deserialize)]
 pub struct Sender {
-    pub id: String,
+    id: String,
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -12,43 +12,58 @@ pub struct Recipient {
 
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct Message {
-    pub text: String
+    text: String,
+}
+
+impl Message {
+    pub fn get_text(&self) -> &String {
+        &self.text
+    }
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct Postback {
-    pub title: String,
-    pub payload: String,
+    title: String,
+    payload: String,
+}
+
+impl Postback {
+    pub fn get_title(&self) -> &String {
+        &self.title
+    }
+
+    pub fn get_payload(&self) -> &String {
+        &self.payload
+    }
 }
 
 #[derive(Debug, Default, Deserialize)]
 pub struct Messaging {
-    pub sender: Sender,
-    pub postback: Option<Postback>,
-    pub message: Option<Message>
+    sender: Sender,
+    postback: Option<Postback>,
+    message: Option<Message>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Entry {
-    pub messaging: Vec<Messaging>,
+    messaging: Vec<Messaging>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct MsgFromFb {
-    pub entry: Vec<Entry>,
+    entry: Vec<Entry>,
 }
 
 impl MsgFromFb {
-    pub fn get_sender(&self) -> String {
-        self.entry[0].messaging[0].sender.id.clone()
+    pub fn get_sender(&self) -> &String {
+        &self.entry[0].messaging[0].sender.id
     }
 
     pub fn get_message(&self) -> Option<Message> {
-       self.entry[0].messaging[0].message.clone()
+        self.entry[0].messaging[0].message.clone()
     }
 
     pub fn get_postback(&self) -> Option<Postback> {
-       self.entry[0].messaging[0].postback.clone()
+        self.entry[0].messaging[0].postback.clone()
     }
 }
-

@@ -1,7 +1,6 @@
 use std::env::var;
 
 use dotenv::dotenv;
-use rocket::tokio;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres, Row};
 
@@ -140,15 +139,4 @@ impl User {
             Err(_) => None,
         }
     }
-}
-
-#[tokio::test]
-async fn test() {
-    use self::User;
-    let user = User::new().await;
-    // println!("test_migration {}", user.migrate().await);
-    println!(
-        "get_action {:?}",
-        user.get_action("5557815397586928").await.unwrap()
-    );
 }

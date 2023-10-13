@@ -2,6 +2,7 @@ use dotenv::dotenv;
 use rocket::serde::Serialize;
 use std::env;
 
+pub mod payload;
 pub mod generic;
 pub mod media;
 pub mod quick_replies;

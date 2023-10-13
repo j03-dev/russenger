@@ -4,13 +4,13 @@ use super::{generic::Recipient, SendResponse};
 
 #[derive(Serialize)]
 pub struct Text<'t> {
-    pub text: &'t str,
+    text: &'t str,
 }
 
 #[derive(Serialize)]
 pub struct TextModel<'s> {
-    pub recipient: Recipient<'s>,
-    pub message: Text<'s>,
+    recipient: Recipient<'s>,
+    message: Text<'s>,
 }
 
 impl<'s> TextModel<'s> {

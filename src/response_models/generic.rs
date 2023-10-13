@@ -1,21 +1,24 @@
 use rocket::serde::Serialize;
 
-use super::SendResponse;
+use super::{
+    payload::Payload,
+    SendResponse,
+};
 
 #[derive(Serialize)]
 pub struct GenericButton<'b> {
     #[serde(rename = "type")]
-    pub r#type: &'b str,
-    pub title: String,
-    pub payload: String,
+    r#type: &'b str,
+    title: String,
+    payload: String,
 }
 
 impl<'b> GenericButton<'b> {
-    pub fn new(title: &str, payload: &str) -> Self {
+    pub fn new(title: &str, payload: Payload) -> Self {
         Self {
             r#type: "postback",
             title: title.into(),
-            payload: payload.into(),
+            payload: payload.to_uri_string(),
         }
     }
 }
@@ -29,7 +32,7 @@ pub struct GenericElement<'e> {
 }
 
 #[derive(Serialize)]
-struct Payload<'p> {
+struct GenericPayload<'p> {
     pub template_type: &'p str,
     pub elements: &'p Vec<GenericElement<'p>>,
 }
@@ -38,7 +41,7 @@ struct Payload<'p> {
 struct Attachment<'a> {
     #[serde(rename = "type")]
     pub r#type: &'a str,
-    pub payload: Payload<'a>,
+    pub payload: GenericPayload<'a>,
 }
 
 #[derive(Serialize)]
@@ -64,7 +67,7 @@ impl<'g> GenericModel<'g> {
             message: GenericMessage {
                 attachment: Attachment {
                     r#type: "template",
-                    payload: Payload {
+                    payload: GenericPayload {
                         template_type: "generic",
                         elements,
                     },

@@ -1,6 +1,3 @@
-Absolutely, I'll complete the README with an example for quick replies, provide information on the endpoints and licenses, and ensure that it's comprehensive and user-friendly for other developers. I'll also include the README in a format suitable for GitHub. Here's the revised README:
-
-```markdown
 # Russenger - Facebook Messenger Webhook Handling in Rust
 
 ![Russenger Logo](./image.png)
@@ -126,8 +123,9 @@ russenger_app!(
 
 ### Endpoints
 
-- **GET `/webhook`**
-- **POST `/webhook`**
+- **GET `/webhook`:** Verify your chatbot with Facebook Messenger. Facebook will send a challenge, and your bot must respond correctly for verification.
+
+- **POST `/webhook`:** This is where Facebook Messenger sends messages from users. Handle incoming messages and respond accordingly here.
 
 ### License
 

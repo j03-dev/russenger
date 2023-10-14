@@ -1,9 +1,5 @@
+use super::{payload::Payload, Recipient, SendResponse};
 use rocket::serde::Serialize;
-
-use super::{
-    payload::Payload,
-    SendResponse,
-};
 
 #[derive(Serialize)]
 pub struct GenericButton<'b> {
@@ -47,11 +43,6 @@ struct Attachment<'a> {
 #[derive(Serialize)]
 struct GenericMessage<'m> {
     pub attachment: Attachment<'m>,
-}
-
-#[derive(Serialize)]
-pub struct Recipient<'r> {
-    pub id: &'r str,
 }
 
 #[derive(Serialize)]

@@ -1,6 +1,6 @@
 use rocket::serde::Serialize;
 
-use super::{generic::Recipient, SendResponse};
+use super::{Recipient, SendResponse};
 
 #[derive(Serialize)]
 pub struct Text<'t> {

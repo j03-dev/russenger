@@ -2,11 +2,16 @@ use dotenv::dotenv;
 use rocket::serde::Serialize;
 use std::env;
 
-pub mod payload;
 pub mod generic;
 pub mod media;
+pub mod payload;
 pub mod quick_replies;
 pub mod text;
+
+#[derive(Serialize)]
+pub struct Recipient<'r> {
+    pub id: &'r str,
+}
 
 #[rocket::async_trait]
 pub trait SendResponse: Serialize {

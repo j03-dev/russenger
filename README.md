@@ -44,9 +44,11 @@ The following example demonstrates the usage of Russenger for creating a chatbot
 use russenger::russenger_app;
 use russenger::core::action::Action;
 use russenger::models::User;
+use russenger::response_models::SendResponse;
 use russenger::response_models::text::TextModel;
+use russenger::response_models::payload::Payload;
 use russenger::response_models::quick_replies::{QuickReplie, QuickReplieModel};
-use russenger::response_models::generic::{GenericModel, GenericElement, GenericButton, Payload};
+use russenger::response_models::generic::{GenericModel, GenericElement, GenericButton};
 
 struct Hello {}
 struct Option1 {}

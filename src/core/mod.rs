@@ -36,7 +36,6 @@ async fn execute_payload(user_id: &str, uri_payload: &str, user_conn: &User) {
                 .await
                 .get(payload.get_action().as_str())
             {
-                user_conn.set_action(user_id, "lock").await;
                 action_fn
                     .execute(user_id, &payload.get_value(), user_conn)
                     .await;
@@ -56,8 +55,8 @@ pub async fn webhook_core(data: Json<MsgFromFb>, state: &State<AppState>) -> &'s
         .get_action(user_id)
         .await
         .expect("failed to get action");
-    if action.ne("lock") {
-        if let Some(message) = data.get_message() {
+    if let Some(message) = data.get_message() {
+        if action.ne("lock") {
             if let Some(quick_reply) = message.get_quick_reply() {
                 let uri_payload = quick_reply.get_payload();
                 execute_payload(user_id, uri_payload, user_conn).await;
@@ -69,12 +68,12 @@ pub async fn webhook_core(data: Json<MsgFromFb>, state: &State<AppState>) -> &'s
                         .await;
                 }
             }
-        } else if let Some(postback) = data.get_postback() {
-            let uri_payload = postback.get_payload();
-            execute_payload(user_id, uri_payload, user_conn).await;
+        } else {
+            user_conn.reset_action(user_id).await;
         }
-    } else {
-        user_conn.reset_action(user_id).await;
+    } else if let Some(postback) = data.get_postback() {
+        let uri_payload = postback.get_payload();
+        execute_payload(user_id, uri_payload, user_conn).await;
     }
     "Ok"
 }

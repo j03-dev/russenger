@@ -5,19 +5,30 @@ pub struct Sender {
     id: String,
 }
 
-#[derive(Debug, Default, Deserialize)]
-pub struct Recipient {
-    pub id: String,
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct QuickReplyPayload {
+    payload: String,
+}
+
+impl QuickReplyPayload {
+    pub fn get_payload(&self) -> &String {
+        &self.payload
+    }
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct Message {
     text: Option<String>,
+    quick_reply: Option<QuickReplyPayload>,
 }
 
 impl Message {
     pub fn get_text(&self) -> String {
         self.text.clone().unwrap_or("".into())
+    }
+
+    pub fn get_quick_reply(&self) -> Option<QuickReplyPayload> {
+        self.quick_reply.clone()
     }
 }
 

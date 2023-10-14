@@ -1,21 +1,21 @@
 use rocket::serde::Serialize;
 
-use super::{generic::Recipient, SendResponse};
+use super::{generic::Recipient, payload::Payload, SendResponse};
 
 #[derive(Serialize)]
 pub struct QuickReplie<'r> {
     content_type: &'r str,
     title: String,
-    payload: &'r str,
+    payload: String,
     image_url: String,
 }
 
 impl<'r> QuickReplie<'r> {
-    pub fn new(title: &str, image_url: &str) -> Self {
+    pub fn new(title: &str, image_url: &str, payload: Payload) -> Self {
         Self {
             content_type: "text",
             title: title.into(),
-            payload: "<POSTBACK_PAYLOAD>",
+            payload: payload.to_uri_string(),
             image_url: image_url.into(),
         }
     }

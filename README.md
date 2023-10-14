@@ -1,91 +1,154 @@
-# Russenger - Facebook Messenger Webhook Handling in Rust
 
-![image](./image.png)
+---
 
-Russenger is a Rust library designed to simplify the handling of Facebook Messenger webhook responses. It offers a convenient way to construct and send various types of responses, including text messages, quick replies, generic templates, and media attachments.
+# Russenger - A Rust Chatbot LIB
 
-## Features
+Russenger is a Rust chatbot lib that simplifies the creation of interactive chatbots for various messaging platforms. Whether you want to build a chatbot for customer support, automation, or entertainment, Russenger provides the tools to get you started quickly.
 
-Russenger provides the following features:
+## Table of Contents
 
-- **Text messages:** Send text messages to users.
-- **Quick replies:** Send quick replies with buttons to users.
-- **Generic templates:** Send generic templates with images, titles, and buttons to users.
-- **Media attachments:** Send media attachments such as images, audio, and video to users.
-- **Webhook verification:** Verify incoming webhook requests from Facebook.
+1. [Getting Started](#getting-started)
+   - [Prerequisites](#prerequisites)
+   - [Installation](#installation)
+2. [Usage](#usage)
+   - [Creating Actions](#creating-actions)
+   - [Defining Routes](#defining-routes)
+3. [Examples](#examples)
+4. [Documentation](#documentation)
+5. [Contributing](#contributing)
+6. [License](#license)
 
-## Installation
+## Getting Started
 
-Add the following line to your `Cargo.toml` file:
+### Prerequisites
+
+Before using Russenger, you'll need to have the following installed on your system:
+
+- [Rust](https://www.rust-lang.org/): Russenger is a Rust library, so ensure you have Rust installed.
+
+### Installation
+
+You can include Russenger in your Rust project by adding it to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-russenger = { git = "https://github.com/j03-dev/russenger", branch = "main" }
-rocket = { version = "0.5.0-rc.3", features = ["json"] }
-rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", branch = "master" }
-```
-
-Set `.env` file on your project 
-```bash
-VERIFY_TOKEN=<yourverifytoken>
-API=https://graph.facebook.com/v16.0/me/messages?access_token=
-PAGE_ACCESS_TOKEN=<youraccesspagetoken>
-DATABASE=postgres://<user>:<password>@<host>/<db_name>
+russenger = "0.1"
 ```
 
 ## Usage
 
+Russenger allows you to define actions and routes to create interactive chatbots. Here's how to get started:
 
-### Example Application
+### Creating Actions
+
+Actions in Russenger represent the behavior of your chatbot. You can create custom actions by implementing the `Action` trait. For example:
+
 ```rust
-use russenger::russenger_app;
 use russenger::core::action::Action;
-use russenger::models::User;
-use russenger::response_models::SendResponse;
 use russenger::response_models::text::TextModel;
+use russenger::response_models::quick_replies::QuickReplyModel;
+use russenger::response_models::generic::{GenericModel, GenericElement, GenericButton};
 
-struct HelloBot {}
-
-#[rocket::async_trait]
-impl Action for HelloBot {
-    async fn execute(&self, user: &str, _message: &str, user_conn: &User) {
-        TextModel::new(user, "Hello World")
-            .send()
-            .await
-            .unwrap();
-
-        TextModel::new(user, "Enter your name: ")
-            .send()
-            .await
-            .unwrap();
-
-        user_conn.set_action(user, "/next_action").await;
-    }
-}
-
-
-struct NextAction {}
+pub struct Greet;
 
 #[rocket::async_trait]
-impl Action for NextAction {
-    async fn execute(&self, user: &str, message: &str, user_conn: &User) {
-        let response = format!("Hello {message}");
-
-        TextModel::new(user, &response)
+impl Action for Greet {
+    async fn execute(&self, user: &str, _message: &str, _user_conn: &User) {
+        let greeting = "Hello, I'm your chatbot!";
+        TextModel::new(user, greeting).send().await.unwrap();
+        
+        // Example Quick Replies
+        let quick_replies = vec![
+            QuickReplie::new("Option 1", "", Payload::new("/option1", None)),
+            QuickReplie::new("Option 2", "", Payload::new("/option2", None)),
+        ];
+        
+        QuickReplieModel::new(user, "Choose an option:", &quick_replies)
             .send()
             .await
             .unwrap();
-
-        user_conn.set_action(user, "/").await;
     }
 }
+```
 
+### Defining Routes
+
+Routes in Russenger map specific paths to actions. You can define your routes using the `russenger_app!` macro. For example:
+
+```rust
 russenger_app!(
-    "/" => HelloBot {},
-    "/next_action" => NextAction {}
+    "/" => Greet,
+    "/option1" => Option1Action,
+    "/option2" => Option2Action,
+    // Add more routes here...
 );
 ```
 
-### End-point
-- GET `/webhook`
-- POST `/webhook`
+In the example above, the `/` path is mapped to the `Greet` action, which greets the user and provides Quick Replies for further interaction.
+
+## Examples
+
+Here are some examples to illustrate how Russenger can be used to create chatbot interactions with Quick Replies and the Generic Model:
+
+#### Example 1: Greeting the User and Providing Quick Replies
+
+```rust
+use russenger::core::action::Action;
+use russenger::response_models::text::TextModel;
+use russenger::response_models::quick_replies::QuickReplyModel;
+use russenger::response_models::quick_replies::QuickReplie;
+
+pub struct Greet;
+
+#[rocket::async_trait]
+impl Action for Greet {
+    async fn execute(&self, user: &str, _message: &str, _user_conn: &User) {
+        let greeting = "Hello, I'm your chatbot!";
+        TextModel::new(user, greeting).send().await.unwrap();
+        
+        // Example Quick Replies
+        let quick_replies = vec![
+            QuickReplie::new("Option 1", "", Payload::new("/option1", None)),
+            QuickReplie::new("Option 2", "", Payload::new("/option2", None)),
+        ];
+        
+        QuickReplieModel::new(user, "Choose an option:", &quick_replies)
+            .send()
+            .await
+            .unwrap();
+    }
+}
+```
+
+In this example, when a user accesses the root path `/`, the chatbot greets the user with a welcome message and provides Quick Replies for further interaction.
+
+#### Example 2: Handling User's Choice
+
+You can create actions to handle user input based on their choice from Quick Replies.
+
+```rust
+use russenger::core::action::Action;
+use russenger::response_models::text::TextModel;
+
+pub struct Option1Action;
+
+#[rocket::async_trait]
+impl Action for Option1Action {
+    async fn execute(&self, user: &str, _message: &str, _user_conn: &User) {
+        let response = "You chose Option 1. What would you like to do next?";
+        TextModel::new(user, response).send().await.unwrap();
+    }
+}
+```
+
+This example demonstrates an action that handles the user's choice from the Quick Replies provided earlier.
+
+## Contributing
+
+We welcome contributions from the community. If you have suggestions, bug reports, or feature requests, please create an issue in this repository. If you'd like to contribute code, feel free to open a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---

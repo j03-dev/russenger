@@ -1,4 +1,5 @@
 use crate::models::User;
+use dotenv::dotenv;
 
 pub struct AppState {
     pub user_conn: User,
@@ -6,9 +7,10 @@ pub struct AppState {
 
 impl AppState {
     pub async fn init() -> Self {
+        dotenv().ok(); //load dotenv
         let user_conn: User = User::new().await;
         let is_migrate = user_conn.migrate().await;
-		println!("migration {is_migrate}");
+        println!("migration {is_migrate}");
         Self { user_conn }
     }
 }

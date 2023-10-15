@@ -1,4 +1,3 @@
-use dotenv::dotenv;
 use rocket::serde::Serialize;
 use std::env;
 
@@ -16,7 +15,6 @@ pub struct Recipient<'r> {
 #[rocket::async_trait]
 pub trait SendResponse: Serialize {
     async fn send(&self) -> Result<reqwest::Response, reqwest::Error> {
-        dotenv().ok();
         let api = env::var("API").expect("API not found on .env file");
         let page_access_token =
             env::var("PAGE_ACCESS_TOKEN").expect("PAGE_ACCESS_TOKEN not found on .env file");

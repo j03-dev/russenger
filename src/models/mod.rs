@@ -1,11 +1,9 @@
 use std::env::var;
 
-use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres, Row};
 
 async fn database_connection() -> Pool<Postgres> {
-    dotenv().ok();
     let database_url =
         var("DATABASE").expect("check your .env file \n pls spécifie your database name");
 

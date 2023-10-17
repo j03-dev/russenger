@@ -11,15 +11,15 @@ use crate::models::User;
 
 #[derive(Debug, Clone)]
 struct Args {
+    _prog: String,
     option: String,
-    _value: String,
 }
 
 impl Args {
-    fn new(option: &str, value: &str) -> Self {
+    fn new(prog: &str, option: &str) -> Self {
         Self {
+            _prog: prog.into(),
             option: option.into(),
-            _value: value.into(),
         }
     }
 
@@ -80,12 +80,11 @@ fn help() {
 
 pub async fn command() {
     if let Some(args) = args_parser() {
-        println!("{args:?}");
-        // let option = args.get_option();
-        // match option.as_str() {
-        //     "--runserver" => run_server().await,
-        //     "--migrate" => migrate().await,
-        //     _ => help()
-        // }
+        let option = args.get_option();
+        match option.as_str() {
+            "runserver" => run_server().await,
+            "migrate" => migrate().await,
+            _ => help()
+        }
     }
 }

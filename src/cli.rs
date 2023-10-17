@@ -9,7 +9,7 @@ use crate::core::{page_not_found, server_panic, webhook_core, webhook_verify};
 use crate::core::app_state::AppState;
 use crate::models::User;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 struct Args {
     option: String,
     _value: String,
@@ -80,11 +80,12 @@ fn help() {
 
 pub async fn command() {
     if let Some(args) = args_parser() {
-        let option = args.get_option();
-        match option.as_str() {
-            "--runserver" => run_server().await,
-            "--migrate" => migrate().await,
-            _ => help()
-        }
+        println!("{args:?}");
+        // let option = args.get_option();
+        // match option.as_str() {
+        //     "--runserver" => run_server().await,
+        //     "--migrate" => migrate().await,
+        //     _ => help()
+        // }
     }
 }

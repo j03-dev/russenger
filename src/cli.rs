@@ -66,7 +66,9 @@ async fn run_server() {
 
 async fn migrate() {
     dotenv().ok();
-    let status = User::new().await.migrate().await;
+    let user_conn = User::new().await;
+    println!("Connexion Success");
+    let status = user_conn.migrate().await;
     if status {
         println!("Migrate Success");
     } else {

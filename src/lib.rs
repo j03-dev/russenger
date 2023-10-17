@@ -20,14 +20,14 @@ macro_rules! russenger_app {
         #[macro_use]
         extern crate rocket;
 
-        use russenger::cli::command; 
+        use russenger::cli::command;
         use russenger::core::action::ACTION_REGISTRY;
         use russenger::register_action;
 
         #[rocket::main]
         async fn main(){
             $(register_action!($path, $action);)*
-            command()
+            command().await;
         }
     };
 }

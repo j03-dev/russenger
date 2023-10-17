@@ -31,7 +31,7 @@ impl Args {
 fn args_parser() -> Option<Args> {
     let args: Vec<String> = env::args().collect();
     match args.len() {
-        2 => Some(Args::new(&args[1], &args[2])),
+        2 => Some(Args::new(&args[0], &args[1])),
         _ => None,
     }
 }

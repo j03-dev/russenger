@@ -82,8 +82,8 @@ pub async fn command() {
     if let Some(args) = args_parser() {
         let option = args.get_option();
         match option.as_str() {
-            "runserver" => run_server().await,
-            "migrate" => migrate().await,
+            "--runserver" => run_server().await,
+            "--migrate" => migrate().await,
             _ => help()
         }
     }

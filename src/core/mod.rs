@@ -1,17 +1,18 @@
-pub mod action;
-pub mod app_state;
+use rocket::{catch, get, post, State};
+use rocket::serde::json::Json;
+
+use action::ACTION_REGISTRY;
 
 use crate::core::app_state::AppState;
 use crate::hooks::messages::MsgFromFb;
 use crate::hooks::MessengerWebhookRequest;
 use crate::models::User;
 use crate::response_models::payload::Payload;
-use crate::response_models::text::TextModel;
 use crate::response_models::SendResponse;
-use action::ACTION_REGISTRY;
+use crate::response_models::text::TextModel;
 
-use rocket::serde::json::Json;
-use rocket::{catch, get, post, State};
+pub mod action;
+pub mod app_state;
 
 #[catch(404)]
 pub fn page_not_found() -> &'static str {

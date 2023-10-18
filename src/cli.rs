@@ -38,7 +38,7 @@ fn args_parser() -> Option<Args> {
 
 async fn run_server() {
     dotenv().ok();
-    let allowed_origins = AllowedOrigins::all();
+    let allowed_origins = AllowedOrigins::some_regex(&["graph.facebook.com"]);
     let allowed_methods: AllowedMethods = ["Get", "Post"]
         .iter()
         .map(|s| FromStr::from_str(s).unwrap())
@@ -88,5 +88,7 @@ pub async fn command() {
             "migrate" => migrate().await,
             _ => help()
         }
+    } else {
+        help()
     }
 }

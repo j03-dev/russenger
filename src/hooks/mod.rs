@@ -1,16 +1,16 @@
-use dotenv::dotenv;
+use std::env;
+
 use rocket::{
-    http::Status,
     request::{FromRequest, Outcome},
     Request,
 };
-use std::{collections::HashMap, env};
+use rocket::http::Status;
 
 pub mod messages;
 
 #[derive(Debug)]
 pub enum MessengerRequestError<'m> {
-    VerificationFailed(&'m str), // Provide a reason for the verification failure.
+    VerificationFailed(&'m str),
     ArgsNotEnough,
 }
 
@@ -25,19 +25,24 @@ impl<'a> FromRequest<'a> for MessengerWebhookRequest {
             .uri()
             .query()
             .expect("failed to get query from request");
+
         let args: Vec<_> = query.segments().collect();
 
-        let mut hash_args: HashMap<&str, &str> = HashMap::new();
-        for (key, value) in &args {
-            hash_args.insert(key, value);
-        }
-        match args.len() {
-            3 => {
-                let hub_mode = *hash_args.get(&"hub.mode").unwrap_or(&"none");
-                let hub_challenge = *hash_args.get(&"hub.challenge").unwrap_or(&"none");
-                let token = *hash_args.get(&"hub.verify_token").unwrap_or(&"none");
-                dotenv().ok();
+        let mut hub_mode = None;
+        let mut hub_challenge = None;
+        let mut token = None;
 
+        for (key, value) in args {
+            match key {
+                "hub.mode" => hub_mode = Some(value),
+                "hub.challenge" => hub_challenge = Some(value),
+                "token" => token = Some(value),
+                _ => ()
+            }
+        }
+
+        match (hub_mode, hub_challenge, token) {
+            (Some(hub_mode), Some(hub_challenge), Some(token)) => {
                 if hub_mode.eq("subscribe") && env::var("VERIFY_TOKEN").unwrap().eq(token) {
                     Outcome::Success(Self(hub_challenge.to_string()))
                 } else {
@@ -47,7 +52,9 @@ impl<'a> FromRequest<'a> for MessengerWebhookRequest {
                     ))
                 }
             }
-            _ => Outcome::Failure((Status::Unauthorized, MessengerRequestError::ArgsNotEnough)),
+            _ => {
+                Outcome::Failure((Status::Unauthorized, MessengerRequestError::ArgsNotEnough))
+            }
         }
     }
 }

@@ -1,5 +1,8 @@
-use rocket::{catch, get, post, State};
+use std::str::FromStr;
+
 use rocket::serde::json::Json;
+use rocket::{catch, catchers, get, post, routes, State};
+use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
 use action::ACTION_REGISTRY;
 
@@ -8,24 +11,24 @@ use crate::hooks::messages::MsgFromFb;
 use crate::hooks::MessengerWebhookRequest;
 use crate::models::User;
 use crate::response_models::payload::Payload;
-use crate::response_models::SendResponse;
 use crate::response_models::text::TextModel;
+use crate::response_models::SendResponse;
 
 pub mod action;
 pub mod app_state;
 
 #[catch(404)]
-pub fn page_not_found() -> &'static str {
+fn page_not_found() -> &'static str {
     "Page not found: 404"
 }
 
 #[catch(500)]
-pub fn server_panic() -> &'static str {
+fn server_panic() -> &'static str {
     "Server panic: 500"
 }
 
 #[get("/webhook")]
-pub async fn webhook_verify(request: MessengerWebhookRequest) -> String {
+async fn webhook_verify(request: MessengerWebhookRequest) -> String {
     request.0
 }
 
@@ -49,7 +52,7 @@ async fn execute_payload(user_id: &str, uri_payload: &str, user_conn: &User) {
 }
 
 #[post("/webhook", format = "json", data = "<data>")]
-pub async fn webhook_core(data: Json<MsgFromFb>, state: &State<AppState>) -> &'static str {
+async fn webhook_core(data: Json<MsgFromFb>, state: &State<AppState>) -> &'static str {
     let user_id = data.get_sender();
     let user_conn = &state.user_conn;
     let action = user_conn
@@ -75,4 +78,42 @@ pub async fn webhook_core(data: Json<MsgFromFb>, state: &State<AppState>) -> &'s
         execute_payload(user_id, uri_payload, user_conn).await;
     }
     "Ok"
+}
+
+pub async fn run_server() {
+    let allowed_origins = AllowedOrigins::some_regex(&["graph.facebook.com"]);
+    let allowed_methods: AllowedMethods = ["Get", "Post"]
+        .iter()
+        .map(|s| FromStr::from_str(s).unwrap())
+        .collect();
+
+    let cors = CorsOptions {
+        allowed_origins,
+        allowed_methods,
+        allowed_headers: AllowedHeaders::all(),
+        allow_credentials: true,
+        ..Default::default()
+    }
+    .to_cors()
+    .expect("Failed create cors: Some thing wrong on cors");
+
+    rocket::build()
+        .attach(cors)
+        .manage(AppState::init().await)
+        .mount("/", routes![webhook_verify, webhook_core])
+        .register("/", catchers![page_not_found, server_panic])
+        .launch()
+        .await
+        .expect("Failed run rocker server");
+}
+
+pub async fn migrate() {
+    let user_conn = User::new().await;
+    println!("Connexion Success");
+    let status = user_conn.migrate().await;
+    if status {
+        println!("Migrate Success");
+    } else {
+        println!("Migrate Failed");
+    }
 }

@@ -20,22 +20,22 @@ macro_rules! russenger_app {
         #[macro_use]
         extern crate rocket;
 
-        use russenger::cli::command;
+        use russenger::cli::execute_command;
         use russenger::core::action::ACTION_REGISTRY;
         use russenger::register_action;
 
         #[rocket::main]
         async fn main(){
             $(register_action!($path, $action);)*
-            command().await;
+            execute_command().await;
         }
     };
 }
 
 #[cfg(test)]
 mod test {
-    use crate::cli::{migrate, run_server};
     use crate::core::action::{Action, ACTION_REGISTRY};
+    use crate::core::{migrate, run_server};
     use crate::models::User;
     use crate::register_action;
     use crate::response_models::payload::Payload;

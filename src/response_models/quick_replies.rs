@@ -1,6 +1,6 @@
 use rocket::serde::Serialize;
 
-use super::{payload::Payload, Recipient, SendResponse};
+use super::{payload::Payload, recipient::Recipient, SendResponse};
 
 #[derive(Serialize)]
 pub struct QuickReplie<'r> {

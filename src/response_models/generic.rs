@@ -1,4 +1,4 @@
-use super::{payload::Payload, Recipient, SendResponse};
+use super::{payload::Payload, recipient::Recipient, SendResponse};
 use rocket::serde::Serialize;
 
 #[derive(Serialize)]

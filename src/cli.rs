@@ -36,7 +36,7 @@ fn args_parser() -> Option<Args> {
     }
 }
 
-async fn run_server() {
+pub async fn run_server() {
     let allowed_origins = AllowedOrigins::some_regex(&["graph.facebook.com"]);
     let allowed_methods: AllowedMethods = ["Get", "Post"]
         .iter()
@@ -51,7 +51,7 @@ async fn run_server() {
         ..Default::default()
     }
     .to_cors()
-    .unwrap();
+    .expect("Failed create cors: Some thing wrong on cors");
 
     rocket::build()
         .attach(cors)
@@ -60,10 +60,10 @@ async fn run_server() {
         .register("/", catchers![page_not_found, server_panic])
         .launch()
         .await
-        .unwrap();
+        .expect("Failed run rocker server");
 }
 
-async fn migrate() {
+pub async fn migrate() {
     let user_conn = User::new().await;
     println!("Connexion Success");
     let status = user_conn.migrate().await;

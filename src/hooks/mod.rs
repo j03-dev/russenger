@@ -1,10 +1,10 @@
 use std::env;
 
+use rocket::http::Status;
 use rocket::{
     request::{FromRequest, Outcome},
     Request,
 };
-use rocket::http::Status;
 
 pub mod messages;
 
@@ -37,7 +37,7 @@ impl<'a> FromRequest<'a> for MessengerWebhookRequest {
                 "hub.mode" => hub_mode = Some(value),
                 "hub.challenge" => hub_challenge = Some(value),
                 "token" => token = Some(value),
-                _ => ()
+                _ => (),
             }
         }
 
@@ -52,9 +52,7 @@ impl<'a> FromRequest<'a> for MessengerWebhookRequest {
                     ))
                 }
             }
-            _ => {
-                Outcome::Failure((Status::Unauthorized, MessengerRequestError::ArgsNotEnough))
-            }
+            _ => Outcome::Failure((Status::Unauthorized, MessengerRequestError::ArgsNotEnough)),
         }
     }
 }

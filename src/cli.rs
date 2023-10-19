@@ -5,8 +5,8 @@ use dotenv::dotenv;
 use rocket::{catchers, routes};
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
-use crate::core::{page_not_found, server_panic, webhook_core, webhook_verify};
 use crate::core::app_state::AppState;
+use crate::core::{page_not_found, server_panic, webhook_core, webhook_verify};
 use crate::models::User;
 
 #[derive(Debug, Clone)]
@@ -37,7 +37,6 @@ fn args_parser() -> Option<Args> {
 }
 
 async fn run_server() {
-    dotenv().ok();
     let allowed_origins = AllowedOrigins::some_regex(&["graph.facebook.com"]);
     let allowed_methods: AllowedMethods = ["Get", "Post"]
         .iter()
@@ -51,8 +50,8 @@ async fn run_server() {
         allow_credentials: true,
         ..Default::default()
     }
-        .to_cors()
-        .unwrap();
+    .to_cors()
+    .unwrap();
 
     rocket::build()
         .attach(cors)
@@ -65,7 +64,6 @@ async fn run_server() {
 }
 
 async fn migrate() {
-    dotenv().ok();
     let user_conn = User::new().await;
     println!("Connexion Success");
     let status = user_conn.migrate().await;
@@ -81,12 +79,13 @@ fn help() {
 }
 
 pub async fn command() {
+    dotenv().ok();
     if let Some(args) = args_parser() {
         let option = args.get_option();
         match option.as_str() {
             "runserver" => run_server().await,
             "migrate" => migrate().await,
-            _ => help()
+            _ => help(),
         }
     } else {
         help()

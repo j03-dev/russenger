@@ -1,8 +1,8 @@
+pub mod cli;
 pub mod core;
 pub mod hooks;
 pub mod models;
 pub mod response_models;
-pub mod cli;
 
 #[macro_export]
 macro_rules! register_action {

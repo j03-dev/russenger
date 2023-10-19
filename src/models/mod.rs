@@ -30,28 +30,10 @@ impl User {
                         facebook_user_id varchar(40) primary key unique,
                         action varchar(20)
                     );";
-        let create_table_choices = "
-                    create table choices(
-                        choice_name varchar(20),
-                        content varchar(255),
-                        facebook_user_id varchar(40),
-                        foreign key(facebook_user_id) references russenger_user(facebook_user_id)
-                    );";
-        if sqlx::query(create_table_user)
+        sqlx::query(create_table_user)
             .execute(&self.connection)
             .await
-            .is_err()
-        {
-            return false;
-        }
-        if sqlx::query(create_table_choices)
-            .execute(&self.connection)
-            .await
-            .is_err()
-        {
-            return false;
-        }
-        true
+            .is_ok()
     }
 
     pub async fn create(&self, facebook_user_id: &str) -> bool {
@@ -81,7 +63,7 @@ impl User {
             .fetch_one(&self.connection)
             .await
         {
-            Ok(row) => Some(row.get(0)),
+            Ok(row) => row.get(0),
             Err(_) => None,
         }
     }
@@ -94,47 +76,5 @@ impl User {
             .execute(&self.connection)
             .await
             .is_ok()
-    }
-
-    pub async fn set_choices(
-        &self,
-        facebook_user_id: &str,
-        choice_name: &str,
-        content: &str,
-    ) -> bool {
-        let sql = "insert into choices(choice_name, content, facebook_user_id) values($1, $2, $3)";
-        sqlx::query(sql)
-            .bind(choice_name)
-            .bind(content)
-            .bind(facebook_user_id)
-            .execute(&self.connection)
-            .await
-            .is_ok()
-    }
-
-    pub async fn delete_all_choices(&self, facebook_user_id: &str) -> bool {
-        let sql = "delete from choices where facebook_user_id=$1";
-        sqlx::query(sql)
-            .bind(facebook_user_id)
-            .execute(&self.connection)
-            .await
-            .is_ok()
-    }
-
-    pub async fn get_choices_content(
-        &self,
-        facebook_user_id: &str,
-        choice_name: &str,
-    ) -> Option<String> {
-        let sql = "select content from choices where choice_name=$1 and facebook_user_id=$2";
-        match sqlx::query(sql)
-            .bind(choice_name)
-            .bind(facebook_user_id)
-            .fetch_one(&self.connection)
-            .await
-        {
-            Ok(row) => Some(row.get(0)),
-            Err(_) => None,
-        }
     }
 }

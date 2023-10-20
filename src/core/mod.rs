@@ -1,23 +1,23 @@
 use std::str::FromStr;
 
-use rocket::{catch, catchers, get, post, routes, State};
 use rocket::serde::json::Json;
+use rocket::{catch, catchers, get, post, routes, State};
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
+use super::core::app_state::AppState;
+use super::core::callback::CallBackRequestVerification;
+use super::core::message_deserializer::MessageDeserializer;
 use action::ACTION_REGISTRY;
 
-use crate::core::app_state::AppState;
-use crate::core::callback::CallBackRequestVerification;
-use crate::core::message_deserializer::MessageDeserializer;
 use crate::query::Query;
 use crate::response_models::payload::Payload;
-use crate::response_models::SendResponse;
 use crate::response_models::text::TextModel;
+use crate::response_models::SendResponse;
 
 pub mod action;
 mod app_state;
-mod message_deserializer;
 mod callback;
+mod message_deserializer;
 
 #[catch(404)]
 fn page_not_found() -> &'static str {
@@ -68,9 +68,7 @@ async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) 
         } else if action.ne("lock") {
             if let Some(action_fn) = ACTION_REGISTRY.lock().await.get(action.as_str()) {
                 query.set_action(user_id, "lock").await;
-                action_fn
-                    .execute(user_id, &message.get_text(), query)
-                    .await;
+                action_fn.execute(user_id, &message.get_text(), query).await;
             }
         } else {
             query.reset_action(user_id).await;
@@ -96,8 +94,8 @@ pub async fn run_server() {
         allow_credentials: true,
         ..Default::default()
     }
-        .to_cors()
-        .expect("Failed create cors: Some thing wrong on cors");
+    .to_cors()
+    .expect("Failed create cors: Some thing wrong on cors");
 
     rocket::build()
         .attach(cors)

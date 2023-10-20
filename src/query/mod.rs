@@ -1,7 +1,7 @@
 use std::env::var;
 
-use sqlx::{Pool, Postgres, Row};
 use sqlx::postgres::PgPoolOptions;
+use sqlx::{Pool, Postgres, Row};
 
 async fn database_connection() -> Pool<Postgres> {
     let database_url =

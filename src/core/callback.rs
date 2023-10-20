@@ -1,10 +1,10 @@
 use std::env;
 
+use rocket::http::Status;
 use rocket::{
     request::{FromRequest, Outcome},
     Request,
 };
-use rocket::http::Status;
 
 #[derive(Debug)]
 pub enum CallbackRequestError<'m> {

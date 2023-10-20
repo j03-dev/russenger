@@ -27,5 +27,3 @@ pub fn parser() -> Option<CommandLineArgs> {
         _ => None,
     }
 }
-
-

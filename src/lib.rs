@@ -1,7 +1,7 @@
+pub mod command;
 pub mod core;
 pub mod query;
 pub mod response_models;
-pub mod command;
 
 #[macro_export]
 macro_rules! register_action {
@@ -35,14 +35,14 @@ macro_rules! russenger_app {
 mod test {
     use dotenv::dotenv;
 
-    use crate::core::{migrate, run_server};
     use crate::core::action::{Action, ACTION_REGISTRY};
+    use crate::core::{migrate, run_server};
     use crate::query::Query;
     use crate::register_action;
     use crate::response_models::payload::Payload;
     use crate::response_models::quick_replies::{QuickReplie, QuickReplieModel};
-    use crate::response_models::SendResponse;
     use crate::response_models::text::TextModel;
+    use crate::response_models::SendResponse;
 
     struct HelloWorld {}
 
@@ -71,9 +71,9 @@ mod test {
                     QuickReplie::new("Retry", "", Payload::new("/", None)),
                 ],
             )
-                .send()
-                .await
-                .unwrap();
+            .send()
+            .await
+            .unwrap();
         }
     }
 

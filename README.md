@@ -43,7 +43,7 @@ The following example demonstrates the usage of Russenger for creating a chatbot
 ```rust
 use russenger::russenger_app;
 use russenger::core::action::Action;
-use russenger::models::User;
+use russenger::query::Query;
 use russenger::response_models::SendResponse;
 use russenger::response_models::text::TextModel;
 use russenger::response_models::payload::Payload;
@@ -56,9 +56,9 @@ struct Option2 {}
 
 #[rocket::async_trait]
 impl Action for Hello {
-    async fn execute(&self, user: &str, _message: &str, _user_conn: &User) {
+    async fn execute(&self, user_id: &str, _message: &str, _query: &Query) {
         // Welcome message
-        TextModel::new(user, "Hello, I'm your chatbot!")
+        TextModel::new(user_id, "Hello, I'm your chatbot!")
             .send()
             .await
             .unwrap();
@@ -69,7 +69,7 @@ impl Action for Hello {
             QuickReplie::new("Option 2", Payload::new("/option2", Some("payload_for_option2".to_string()))),
         ];
 
-        QuickReplieModel::new(user, "Choose an option:", &quick_replies)
+        QuickReplieModel::new(user_id, "Choose an option:", &quick_replies)
             .send()
             .await
             .unwrap();
@@ -79,9 +79,9 @@ impl Action for Hello {
 // For Option1
 #[rocket::async_trait]
 impl Action for Option1 {
-    async fn execute(&self, user: &str, message: &str, _user_conn: &User) {
+    async fn execute(&self, user_id: &str, payload: &str, _query: &Query) {
         // Handle Option 1 with a TextModel
-        TextModel::new(user, &format!("You selected Option 1 with payload: {}", message))
+        TextModel::new(user_id, &format!("You selected Option 1 with payload: {}", payload))
             .send()
             .await
             .unwrap();
@@ -91,9 +91,9 @@ impl Action for Option1 {
 // For Option2
 #[rocket::async_trait]
 impl Action for Option2 {
-    async fn execute(&self, user: &str, message: &str, _user_conn: &User) {
+    async fn execute(&self, user_id: &str, message: &str, _query: &Query) {
         // Handle Option 2 with a TextModel
-        TextModel::new(user, &format!("You selected Option 2 with payload: {}", message))
+        TextModel::new(user_id, &format!("You selected Option 2 with payload: {}", message))
             .send()
             .await
             .unwrap();
@@ -109,7 +109,7 @@ impl Action for Option2 {
             )],
         }];
 
-        GenericModel::new(user, &generic_elements)
+        GenericModel::new(user_id, &generic_elements)
             .send()
             .await
             .unwrap();

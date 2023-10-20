@@ -6,8 +6,6 @@ use rocket::{
 };
 use rocket::http::Status;
 
-pub mod messages;
-
 #[derive(Debug)]
 pub enum CallbackRequestError<'m> {
     VerificationFailed(&'m str),

@@ -1,5 +1,4 @@
 pub mod core;
-pub mod hooks;
 pub mod query;
 pub mod response_models;
 pub mod command;

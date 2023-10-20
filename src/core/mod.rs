@@ -7,8 +7,8 @@ use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 use action::ACTION_REGISTRY;
 
 use crate::core::app_state::AppState;
-use crate::hooks::messages::MsgFromFb;
-use crate::hooks::CallBackRequestVerification;
+use crate::core::callback::CallBackRequestVerification;
+use crate::core::message_deserializer::MessageDeserializer;
 use crate::query::Query;
 use crate::response_models::payload::Payload;
 use crate::response_models::SendResponse;
@@ -16,6 +16,8 @@ use crate::response_models::text::TextModel;
 
 pub mod action;
 mod app_state;
+mod message_deserializer;
+mod callback;
 
 #[catch(404)]
 fn page_not_found() -> &'static str {
@@ -52,7 +54,7 @@ async fn execute_payload(user_id: &str, uri_payload: &str, query: &Query) {
 }
 
 #[post("/webhook", format = "json", data = "<data>")]
-async fn webhook_core(data: Json<MsgFromFb>, state: &State<AppState>) -> &'static str {
+async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) -> &'static str {
     let user_id = data.get_sender();
     let query = &state.query;
     let action = query

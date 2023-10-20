@@ -34,15 +34,10 @@ impl Message {
 
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct Postback {
-    title: String,
     payload: String,
 }
 
 impl Postback {
-    pub fn get_title(&self) -> &String {
-        &self.title
-    }
-
     pub fn get_payload(&self) -> &String {
         &self.payload
     }
@@ -61,11 +56,11 @@ pub struct Entry {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct MsgFromFb {
+pub struct MessageDeserializer {
     entry: Vec<Entry>,
 }
 
-impl MsgFromFb {
+impl MessageDeserializer {
     pub fn get_sender(&self) -> &String {
         &self.entry[0].messaging[0].sender.id
     }

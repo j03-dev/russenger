@@ -1,7 +1,7 @@
 pub mod cli;
 pub mod core;
 pub mod hooks;
-pub mod models;
+pub mod query;
 pub mod response_models;
 
 #[macro_export]
@@ -34,21 +34,22 @@ macro_rules! russenger_app {
 
 #[cfg(test)]
 mod test {
-    use crate::core::action::{Action, ACTION_REGISTRY};
+    use dotenv::dotenv;
+
     use crate::core::{migrate, run_server};
-    use crate::models::User;
+    use crate::core::action::{Action, ACTION_REGISTRY};
+    use crate::query::Query;
     use crate::register_action;
     use crate::response_models::payload::Payload;
     use crate::response_models::quick_replies::{QuickReplie, QuickReplieModel};
-    use crate::response_models::text::TextModel;
     use crate::response_models::SendResponse;
-    use dotenv::dotenv;
+    use crate::response_models::text::TextModel;
 
     struct HelloWorld {}
 
     #[rocket::async_trait]
     impl Action for HelloWorld {
-        async fn execute(&self, user_id: &str, _message: &str, _user_conn: &User) {
+        async fn execute(&self, user_id: &str, _message: &str, _user_conn: &Query) {
             TextModel::new(user_id, "Hello World!")
                 .send()
                 .await
@@ -71,9 +72,9 @@ mod test {
                     QuickReplie::new("Retry", "", Payload::new("/", None)),
                 ],
             )
-            .send()
-            .await
-            .unwrap();
+                .send()
+                .await
+                .unwrap();
         }
     }
 
@@ -81,7 +82,7 @@ mod test {
 
     #[rocket::async_trait]
     impl Action for NextAction {
-        async fn execute(&self, user_id: &str, message: &str, user_conn: &User) {
+        async fn execute(&self, user_id: &str, message: &str, user_conn: &Query) {
             TextModel::new(user_id, &format!("Your choice is {message}"))
                 .send()
                 .await

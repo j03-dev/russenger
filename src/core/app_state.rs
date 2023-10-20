@@ -1,12 +1,12 @@
-use crate::models::User;
+use crate::query::Query;
 
 pub struct AppState {
-    pub user_conn: User,
+    pub query: Query,
 }
 
 impl AppState {
     pub async fn init() -> Self {
-        let user_conn: User = User::new().await;
-        Self { user_conn }
+        let query: Query = Query::new().await;
+        Self { query }
     }
 }

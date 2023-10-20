@@ -1,6 +1,8 @@
-use crate::core::{migrate, run_server};
-use dotenv::dotenv;
 use std::env;
+
+use dotenv::dotenv;
+
+use crate::core::{migrate, run_server};
 
 #[derive(Debug, Clone)]
 pub struct CommandLineArgs {

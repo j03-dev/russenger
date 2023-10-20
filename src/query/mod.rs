@@ -1,7 +1,7 @@
 use std::env::var;
 
-use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres, Row};
+use sqlx::postgres::PgPoolOptions;
 
 async fn database_connection() -> Pool<Postgres> {
     let database_url =
@@ -13,11 +13,11 @@ async fn database_connection() -> Pool<Postgres> {
         .expect("Database connection failed")
 }
 
-pub struct User {
+pub struct Query {
     pub connection: Pool<Postgres>,
 }
 
-impl User {
+impl Query {
     pub async fn new() -> Self {
         Self {
             connection: database_connection().await,
@@ -36,30 +36,30 @@ impl User {
             .is_ok()
     }
 
-    pub async fn create(&self, facebook_user_id: &str) -> bool {
+    pub async fn create(&self, user_id: &str) -> bool {
         let sql = "insert into russenger_user (facebook_user_id, action) values ($1, $2)";
         sqlx::query(sql)
-            .bind(facebook_user_id)
+            .bind(user_id)
             .bind("/")
             .execute(&self.connection)
             .await
             .is_ok()
     }
 
-    pub async fn set_action(&self, facebook_user_id: &str, action: &str) -> bool {
+    pub async fn set_action(&self, user_id: &str, action: &str) -> bool {
         let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
         sqlx::query(sql)
             .bind(action)
-            .bind(facebook_user_id)
+            .bind(user_id)
             .execute(&self.connection)
             .await
             .is_ok()
     }
 
-    pub async fn get_action(&self, facebook_user_id: &str) -> Option<String> {
+    pub async fn get_action(&self, user_id: &str) -> Option<String> {
         let sql = "select action from russenger_user where facebook_user_id=$1";
         match sqlx::query(sql)
-            .bind(facebook_user_id)
+            .bind(user_id)
             .fetch_one(&self.connection)
             .await
         {
@@ -68,11 +68,11 @@ impl User {
         }
     }
 
-    pub async fn reset_action(&self, facebook_user_id: &str) -> bool {
+    pub async fn reset_action(&self, user_id: &str) -> bool {
         let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
         sqlx::query(sql)
             .bind("/")
-            .bind(facebook_user_id)
+            .bind(user_id)
             .execute(&self.connection)
             .await
             .is_ok()

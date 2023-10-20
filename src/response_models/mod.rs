@@ -1,5 +1,6 @@
-use rocket::serde::Serialize;
 use std::env;
+
+use rocket::serde::Serialize;
 
 pub mod generic;
 pub mod media;

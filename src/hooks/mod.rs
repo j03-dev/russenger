@@ -1,24 +1,24 @@
 use std::env;
 
-use rocket::http::Status;
 use rocket::{
     request::{FromRequest, Outcome},
     Request,
 };
+use rocket::http::Status;
 
 pub mod messages;
 
 #[derive(Debug)]
-pub enum MessengerRequestError<'m> {
+pub enum CallbackRequestError<'m> {
     VerificationFailed(&'m str),
     ArgsNotEnough,
 }
 
-pub struct MessengerWebhookRequest(pub String);
+pub struct CallBackRequestVerification(pub String);
 
 #[rocket::async_trait]
-impl<'a> FromRequest<'a> for MessengerWebhookRequest {
-    type Error = MessengerRequestError<'a>;
+impl<'a> FromRequest<'a> for CallBackRequestVerification {
+    type Error = CallbackRequestError<'a>;
 
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
         let query = request
@@ -48,11 +48,11 @@ impl<'a> FromRequest<'a> for MessengerWebhookRequest {
                 } else {
                     Outcome::Failure((
                         Status::Unauthorized,
-                        MessengerRequestError::VerificationFailed("Token mismatch"),
+                        CallbackRequestError::VerificationFailed("Token mismatch"),
                     ))
                 }
             }
-            _ => Outcome::Failure((Status::Unauthorized, MessengerRequestError::ArgsNotEnough)),
+            _ => Outcome::Failure((Status::Unauthorized, CallbackRequestError::ArgsNotEnough)),
         }
     }
 }

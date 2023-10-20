@@ -57,11 +57,12 @@ async fn execute_payload(user_id: &str, uri_payload: &str, query: &Query) {
 async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) -> &'static str {
     let user_id = data.get_sender();
     let query = &state.query;
-    let action = query
-        .get_action(user_id)
-        .await
-        .expect("failed to get action");
     if let Some(message) = data.get_message() {
+        query.create(user_id).await;
+        let action = query
+            .get_action(user_id)
+            .await
+            .expect("failed to get action");
         if let Some(quick_reply) = message.get_quick_reply() {
             let uri_payload = quick_reply.get_payload();
             execute_payload(user_id, uri_payload, query).await;

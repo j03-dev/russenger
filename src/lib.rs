@@ -1,8 +1,8 @@
-pub mod cli;
 pub mod core;
 pub mod hooks;
 pub mod query;
 pub mod response_models;
+pub mod command;
 
 #[macro_export]
 macro_rules! register_action {
@@ -20,7 +20,7 @@ macro_rules! russenger_app {
         #[macro_use]
         extern crate rocket;
 
-        use russenger::cli::execute_command;
+        use russenger::command::execute_command;
         use russenger::core::action::ACTION_REGISTRY;
         use russenger::register_action;
 
@@ -49,7 +49,7 @@ mod test {
 
     #[rocket::async_trait]
     impl Action for HelloWorld {
-        async fn execute(&self, user_id: &str, _message: &str, _user_conn: &Query) {
+        async fn execute(&self, user_id: &str, _message: &str, _query: &Query) {
             TextModel::new(user_id, "Hello World!")
                 .send()
                 .await
@@ -82,12 +82,12 @@ mod test {
 
     #[rocket::async_trait]
     impl Action for NextAction {
-        async fn execute(&self, user_id: &str, message: &str, user_conn: &Query) {
-            TextModel::new(user_id, &format!("Your choice is {message}"))
+        async fn execute(&self, user_id: &str, payload: &str, query: &Query) {
+            TextModel::new(user_id, &format!("Your choice is {payload}"))
                 .send()
                 .await
                 .unwrap();
-            user_conn.reset_action(user_id).await;
+            query.reset_action(user_id).await;
         }
     }
 

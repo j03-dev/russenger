@@ -3,7 +3,7 @@ use rocket::serde::Serialize;
 use super::{recipient::Recipient, SendResponse};
 
 #[derive(Serialize)]
-pub struct Text<'t> {
+struct Text<'t> {
     text: &'t str,
 }
 

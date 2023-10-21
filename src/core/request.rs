@@ -7,16 +7,16 @@ use rocket::{
 };
 
 #[derive(Debug)]
-pub enum CallbackRequestError<'m> {
+pub enum FacebookRequestError<'m> {
     VerificationFailed(&'m str),
     ArgsNotEnough,
 }
 
-pub struct CallBackRequestVerification(pub String);
+pub struct FacebookRequest(pub String);
 
 #[rocket::async_trait]
-impl<'a> FromRequest<'a> for CallBackRequestVerification {
-    type Error = CallbackRequestError<'a>;
+impl<'a> FromRequest<'a> for FacebookRequest {
+    type Error = FacebookRequestError<'a>;
 
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
         let query = request
@@ -46,11 +46,11 @@ impl<'a> FromRequest<'a> for CallBackRequestVerification {
                 } else {
                     Outcome::Failure((
                         Status::Unauthorized,
-                        CallbackRequestError::VerificationFailed("Token mismatch"),
+                        FacebookRequestError::VerificationFailed("Token mismatch"),
                     ))
                 }
             }
-            _ => Outcome::Failure((Status::Unauthorized, CallbackRequestError::ArgsNotEnough)),
+            _ => Outcome::Failure((Status::Unauthorized, FacebookRequestError::ArgsNotEnough)),
         }
     }
 }

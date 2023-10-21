@@ -5,8 +5,8 @@ use rocket::{catch, catchers, get, post, routes, State};
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
 use super::core::app_state::AppState;
-use super::core::callback::CallBackRequestVerification;
-use super::core::message_deserializer::MessageDeserializer;
+use super::core::request::FacebookRequest;
+use super::core::deserializers::MessageDeserializer;
 use action::ACTION_REGISTRY;
 
 use crate::query::Query;
@@ -16,8 +16,8 @@ use crate::response_models::SendResponse;
 
 pub mod action;
 mod app_state;
-mod callback;
-mod message_deserializer;
+mod request;
+mod deserializers;
 
 #[catch(404)]
 fn page_not_found() -> &'static str {
@@ -30,7 +30,7 @@ fn server_panic() -> &'static str {
 }
 
 #[get("/webhook")]
-async fn webhook_verify(request: CallBackRequestVerification) -> String {
+async fn webhook_verify(request: FacebookRequest) -> String {
     request.0
 }
 

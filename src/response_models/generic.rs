@@ -1,6 +1,6 @@
 use rocket::serde::Serialize;
 
-use super::{payload::Payload, recipient::Recipient, SendResponse};
+use super::{payload::Payload, recipient::Recipient};
 
 #[derive(Serialize)]
 pub struct GenericButton<'b> {
@@ -68,6 +68,3 @@ impl<'g> GenericModel<'g> {
         }
     }
 }
-
-#[rocket::async_trait]
-impl<'g> SendResponse for GenericModel<'g> {}

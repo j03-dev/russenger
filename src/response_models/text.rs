@@ -1,6 +1,6 @@
 use rocket::serde::Serialize;
 
-use super::{recipient::Recipient, SendResponse};
+use super::recipient::Recipient;
 
 #[derive(Serialize)]
 struct Text<'t> {
@@ -22,5 +22,3 @@ impl<'s> TextModel<'s> {
     }
 }
 
-#[rocket::async_trait]
-impl<'s> SendResponse for TextModel<'s> {}

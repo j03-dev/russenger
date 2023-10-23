@@ -3,11 +3,12 @@ use std::sync::Arc;
 
 use rocket::tokio::sync::Mutex;
 
-use crate::query::Query;
+use crate::core::request::Req;
+use crate::core::response::Res;
 
 #[rocket::async_trait]
 pub trait Action: Send + Sync {
-    async fn execute(&self, user_id: &str, message: &str, query: &Query);
+    async fn execute<'l>(&self, res: Res, req: Req<'l>);
 }
 
 type ActionRegistryType = Arc<Mutex<HashMap<&'static str, Box<dyn Action>>>>;

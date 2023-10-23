@@ -1,6 +1,6 @@
 use rocket::serde::Serialize;
 
-use super::{recipient::Recipient, SendResponse};
+use super::recipient::Recipient;
 
 #[derive(Serialize)]
 struct MediaPayload<'p> {
@@ -35,6 +35,3 @@ impl<'m> MediaModel<'m> {
         }
     }
 }
-
-#[rocket::async_trait]
-impl<'m> SendResponse for MediaModel<'m> {}

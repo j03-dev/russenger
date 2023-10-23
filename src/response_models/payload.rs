@@ -38,7 +38,7 @@ impl Payload {
         let mut value = None;
 
         for (name, val) in parsed {
-            match &name[..] {
+            match name.as_str() {
                 "action" => action = Some(val),
                 "value" => value = Some(val),
                 _ => return Err(format!("Unknown field in URI: {}", name)),

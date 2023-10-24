@@ -10,7 +10,6 @@ path = "src/lib.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-russenger_macro = { git = "https://github.com/j03-dev/russenger_macro", branch = "workversion" }
 rocket = { version = "0.5.0-rc.3", features = ["json"] }
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", branch = "master" }
 reqwest = { version = "0.11.18", features = ["json"] }

@@ -46,7 +46,9 @@ async fn execute_payload(user: &str, data: &str, query: &Query) {
                 .await
                 .get(payload.get_action().as_str())
             {
-                action_fn.execute(Res, Req::new(user, query, data)).await;
+                action_fn
+                    .execute(Res, Req::new(user, query, &payload.get_value()))
+                    .await;
             }
         }
         Err(err) => {

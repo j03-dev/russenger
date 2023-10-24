@@ -2,7 +2,7 @@ use rocket::serde::Serialize;
 
 use super::{payload::Payload, recipient::Recipient};
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct GenericButton<'b> {
     #[serde(rename = "type")]
     r#type: &'b str,
@@ -20,7 +20,7 @@ impl<'b> GenericButton<'b> {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct GenericElement<'e> {
     pub title: &'e str,
     pub image_url: &'e str,
@@ -28,25 +28,25 @@ pub struct GenericElement<'e> {
     pub buttons: Vec<GenericButton<'e>>,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 struct GenericPayload<'p> {
     pub template_type: &'p str,
     pub elements: &'p Vec<GenericElement<'p>>,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 struct Attachment<'a> {
     #[serde(rename = "type")]
     pub r#type: &'a str,
     pub payload: GenericPayload<'a>,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 struct GenericMessage<'m> {
     pub attachment: Attachment<'m>,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct GenericModel<'g> {
     recipient: Recipient<'g>,
     message: GenericMessage<'g>,

@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use rocket::{catch, catchers, get, post, routes, State};
 use rocket::serde::json::Json;
+use rocket::{catch, catchers, get, post, routes, State};
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
 use action::ACTION_REGISTRY;
@@ -18,10 +18,10 @@ use super::core::facebook_request::FacebookRequest;
 
 pub mod action;
 mod app_state;
-mod facebook_request;
 mod deserializers;
-pub mod response;
+mod facebook_request;
 pub mod request;
+pub mod response;
 
 #[catch(404)]
 fn page_not_found() -> &'static str {
@@ -61,10 +61,7 @@ async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) 
     let query = &state.query;
     if let Some(message) = data.get_message() {
         query.create(user).await;
-        let action = query
-            .get_action(user)
-            .await
-            .expect("failed to get action");
+        let action = query.get_action(user).await.expect("failed to get action");
         if let Some(quick_reply) = message.get_quick_reply() {
             let uri_payload = quick_reply.get_payload();
             execute_payload(user, uri_payload, query).await;
@@ -98,8 +95,8 @@ pub async fn run_server() {
         allow_credentials: true,
         ..Default::default()
     }
-        .to_cors()
-        .expect("Failed create cors: Some thing wrong on cors");
+    .to_cors()
+    .expect("Failed create cors: Some thing wrong on cors");
 
     rocket::build()
         .attach(cors)

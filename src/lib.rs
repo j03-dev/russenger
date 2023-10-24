@@ -5,7 +5,8 @@ pub mod response_models;
 
 #[macro_export]
 macro_rules! create_action {
-    ($name:ident, $handler:expr) => {
+    ($path:expr, $name:ident, $handler:expr) => {
+        #[action($path)]
         struct $name;
 
         #[rocket::async_trait]
@@ -24,11 +25,9 @@ macro_rules! russenger_app {
         extern crate rocket;
 
         use russenger::command::execute_command;
-        use russenger::core::action::ACTION_REGISTRY;
 
         #[rocket::main]
-        async fn main(){
-            $(ACTION_REGISTRY.lock().await.insert($path, Box::new($action));)*
+        async fn main() {
             execute_command().await;
         }
     };
@@ -45,6 +44,7 @@ mod test {
     use crate::response_models::payload::Payload;
     use crate::response_models::quick_replies::{QuickReplie, QuickReplieModel};
     use crate::response_models::text::TextModel;
+    use russenger_macro::action;
 
     #[rocket::async_test]
     async fn test_migration() {
@@ -52,7 +52,7 @@ mod test {
         migrate().await;
     }
 
-    create_action!(NextAction, |res: Res, req: Req<'l>| async move {
+    create_action!("/", NextAction, |res: Res, req: Req<'l>| async move {
         res.send(TextModel::new(
             req.user,
             &format!("Your choice is {}", req.data),
@@ -62,7 +62,7 @@ mod test {
         req.query.reset_action(req.user).await;
     });
 
-    create_action!(Hello, |res: Res, req: Req<'l>| async move {
+    create_action!("/", Hello, |res: Res, req: Req<'l>| async move {
         res.send(TextModel::new(req.user, "Hello World!"))
             .await
             .unwrap();

@@ -41,80 +41,81 @@ DATABASE=postgres://<user>:<password>@<host>/<db_name>
 The following example demonstrates the usage of Russenger for creating a chatbot in Rust. It includes actions named `Hello`, `Option1`, and `Option2`, along with a user scenario:
 
 ```rust
-use russenger::russenger_app;
 use russenger::core::action::Action;
-use russenger::query::Query;
-use russenger::response_models::SendResponse;
-use russenger::response_models::text::TextModel;
+use russenger::core::request::Req;
+use russenger::core::response::Res;
+use russenger::response_models::generic::{GenericButton, GenericElement, GenericModel};
 use russenger::response_models::payload::Payload;
 use russenger::response_models::quick_replies::{QuickReplie, QuickReplieModel};
-use russenger::response_models::generic::{GenericModel, GenericElement, GenericButton};
+use russenger::response_models::text::TextModel;
+use russenger::{create_action, russenger_app};
 
-struct Hello {}
-struct Option1 {}
-struct Option2 {}
 
-#[rocket::async_trait]
-impl Action for Hello {
-    async fn execute(&self, user_id: &str, _message: &str, _query: &Query) {
-        // Welcome message
-        TextModel::new(user_id, "Hello, I'm your chatbot!")
-            .send()
-            .await
-            .unwrap();
+create_action!(Hello, |res: Res, req: Req<'l>| async move {
+    // Welcome message
+    res.send(TextModel::new(req.user, "Hello, I'm your chatbot!"))
+        .await
+        .unwrap();
 
-        // Example with Quick Replies
-        let quick_replies = vec![
-            QuickReplie::new("Option 1", Payload::new("/option1", Some("payload_for_option1".to_string()))),
-            QuickReplie::new("Option 2", Payload::new("/option2", Some("payload_for_option2".to_string()))),
-        ];
+    // Example with Quick Replies
+    let quick_replies = vec![
+        QuickReplie::new(
+            "Option 1",
+            "",
+            Payload::new("/option1", Some("payload_for_option1".to_string())),
+        ),
+        QuickReplie::new(
+            "Option 2",
+            "",
+            Payload::new("/option2", Some("payload_for_option2".to_string())),
+        ),
+    ];
 
-        QuickReplieModel::new(user_id, "Choose an option:", &quick_replies)
-            .send()
-            .await
-            .unwrap();
-    }
-}
+    res.send(QuickReplieModel::new(
+        req.user,
+        "Choose an option:",
+        &quick_replies,
+    ))
+    .await
+    .unwrap();
+});
 
 // For Option1
-#[rocket::async_trait]
-impl Action for Option1 {
-    async fn execute(&self, user_id: &str, payload: &str, _query: &Query) {
-        // Handle Option 1 with a TextModel
-        TextModel::new(user_id, &format!("You selected Option 1 with payload: {}", payload))
-            .send()
-            .await
-            .unwrap();
-    }
-}
+create_action!(Option1, |res: Res, req: Req<'l>| async move {
+    // Handle Option 1 with a TextModel
+    res.send(TextModel::new(
+        req.user,
+        &format!("You selected Option 1 with payload: {}", req.data),
+    ))
+    .await
+    .unwrap();
+});
 
 // For Option2
-#[rocket::async_trait]
-impl Action for Option2 {
-    async fn execute(&self, user_id: &str, message: &str, _query: &Query) {
-        // Handle Option 2 with a TextModel
-        TextModel::new(user_id, &format!("You selected Option 2 with payload: {}", message))
-            .send()
-            .await
-            .unwrap();
-        
-        // Handle Option 2 with a Generic Template
-        let generic_elements = vec![GenericElement {
-            title: "Option 2",
-            image_url: "https://example.com/option2.jpg",
-            subtitle: "Option 2 description",
-            buttons: vec![GenericButton::new(
-                "Choose Option 2",
-                Payload::new("/hello", None),
-            )],
-        }];
+create_action!(Option2, |res: Res, req: Req<'l>| async move {
+    // Handle Option 2 with a TextModel
+    res.send(TextModel::new(
+        req.user,
+        &format!("You selected Option 2 with payload: {}", req.data),
+    ))
+    .await
+    .unwrap();
 
-        GenericModel::new(user_id, &generic_elements)
-            .send()
-            .await
-            .unwrap();
-    }
-}
+    // Handle Option 2 with a Generic Template
+    let generic_elements = vec![GenericElement {
+        title: "Option 2",
+        image_url: "https://example.com/option2.jpg",
+        subtitle: "Option 2 description",
+        buttons: vec![GenericButton::new(
+            "Choose Option 2",
+            Payload::new("/hello", None),
+        )],
+    }];
+
+    res.send(GenericModel::new(req.user, &generic_elements))
+        .await
+        .unwrap();
+});
 
 russenger_app!(
     "/" => Hello {},

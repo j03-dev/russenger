@@ -6,6 +6,7 @@ pub mod response_models;
 #[macro_export]
 macro_rules! create_action {
     ($path:expr, $name:ident, $handler:expr) => {
+        #[derive(Debug)]
         #[action($path)]
         struct $name;
 

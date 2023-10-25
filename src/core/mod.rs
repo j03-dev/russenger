@@ -46,7 +46,7 @@ async fn execute_payload(user: &str, data: &str, query: &Query) {
                 .await
                 .get(payload.get_action().as_str())
             {
-                let data = &payload.get_value();
+                let data = &payload.get_data_to_string();
                 action_fn.execute(Res, Req::new(user, query, data)).await;
             }
         }

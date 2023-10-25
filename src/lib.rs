@@ -36,15 +36,15 @@ macro_rules! russenger_app {
 
 #[cfg(test)]
 mod test {
-    use dotenv::dotenv;
-
     use crate::core::action::Action;
     use crate::core::request::Req;
     use crate::core::response::Res;
     use crate::core::{migrate, run_server};
+    use crate::response_models::payload::Data;
     use crate::response_models::payload::Payload;
     use crate::response_models::quick_replies::{QuickReplie, QuickReplieModel};
     use crate::response_models::text::TextModel;
+    use dotenv::dotenv;
 
     #[rocket::async_test]
     async fn test_migration() {
@@ -53,13 +53,19 @@ mod test {
     }
 
     create_action!(NextAction, |res: Res, req: Req<'l>| async move {
-        res.send(TextModel::new(
-            req.user,
-            &format!("Your choice is {}", req.data),
-        ))
-        .await
-        .unwrap();
-        req.query.reset_action(req.user).await;
+        if let Some(data) = Data::from_str(req.data) {
+            res.send(TextModel::new(
+                req.user,
+                &format!("Your choice is {}", data.get_value()),
+            ))
+            .await
+            .unwrap();
+            req.query.reset_action(req.user).await;
+        } else {
+            res.send(TextModel::new(req.user, "There is no data"))
+                .await
+                .unwrap();
+        }
     });
 
     create_action!(Hello, |res: Res, req: Req<'l>| async move {
@@ -73,12 +79,12 @@ mod test {
                 QuickReplie::new(
                     "red",
                     "",
-                    Payload::new("/next_action", Some("RED".to_string())),
+                    Payload::new("/next_action", Some(Data::new("BLUE", None))),
                 ),
                 QuickReplie::new(
                     "blue",
                     "",
-                    Payload::new("/next_action", Some("BLUE".to_string())),
+                    Payload::new("/next_action", Some(Data::new("RED", None))),
                 ),
                 QuickReplie::new("Retry", "", Payload::new("/", None)),
             ],

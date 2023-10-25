@@ -19,8 +19,8 @@ impl Data {
         Self { value, pages }
     }
 
-    pub fn get_value(&self) -> String {
-        self.value.clone()
+    pub fn get_value<T: for<'a> Deserialize<'a> + Default>(&self) -> T {
+        serde_json::from_str::<T>(&self.value).unwrap_or_default()
     }
 
     pub fn get_page(&self) -> Option<[i8; 2]> {

@@ -56,7 +56,7 @@ mod test {
         if let Some(data) = Data::from_str(req.data) {
             res.send(TextModel::new(
                 req.user,
-                &format!("Your choice is {}", data.get_value()),
+                &format!("Your choice is {}", data.get_value::<String>()),
             ))
             .await
             .unwrap();

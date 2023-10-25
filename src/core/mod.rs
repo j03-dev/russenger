@@ -1,13 +1,14 @@
 use std::str::FromStr;
 
-use rocket::serde::json::Json;
 use rocket::{catch, catchers, get, post, routes, State};
+use rocket::serde::json::Json;
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
 use action::ACTION_REGISTRY;
 use request::Req;
 use response::Res;
 
+use crate::core::data::Data;
 use crate::core::deserializers::MessageDeserializer;
 use crate::query::Query;
 use crate::response_models::payload::Payload;
@@ -22,6 +23,7 @@ mod deserializers;
 mod facebook_request;
 pub mod request;
 pub mod response;
+pub mod data;
 
 #[catch(404)]
 fn page_not_found() -> &'static str {
@@ -47,7 +49,9 @@ async fn execute_payload(user: &str, data: &str, query: &Query) {
                 .get(payload.get_action().as_str())
             {
                 let data = &payload.get_data_to_string();
-                action_fn.execute(Res, Req::new(user, query, data)).await;
+                action_fn
+                    .execute(Res, Req::new(user, query, Data::from_str(data)))
+                    .await;
             }
         }
         Err(err) => {
@@ -70,7 +74,9 @@ async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) 
             if let Some(action_fn) = ACTION_REGISTRY.lock().await.get(action.as_str()) {
                 query.set_action(user, "lock").await;
                 let data = &message.get_text();
-                action_fn.execute(Res, Req::new(user, query, data)).await;
+                action_fn
+                    .execute(Res, Req::new(user, query, Data::new(data, None)))
+                    .await;
             }
         } else {
             query.reset_action(user).await;
@@ -96,8 +102,8 @@ pub async fn run_server() {
         allow_credentials: true,
         ..Default::default()
     }
-    .to_cors()
-    .expect("Failed create cors: Some thing wrong on cors");
+        .to_cors()
+        .expect("Failed create cors: Some thing wrong on cors");
 
     rocket::build()
         .attach(cors)

@@ -53,19 +53,14 @@ mod test {
     }
 
     create_action!(NextAction, |res: Res, req: Req<'l>| async move {
-        if let Some(data) = Data::from_str(req.data) {
-            res.send(TextModel::new(
-                req.user,
-                &format!("Your choice is {}", data.get_value::<String>()),
-            ))
-            .await
-            .unwrap();
-            req.query.reset_action(req.user).await;
-        } else {
-            res.send(TextModel::new(req.user, "There is no data"))
-                .await
-                .unwrap();
-        }
+        let data: String = req.data.get_value();
+        res.send(TextModel::new(
+            req.user,
+            &format!("Your choice is {}", data),
+        ))
+        .await
+        .unwrap();
+        req.query.reset_action(req.user).await;
     });
 
     create_action!(Hello, |res: Res, req: Req<'l>| async move {

@@ -14,11 +14,9 @@ pub struct Data {
 }
 
 impl Data {
-    pub fn new(value: &str, pages: Option<[i8; 2]>) -> Self {
-        Self {
-            value: value.into(),
-            pages,
-        }
+    pub fn new<T: Serialize>(value: T, pages: Option<[i8; 2]>) -> Self {
+        let value = serde_json::to_string(&value).unwrap_or_default();
+        Self { value, pages }
     }
 
     pub fn get_value(&self) -> String {

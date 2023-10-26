@@ -1,6 +1,6 @@
 use rocket::serde::Serialize;
 
-use super::{payload::Payload, recipient::Recipient};
+use super::{next::NextAction, payload::Payload, recipient::Recipient};
 
 #[derive(Serialize)]
 pub struct QuickReplie<'r> {
@@ -46,3 +46,5 @@ impl<'q> QuickReplieModel<'q> {
         }
     }
 }
+
+impl<'q> NextAction for QuickReplieModel<'q> {}

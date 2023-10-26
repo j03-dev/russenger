@@ -12,9 +12,10 @@ impl Data {
         Self { value, pages }
     }
 
-    pub fn from_str(data: &str) -> Data {
-        serde_json::from_str(data).unwrap_or_default()
+    pub fn from<T: ToString>(data: T) -> Data {
+        serde_json::from_str(&data.to_string()).unwrap_or_default()
     }
+
     pub fn get_value<T: for<'a> Deserialize<'a> + Default>(&self) -> T {
         serde_json::from_str::<T>(&self.value).unwrap_or_default()
     }

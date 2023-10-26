@@ -1,13 +1,11 @@
+pub use crate::core::data::Data;
 use url::form_urlencoded;
-
-use crate::core::data::Data;
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Payload {
     action: String,
     data: Option<Data>,
 }
-
 
 impl Payload {
     pub fn new(action: &str, data: Option<Data>) -> Self {
@@ -49,7 +47,7 @@ impl Payload {
         }
 
         match (action, value) {
-            (Some(action), Some(value)) => Ok(Self::new(&action, Some(Data::from_str(&value)))),
+            (Some(action), Some(value)) => Ok(Self::new(&action, Some(Data::from(value)))),
             _ => Err("Missing fields in URI".to_string()),
         }
     }

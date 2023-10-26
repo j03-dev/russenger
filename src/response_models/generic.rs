@@ -1,5 +1,7 @@
+pub use crate::Data;
 use rocket::serde::Serialize;
 
+use super::next::NextAction;
 use super::{payload::Payload, recipient::Recipient};
 
 #[derive(Debug, Serialize)]
@@ -68,3 +70,5 @@ impl<'g> GenericModel<'g> {
         }
     }
 }
+
+impl<'g> NextAction for GenericModel<'g> {}

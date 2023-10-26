@@ -24,7 +24,7 @@ pub struct Message {
 
 impl Message {
     pub fn get_text(&self) -> String {
-        self.text.clone().unwrap_or("".into())
+        self.text.clone().unwrap_or_default()
     }
 
     pub fn get_quick_reply(&self) -> Option<QuickReplyPayload> {

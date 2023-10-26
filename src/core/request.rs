@@ -1,5 +1,5 @@
-use crate::core::data::Data;
 use crate::query::Query;
+use crate::Data;
 
 pub struct Req<'r> {
     pub user: &'r str,

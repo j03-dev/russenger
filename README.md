@@ -41,9 +41,7 @@ DATABASE=postgres://<user>:<password>@<host>/<db_name>
 The following example demonstrates the usage of Russenger for creating a chatbot in Rust. It includes actions named `Hello`, `Option1`, and `Option2`, along with a user scenario:
 
 ```rust
-use russenger::core::action::Action;
-use russenger::core::request::Req;
-use russenger::core::response::Res;
+use russenger::{Action, Data, Req, Res};
 use russenger::response_models::generic::{GenericButton, GenericElement, GenericModel};
 use russenger::response_models::payload::Payload;
 use russenger::response_models::quick_replies::{QuickReplie, QuickReplieModel};
@@ -62,12 +60,12 @@ create_action!(Hello, |res: Res, req: Req<'l>| async move {
         QuickReplie::new(
             "Option 1",
             "",
-            Payload::new("/option1", Some("payload_for_option1".to_string())),
+            Payload::new("/option1", Some(Data::new("payload_for_option1", None))),
         ),
         QuickReplie::new(
             "Option 2",
             "",
-            Payload::new("/option2", Some("payload_for_option2".to_string())),
+            Payload::new("/option2", Some(Data::new("payload_for_option2", None))),
         ),
     ];
 
@@ -85,7 +83,7 @@ create_action!(Option1, |res: Res, req: Req<'l>| async move {
     // Handle Option 1 with a TextModel
     res.send(TextModel::new(
         req.user,
-        &format!("You selected Option 1 with payload: {}", req.data),
+        &format!("You selected Option 1 with payload: {}", req.data.get_value::<String>()),
     ))
     .await
     .unwrap();
@@ -96,7 +94,7 @@ create_action!(Option2, |res: Res, req: Req<'l>| async move {
     // Handle Option 2 with a TextModel
     res.send(TextModel::new(
         req.user,
-        &format!("You selected Option 2 with payload: {}", req.data),
+        &format!("You selected Option 2 with payload: {}", req.data.get_value::<String>()),
     ))
     .await
     .unwrap();

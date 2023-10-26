@@ -23,4 +23,9 @@ impl Data {
     pub fn get_page(&self) -> Option<[usize; 2]> {
         self.pages
     }
+
+    pub fn next_page(&self) -> [usize; 2] {
+        let [start, end] = self.pages.unwrap_or([0, 5]);
+        [start + 5, end + 5]
+    }
 }

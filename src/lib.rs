@@ -7,7 +7,6 @@ pub use crate::core::action::Action;
 pub use crate::core::data::Data;
 pub use crate::core::request::Req;
 pub use crate::core::response::Res;
-pub use crate::response_models::next::Next;
 pub use rocket::{async_trait, main};
 
 #[macro_export]

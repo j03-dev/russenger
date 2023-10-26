@@ -14,7 +14,7 @@ impl Next {
         Self {
             path: path.into(),
             value: value.into(),
-            pages,
+            pages: [pages[0] + 5, pages[1] + 5],
         }
     }
 }

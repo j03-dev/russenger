@@ -7,7 +7,7 @@ pub trait NextAction {
     async fn next(&self, user: &str, payload: Payload) {
         Res.send(QuickReplieModel::new(
             user,
-            "",
+            "Action",
             &vec![QuickReplie::new("Next", "", payload)],
         ))
         .await

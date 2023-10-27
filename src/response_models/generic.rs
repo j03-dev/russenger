@@ -1,6 +1,6 @@
+use super::next::SendAnotherAction;
 pub use crate::Data;
 use rocket::serde::Serialize;
-use super::next::SendAnotherAction;
 
 use super::{payload::Payload, recipient::Recipient};
 

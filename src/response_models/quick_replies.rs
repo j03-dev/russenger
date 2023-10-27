@@ -1,6 +1,5 @@
 use rocket::serde::Serialize;
-
-use super::{next::NextAction, payload::Payload, recipient::Recipient};
+use super::{payload::Payload, recipient::Recipient, next::SendAnotherAction};
 
 #[derive(Serialize)]
 pub struct QuickReplie<'r> {
@@ -47,4 +46,5 @@ impl<'q> QuickReplieModel<'q> {
     }
 }
 
-impl<'q> NextAction for QuickReplieModel<'q> {}
+#[rocket::async_trait]
+impl<'q> SendAnotherAction for QuickReplieModel<'q> {}

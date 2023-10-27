@@ -24,8 +24,15 @@ impl Data {
         self.pages
     }
 
-    pub fn next_page(&self) -> [usize; 2] {
+    pub fn next_page(&mut self) -> Self {
         let [start, end] = self.pages.unwrap_or([0, 5]);
-        [start + 5, end + 5]
+        self.pages = Some([start + 5, end + 5]);
+        self.clone()
     }
+    
+    pub fn prev_page(&mut self) -> Self {
+		let [start , end] = self.pages.unwrap_or([0, 5]);
+		self.pages = Some([start - 5, end - 5]);
+		self.clone()
+	}
 }

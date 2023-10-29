@@ -116,10 +116,9 @@ pub async fn run_server() {
 }
 
 pub async fn migrate() {
-    let user_conn = Query::new().await;
+    let query = Query::new().await;
     println!("Connexion Success");
-    let status = user_conn.migrate().await;
-    if status {
+    if query.migrate().await {
         println!("Migrate Success");
     } else {
         println!("Migrate Failed");

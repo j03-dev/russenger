@@ -1,4 +1,4 @@
-use super::next::SendAnotherAction;
+use super::SendAnotherAction;
 pub use crate::Data;
 use rocket::serde::Serialize;
 

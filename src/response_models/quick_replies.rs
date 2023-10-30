@@ -46,5 +46,4 @@ impl<'q> QuickReplieModel<'q> {
     }
 }
 
-#[rocket::async_trait]
 impl<'q> SendAnotherAction for QuickReplieModel<'q> {}

@@ -71,5 +71,4 @@ impl<'g> GenericModel<'g> {
     }
 }
 
-#[rocket::async_trait]
 impl<'g> SendAnotherAction for GenericModel<'g> {}

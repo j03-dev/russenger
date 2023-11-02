@@ -44,13 +44,13 @@ impl<'a> FromRequest<'a> for FacebookRequest {
                 if hub_mode.eq("subscribe") && env::var("VERIFY_TOKEN").unwrap().eq(token) {
                     Outcome::Success(Self(hub_challenge.to_string()))
                 } else {
-                    Outcome::Failure((
+                    Outcome::Error((
                         Status::Unauthorized,
                         FacebookRequestError::VerificationFailed("Token mismatch"),
                     ))
                 }
             }
-            _ => Outcome::Failure((Status::Unauthorized, FacebookRequestError::ArgsNotEnough)),
+            _ => Outcome::Error((Status::Unauthorized, FacebookRequestError::ArgsNotEnough)),
         }
     }
 }

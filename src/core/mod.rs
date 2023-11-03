@@ -64,16 +64,16 @@ async fn execute_payload(user: &str, data: &str, query: &Query) {
 async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) -> &'static str {
     let query = &state.query;
     let user = data.get_sender();
-    query.create(user).await;
-    let action = query.get_action(user).await.unwrap_or("lock".to_string());
     if let Some(message) = data.get_message() {
+        query.create(user).await;
+        let action = query.get_action(user).await.unwrap_or("lock".to_string());
         if let Some(quick_reply) = message.get_quick_reply() {
             let uri_payload = quick_reply.get_payload();
             execute_payload(user, uri_payload, query).await;
         } else if action.ne("lock") {
             if let Some(action_fn) = ACTION_REGISTRY.lock().await.get(action.as_str()) {
-                let data = message.get_text();
                 query.set_action(user, "lock").await;
+                let data = message.get_text();
                 action_fn
                     .execute(Res, Req::new(user, query, Data::new(data, None)))
                     .await;
@@ -85,7 +85,6 @@ async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) 
         let uri_payload = postback.get_payload();
         execute_payload(user, uri_payload, query).await;
     }
-
     "Ok"
 }
 

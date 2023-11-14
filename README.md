@@ -21,8 +21,7 @@ To use Russenger in your Rust project, add the following dependencies to your `C
 ```toml
 [dependencies]
 russenger = { git = "https://github.com/j03-dev/russenger", branch = "main" }
-rocket = { version = "0.5.0-rc.3", features = ["json"] }
-rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", branch = "master" }
+rocket = { version = "0.5.0-rc.4", features = ["json"] }
 ```
 
 Ensure that you have set up your `.env` file within your project directory. The file should contain the following configurations:

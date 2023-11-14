@@ -1,14 +1,15 @@
+use payload::Payload;
+use quick_replies::{QuickReplie, QuickReplieModel};
+
+use crate::Data;
+use crate::Res;
+
 pub mod generic;
 pub mod media;
 pub mod payload;
 pub mod quick_replies;
 pub mod recipient;
 pub mod text;
-
-use crate::Data;
-use crate::Res;
-use payload::Payload;
-use quick_replies::{QuickReplie, QuickReplieModel};
 
 type Path = &'static str;
 

@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use rocket::serde::json::Json;
 use rocket::{catch, catchers, get, post, routes, State};
+use rocket::serde::json::Json;
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
 use action::ACTION_REGISTRY;
@@ -66,7 +66,9 @@ async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) 
     let user = data.get_sender();
     if let Some(message) = data.get_message() {
         query.create(user).await;
+
         let action = query.get_action(user).await.unwrap_or("lock".to_string());
+
         if let Some(quick_reply) = message.get_quick_reply() {
             let uri_payload = quick_reply.get_payload();
             execute_payload(user, uri_payload, query).await;
@@ -102,8 +104,8 @@ pub async fn run_server() {
         allow_credentials: true,
         ..Default::default()
     }
-    .to_cors()
-    .expect("Failed create cors: Some thing wrong on cors");
+        .to_cors()
+        .expect("Failed create cors: Some thing wrong on cors");
 
     rocket::build()
         .attach(cors)

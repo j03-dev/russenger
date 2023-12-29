@@ -1,23 +1,28 @@
-pub mod command;
-pub mod core;
-pub mod query;
-pub mod response_models;
+pub use rocket::{async_trait, main};
 
 pub use crate::core::action::Action;
 pub use crate::core::data::Data;
 pub use crate::core::request::Req;
 pub use crate::core::response::Res;
-pub use rocket::{async_trait, main};
+
+pub mod command;
+pub mod core;
+pub mod query;
+pub mod response_models;
 
 #[macro_export]
 macro_rules! create_action {
-    ($name:ident, $handler:expr) => {
+    ($name:ident, $path_action:ident, $handler:expr) => {
         pub struct $name;
 
         #[russenger::async_trait]
         impl russenger::Action for $name {
             async fn execute<'l>(&self, res: russenger::Res, req: russenger::Req<'l>) {
                 ($handler)(res, req).await;
+            }
+
+            fn path() -> String {
+                $path_action
             }
         }
     };

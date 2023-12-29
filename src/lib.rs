@@ -11,12 +11,12 @@ pub mod query;
 pub mod response_models;
 
 #[macro_export]
-macro_rules! action {
-    ($path_action:expr, $handler:expr) => {{
-        struct Action;
+macro_rules! create_action {
+    ($name:ident, $path_action:expr, $handler:expr) => {
+        pub struct $name;
 
         #[russenger::async_trait]
-        impl russenger::Action for Action {
+        impl russenger::Action for $name {
             async fn execute<'l>(&self, res: russenger::Res, req: russenger::Req<'l>) {
                 ($handler)(res, req).await;
             }
@@ -25,7 +25,7 @@ macro_rules! action {
                 $path_action.to_string()
             }
         }
-    }};
+    };
 }
 
 #[macro_export]

@@ -47,7 +47,7 @@ async fn execute_payload(user: &str, data: &str, query: &Query) {
             if let Some(action_fn) = ACTION_REGISTRY
                 .lock()
                 .await
-                .get(payload.get_action().as_str())
+                .get(payload.get_path_action().as_str())
             {
                 let data = payload.get_data_to_string();
                 action_fn

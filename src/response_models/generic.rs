@@ -1,6 +1,6 @@
-use super::SendAnotherAction;
-pub use crate::Data;
 use rocket::serde::Serialize;
+
+pub use crate::Data;
 
 use super::{payload::Payload, recipient::Recipient};
 
@@ -70,5 +70,3 @@ impl<'g> GenericModel<'g> {
         }
     }
 }
-
-impl<'g> SendAnotherAction for GenericModel<'g> {}

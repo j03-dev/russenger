@@ -1,22 +1,35 @@
-pub use crate::core::data::Data;
 use url::form_urlencoded;
+
+use crate::Action;
+pub use crate::core::data::Data;
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Payload {
-    action: String,
+    path_action: String,
     data: Option<Data>,
 }
 
+pub enum ActionPayload {
+    Action(Box<dyn Action>),
+    PathAction(String),
+}
+
 impl Payload {
-    pub fn new(action: &str, data: Option<Data>) -> Self {
+    pub fn new(action_payload: ActionPayload, data: Option<Data>) -> Self {
+        let path_action = match action_payload {
+            ActionPayload::Action(action) => action.path(),
+            ActionPayload::PathAction(path_action) => path_action,
+        };
+
         Self {
-            action: action.into(),
+            path_action,
             data,
         }
     }
 
-    pub fn get_action(&self) -> &String {
-        &self.action
+
+    pub fn get_path_action(&self) -> &String {
+        &self.path_action
     }
 
     pub fn get_data_to_string(&self) -> String {
@@ -25,7 +38,7 @@ impl Payload {
 
     pub fn to_uri_string(&self) -> String {
         form_urlencoded::Serializer::new(String::new())
-            .append_pair("action", self.get_action())
+            .append_pair("action", self.get_path_action())
             .append_pair("value", &self.get_data_to_string())
             .finish()
     }
@@ -35,19 +48,19 @@ impl Payload {
             .into_owned()
             .collect();
 
-        let mut action = None;
+        let mut path = None;
         let mut value = None;
 
         for (name, val) in parsed {
             match name.as_str() {
-                "action" => action = Some(val),
+                "action" => path = Some(val),
                 "value" => value = Some(val),
                 _ => return Err(format!("Unknown field in URI: {}", name)),
             }
         }
 
-        match (action, value) {
-            (Some(action), Some(value)) => Ok(Self::new(&action, Some(Data::from(value)))),
+        match (path, value) {
+            (Some(path_action), Some(value)) => Ok(Self::new(ActionPayload::PathAction(path_action), Some(Data::from(value)))),
             _ => Err("Missing fields in URI".to_string()),
         }
     }

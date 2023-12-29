@@ -25,13 +25,13 @@ macro_rules! create_action {
 
 #[macro_export]
 macro_rules! russenger_app {
-    ($($path:expr => $action:expr),* $(,)?) => {
+    ($($action:expr),* $(,)?) => {
         use russenger::command::execute_command;
         use russenger::core::action::ACTION_REGISTRY;
 
         #[russenger::main]
         async fn main() {
-            $(ACTION_REGISTRY.lock().await.insert($path, Box::new($action));)*
+            $(ACTION_REGISTRY.lock().await.insert($action.path().as_str(), Box::new($action));)*
             execute_command().await;
         }
     };

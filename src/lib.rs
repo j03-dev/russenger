@@ -12,7 +12,7 @@ pub mod response_models;
 
 #[macro_export]
 macro_rules! create_action {
-    ($name:ident, $path_action:ident, $handler:expr) => {
+    ($name:ident, $path_action:expr, $handler:expr) => {
         pub struct $name;
 
         #[russenger::async_trait]

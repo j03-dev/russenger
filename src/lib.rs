@@ -21,7 +21,7 @@ macro_rules! create_action {
                 ($handler)(res, req).await;
             }
 
-            fn path() -> String {
+            fn path(&self) -> String {
                 $path_action.to_string()
             }
         }

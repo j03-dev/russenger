@@ -9,6 +9,8 @@ use crate::core::response::Res;
 #[rocket::async_trait]
 pub trait Action: Send + Sync {
     async fn execute<'l>(&self, res: Res, req: Req<'l>);
+
+    fn path(&self) -> String;
 }
 
 type ActionRegistryType = Arc<Mutex<HashMap<&'static str, Box<dyn Action>>>>;

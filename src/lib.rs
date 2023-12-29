@@ -22,7 +22,7 @@ macro_rules! create_action {
             }
 
             fn path() -> String {
-                $path_action
+                $path_action.to_string()
             }
         }
     };

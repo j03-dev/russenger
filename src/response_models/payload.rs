@@ -1,7 +1,7 @@
 use url::form_urlencoded;
 
-use crate::Action;
 pub use crate::core::data::Data;
+use crate::Action;
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Payload {
@@ -21,12 +21,8 @@ impl Payload {
             ActionPayload::PathAction(path_action) => path_action,
         };
 
-        Self {
-            path_action,
-            data,
-        }
+        Self { path_action, data }
     }
-
 
     pub fn get_path_action(&self) -> &String {
         &self.path_action
@@ -60,7 +56,10 @@ impl Payload {
         }
 
         match (path, value) {
-            (Some(path_action), Some(value)) => Ok(Self::new(ActionPayload::PathAction(path_action), Some(Data::from(value)))),
+            (Some(path_action), Some(value)) => Ok(Self::new(
+                ActionPayload::PathAction(path_action),
+                Some(Data::from(value)),
+            )),
             _ => Err("Missing fields in URI".to_string()),
         }
     }

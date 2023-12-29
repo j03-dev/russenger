@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use rocket::{catch, catchers, get, post, routes, State};
+use rocket::fs::FileServer;
 use rocket::serde::json::Json;
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
@@ -111,6 +112,7 @@ pub async fn run_server() {
         .attach(cors)
         .manage(AppState::init().await)
         .mount("/", routes![webhook_verify, webhook_core])
+        .mount("/static", FileServer::from("/static"))
         .register("/", catchers![page_not_found, server_panic])
         .launch()
         .await

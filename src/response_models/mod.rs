@@ -22,7 +22,7 @@ pub trait SendAnotherAction {
 
         let value: String = data.get_value();
 
-        if start & end > 0 {
+        if start >= 5 && end >= 5 {
             quick_replies.push(QuickReplie::new(
                 "Prev",
                 "",

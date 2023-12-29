@@ -13,7 +13,7 @@ pub trait Action: Send + Sync {
     fn path(&self) -> String;
 }
 
-type ActionRegistryType = Arc<Mutex<HashMap<&'static str, Box<dyn Action>>>>;
+type ActionRegistryType = Arc<Mutex<HashMap<String, Box<dyn Action>>>>;
 
 lazy_static::lazy_static! {
     pub static ref ACTION_REGISTRY: ActionRegistryType = Arc::new(Mutex::new(HashMap::new()));

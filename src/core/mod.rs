@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use rocket::{catch, catchers, get, post, routes, State};
 use rocket::fs::FileServer;
 use rocket::serde::json::Json;
+use rocket::{catch, catchers, get, post, routes, State};
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
 use action::ACTION_REGISTRY;
@@ -105,8 +105,8 @@ pub async fn run_server() {
         allow_credentials: true,
         ..Default::default()
     }
-        .to_cors()
-        .expect("Failed create cors: Some thing wrong on cors");
+    .to_cors()
+    .expect("Failed create cors: Some thing wrong on cors");
 
     rocket::build()
         .attach(cors)

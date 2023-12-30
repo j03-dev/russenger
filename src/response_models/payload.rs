@@ -10,15 +10,15 @@ pub struct Payload {
 }
 
 pub enum ActionPayload {
-    Action(Box<dyn Action>),
-    PathAction(String),
+    Action(dyn Action),
+    Path(String),
 }
 
 impl Payload {
     pub fn new(action_payload: ActionPayload, data: Option<Data>) -> Self {
         let path_action = match action_payload {
             ActionPayload::Action(action) => action.path(),
-            ActionPayload::PathAction(path_action) => path_action,
+            ActionPayload::Path(path) => path,
         };
 
         Self { path_action, data }
@@ -56,8 +56,8 @@ impl Payload {
         }
 
         match (path, value) {
-            (Some(path_action), Some(value)) => Ok(Self::new(
-                ActionPayload::PathAction(path_action),
+            (Some(path), Some(value)) => Ok(Self::new(
+                ActionPayload::Path(path),
                 Some(Data::from(value)),
             )),
             _ => Err("Missing fields in URI".to_string()),

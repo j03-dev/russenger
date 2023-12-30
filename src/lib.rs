@@ -12,13 +12,13 @@ pub mod response_models;
 
 #[macro_export]
 macro_rules! create_action {
-    ($name:ident, |$res:ident, $req: ident| $custom_impl:block) => {
+    ($name:ident, $handler:expr) => {
         pub struct $name;
 
         #[russenger::async_trait]
         impl russenger::Action for $name {
             async fn execute<'l>(&self, res: russenger::Res, req: russenger::Req<'l>) {
-                $custom_impl
+                ($handler)(res, req).await;
             }
 
             fn path(&self) -> String {

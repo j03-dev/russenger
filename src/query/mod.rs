@@ -1,16 +1,16 @@
 use std::env::var;
 
-use sqlx::{Any, AnyPool, Pool, Row};
+use sqlx::{MySql, MySqlPool, Pool, Row};
 
-async fn database_connection() -> Pool<Any> {
+async fn database_connection() -> Pool<MySql> {
     let url = var("DATABASE").expect("check your .env file \n pls spécifie your database name");
-    AnyPool::connect(&url)
+    MySqlPool::connect(&url)
         .await
         .expect("Database connection failed")
 }
 
 pub struct Query {
-    pub connection: Pool<Any>,
+    pub connection: Pool<MySql>,
 }
 
 impl Query {

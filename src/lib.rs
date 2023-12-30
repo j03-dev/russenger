@@ -22,7 +22,7 @@ macro_rules! create_action {
             }
 
             fn path(&self) -> String {
-                stringify!($name)
+                stringify!($name).to_string()
             }
         }
     };

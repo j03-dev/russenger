@@ -40,15 +40,15 @@ DATABASE=postgres://<user>:<password>@<host>/<db_name>
 The following example demonstrates the usage of Russenger for creating a chatbot in Rust. It includes actions named `Hello`, `Option1`, and `Option2`, along with a user scenario:
 
 ```rust
-use russenger::{Action, Data, Req, Res};
+use russenger::{Data, Req, Res};
 use russenger::response_models::generic::{GenericButton, GenericElement, GenericModel};
-use russenger::response_models::payload::Payload;
+use russenger::response_models::payload::{ActionPayload, Payload};
 use russenger::response_models::quick_replies::{QuickReplie, QuickReplieModel};
 use russenger::response_models::text::TextModel;
 use russenger::{create_action, russenger_app};
 
 
-create_action!(Hello, |res: Res, req: Req<'l>| async move {
+create_action!(Hello, "/", |res: Res, req: Req<'l>| async move {
     // Welcome message
     res.send(TextModel::new(req.user, "Hello, I'm your chatbot!"))
         .await
@@ -59,12 +59,18 @@ create_action!(Hello, |res: Res, req: Req<'l>| async move {
         QuickReplie::new(
             "Option 1",
             "",
-            Payload::new("/option1", Some(Data::new("payload_for_option1", None))),
+            Payload::new(
+                ActionPayload::Action(Box::new(Option1)),
+                Some(Data::new("payload_for_option1", None))
+            ),
         ),
         QuickReplie::new(
             "Option 2",
             "",
-            Payload::new("/option2", Some(Data::new("payload_for_option2", None))),
+            Payload::new(
+                ActionPayload::Action(Box::new(Option2)),
+                Some(Data::new("payload_for_option2", None))
+            ),
         ),
     ];
 
@@ -78,7 +84,7 @@ create_action!(Hello, |res: Res, req: Req<'l>| async move {
 });
 
 // For Option1
-create_action!(Option1, |res: Res, req: Req<'l>| async move {
+create_action!(Option1, "/option1", |res: Res, req: Req<'l>| async move {
     // Handle Option 1 with a TextModel
     res.send(TextModel::new(
         req.user,
@@ -89,7 +95,7 @@ create_action!(Option1, |res: Res, req: Req<'l>| async move {
 });
 
 // For Option2
-create_action!(Option2, |res: Res, req: Req<'l>| async move {
+create_action!(Option2, "/option2", |res: Res, req: Req<'l>| async move {
     // Handle Option 2 with a TextModel
     res.send(TextModel::new(
         req.user,
@@ -105,7 +111,7 @@ create_action!(Option2, |res: Res, req: Req<'l>| async move {
         subtitle: "Option 2 description",
         buttons: vec![GenericButton::new(
             "Choose Option 2",
-            Payload::new("/hello", None),
+            Payload::new(ActionPayload::Action(Box::new(Hello)), None),
         )],
     }];
 
@@ -114,11 +120,7 @@ create_action!(Option2, |res: Res, req: Req<'l>| async move {
         .unwrap();
 });
 
-russenger_app!(
-    "/" => Hello {},
-    "/option1" => Option1 {},
-    "/option2" => Option2 {}
-);
+russenger_app!(Hello, Option1, Option2);
 ```
 
 ### Endpoints

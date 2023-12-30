@@ -10,7 +10,7 @@ pub struct Payload {
 }
 
 pub enum ActionPayload {
-    Action(dyn Action),
+    Action(Box<dyn Action>),
     Path(String),
 }
 

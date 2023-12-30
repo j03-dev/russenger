@@ -1,20 +1,16 @@
 use std::env::var;
 
-use sqlx::postgres::PgPoolOptions;
-use sqlx::{Pool, Postgres, Row};
+use sqlx::{Any, AnyPool, Pool, Row};
 
-async fn database_connection() -> Pool<Postgres> {
-    let database_url =
-        var("DATABASE").expect("check your .env file \n pls spécifie your database name");
-
-    PgPoolOptions::new()
-        .connect(&database_url)
+async fn database_connection() -> Pool<Any> {
+    let url = var("DATABASE").expect("check your .env file \n pls spécifie your database name");
+    AnyPool::connect(&url)
         .await
         .expect("Database connection failed")
 }
 
 pub struct Query {
-    pub connection: Pool<Postgres>,
+    pub connection: Pool<Any>,
 }
 
 impl Query {

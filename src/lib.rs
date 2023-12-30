@@ -31,6 +31,7 @@ macro_rules! create_action {
 #[macro_export]
 macro_rules! russenger_app {
     ($($action:expr),* $(,)?) => {
+        use russenger::Action;
         use russenger::command::execute_command;
         use russenger::core::action::ACTION_REGISTRY;
 

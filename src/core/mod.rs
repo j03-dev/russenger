@@ -112,7 +112,7 @@ pub async fn run_server() {
         .attach(cors)
         .manage(AppState::init().await)
         .mount("/", routes![webhook_verify, webhook_core])
-        .mount("/static", FileServer::from("/static"))
+        .mount("/static", FileServer::from("static"))
         .register("/", catchers![page_not_found, server_panic])
         .launch()
         .await

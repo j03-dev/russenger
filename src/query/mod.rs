@@ -36,7 +36,7 @@ impl Query {
         let sql = "insert into russenger_user (facebook_user_id, action) values ($1, $2)";
         sqlx::query(sql)
             .bind(user_id)
-            .bind("/")
+            .bind("Main")
             .execute(&self.connection)
             .await
             .is_ok()
@@ -67,7 +67,7 @@ impl Query {
     pub async fn reset_action(&self, user_id: &str) -> bool {
         let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
         sqlx::query(sql)
-            .bind("/")
+            .bind("Main")
             .bind(user_id)
             .execute(&self.connection)
             .await

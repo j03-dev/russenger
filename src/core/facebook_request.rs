@@ -34,12 +34,10 @@ impl<'a> FromRequest<'a> for FacebookRequest {
             match key {
                 "hub.mode" => hub_mode = Some(value),
                 "hub.challenge" => hub_challenge = Some(value),
-                "token" => token = Some(value),
+                "hub.verify_token" => token = Some(value),
                 _ => (),
             }
         }
-
-        println!("{hub_mode:?} => {hub_challenge:?} => {token:?}");
 
         match (hub_mode, hub_challenge, token) {
             (Some(hub_mode), Some(hub_challenge), Some(token)) => {

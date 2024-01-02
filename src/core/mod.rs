@@ -65,11 +65,13 @@ async fn execute_payload(user: &str, data: &str, query: &Query) {
 async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) -> &'static str {
     let query = &state.query;
     let user = data.get_sender();
-    
+
     println!("{data:?}");
 
     if let Some(message) = data.get_message() {
-        query.create(user).await;
+        println!("Message {message:?}");
+
+        println!("query create user {result}", result = query.create(user).await);
 
         let action = query.get_action(user).await.unwrap_or("lock".to_string());
 

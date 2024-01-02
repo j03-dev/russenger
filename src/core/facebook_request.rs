@@ -39,6 +39,8 @@ impl<'a> FromRequest<'a> for FacebookRequest {
             }
         }
 
+        println!("{hub_mode:?} => {hub_challenge:?} => {token:?}");
+
         match (hub_mode, hub_challenge, token) {
             (Some(hub_mode), Some(hub_challenge), Some(token)) => {
                 if hub_mode.eq("subscribe") && env::var("VERIFY_TOKEN").unwrap().eq(token) {

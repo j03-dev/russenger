@@ -4,6 +4,7 @@ pub use crate::core::action::Action;
 pub use crate::core::data::Data;
 pub use crate::core::request::Req;
 pub use crate::core::response::Res;
+pub use dotenv::dotenv;
 
 pub mod command;
 pub mod core;

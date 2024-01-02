@@ -66,13 +66,7 @@ async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) 
     let query = &state.query;
     let user = data.get_sender();
 
-    println!("{data:?}");
-
     if let Some(message) = data.get_message() {
-        println!("Message {message:?}");
-
-        println!("query create user {result}", result = query.create(user).await);
-
         let action = query.get_action(user).await.unwrap_or("lock".to_string());
 
         if let Some(quick_reply) = message.get_quick_reply() {

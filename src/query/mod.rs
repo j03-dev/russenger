@@ -75,8 +75,6 @@ impl Query {
     }
 }
 
-
-
 #[cfg(test)]
 mod test {
     use crate::query::Query;
@@ -84,9 +82,17 @@ mod test {
 
     #[rocket::async_test]
     async fn insert_user() {
-        dotenv().ok(); 
+        dotenv().ok();
         let query = Query::new().await;
         let left = query.create("test").await;
+        assert_eq!(true, left);
+    }
+
+    #[rocket::async_test]
+    async fn set_action() {
+        dotenv().ok();
+        let query = Query::new().await;
+        let left = query.set_action("test", "Test").await;
         assert_eq!(true, left);
     }
 }

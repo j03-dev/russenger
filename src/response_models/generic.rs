@@ -2,6 +2,7 @@ use rocket::serde::Serialize;
 
 pub use crate::Data;
 
+use super::GetSender;
 use super::{payload::Payload, recipient::Recipient};
 
 #[derive(Debug, Serialize)]
@@ -48,6 +49,8 @@ struct GenericMessage<'m> {
     pub attachment: Attachment<'m>,
 }
 
+use super::NextPrevNavigation;
+
 #[derive(Debug, Serialize)]
 pub struct GenericModel<'g> {
     recipient: Recipient<'g>,
@@ -70,3 +73,12 @@ impl<'g> GenericModel<'g> {
         }
     }
 }
+
+impl<'g> GetSender<'g> for GenericModel<'g> {
+    fn get_sender(&self) -> &'g str {
+        self.recipient.id
+    }
+}
+
+#[rocket::async_trait]
+impl<'g> NextPrevNavigation<'g> for GenericModel<'g> {}

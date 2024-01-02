@@ -33,7 +33,7 @@ impl Query {
     }
 
     pub async fn create(&self, user_id: &str) -> bool {
-        let sql = "insert into russenger_user (facebook_user_id, action) values ($1, $2)";
+        let sql = "insert into russenger_user (facebook_user_id, action) values (?, ?)";
         sqlx::query(sql)
             .bind(user_id)
             .bind("Main")
@@ -43,7 +43,7 @@ impl Query {
     }
 
     pub async fn set_action(&self, user_id: &str, action: &str) -> bool {
-        let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
+        let sql = "update russenger_user set action=? where facebook_user_id=?";
         sqlx::query(sql)
             .bind(action)
             .bind(user_id)
@@ -53,7 +53,7 @@ impl Query {
     }
 
     pub async fn get_action(&self, user_id: &str) -> Option<String> {
-        let sql = "select action from russenger_user where facebook_user_id=$1";
+        let sql = "select action from russenger_user where facebook_user_id=?";
         match sqlx::query(sql)
             .bind(user_id)
             .fetch_one(&self.connection)
@@ -65,7 +65,7 @@ impl Query {
     }
 
     pub async fn reset_action(&self, user_id: &str) -> bool {
-        let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
+        let sql = "update russenger_user set action=? where facebook_user_id=?";
         sqlx::query(sql)
             .bind("Main")
             .bind(user_id)

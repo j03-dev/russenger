@@ -80,5 +80,4 @@ impl<'g> GetSender<'g> for GenericModel<'g> {
     }
 }
 
-#[rocket::async_trait]
 impl<'g> NextPrevNavigation<'g> for GenericModel<'g> {}

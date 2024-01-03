@@ -37,7 +37,7 @@ DATABASE=postgres://<user>:<password>@<host>/<db_name>
 
 ### Example Application
 
-The following example demonstrates the usage of Russenger for creating a chatbot in Rust. It includes actions named `Hello`, `Option1`, and `Option2`, along with a user scenario:
+The following example demonstrates the usage of Russenger for creating a chatbot in Rust. It includes actions named `Main`, `Option1`, and `Option2`, along with a user scenario:
 
 ```rust
 use russenger::{Data, Req, Res};
@@ -48,9 +48,9 @@ use russenger::response_models::text::TextModel;
 use russenger::{create_action, russenger_app};
 
 
-create_action!(Hello, |res: Res, req: Req<'l>| async move {
+create_action!(Main, |res: Res, req: Req<'l>| async move {
     // Welcome message
-    res.send(TextModel::new(req.user, "Hello, I'm your chatbot!"))
+    res.send(TextModel::new(req.user, "Main, I'm your chatbot!"))
         .await
         .unwrap();
 
@@ -111,7 +111,7 @@ create_action!(Option2, |res: Res, req: Req<'l>| async move {
         subtitle: "Option 2 description",
         buttons: vec![GenericButton::new(
             "Choose Option 2",
-            Payload::new(ActionPayload::Action(Box::new(Hello)), None),
+            Payload::new(ActionPayload::Action(Box::new(Main)), None),
         )],
     }];
 
@@ -120,7 +120,7 @@ create_action!(Option2, |res: Res, req: Req<'l>| async move {
         .unwrap();
 });
 
-russenger_app!(Hello, Option1, Option2);
+russenger_app!(Main, Option1, Option2);
 ```
 
 ### Endpoints

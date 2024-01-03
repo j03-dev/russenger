@@ -5,7 +5,7 @@ use super::recipient::Recipient;
 #[derive(Serialize)]
 struct MediaPayload<'p> {
     url: &'p str,
-    is_resuable: bool,
+    is_reusable: bool,
 }
 
 #[derive(Serialize)]
@@ -37,7 +37,7 @@ impl<'m> MediaModel<'m> {
                     r#type: media_type,
                     payload: MediaPayload {
                         url,
-                        is_resuable: true,
+                        is_reusable: true,
                     },
                 },
             },

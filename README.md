@@ -48,7 +48,7 @@ use russenger::response_models::text::TextModel;
 use russenger::{create_action, russenger_app};
 
 
-create_action!(Hello, "/", |res: Res, req: Req<'l>| async move {
+create_action!(Hello, |res: Res, req: Req<'l>| async move {
     // Welcome message
     res.send(TextModel::new(req.user, "Hello, I'm your chatbot!"))
         .await
@@ -84,7 +84,7 @@ create_action!(Hello, "/", |res: Res, req: Req<'l>| async move {
 });
 
 // For Option1
-create_action!(Option1, "/option1", |res: Res, req: Req<'l>| async move {
+create_action!(Option1, |res: Res, req: Req<'l>| async move {
     // Handle Option 1 with a TextModel
     res.send(TextModel::new(
         req.user,
@@ -95,7 +95,7 @@ create_action!(Option1, "/option1", |res: Res, req: Req<'l>| async move {
 });
 
 // For Option2
-create_action!(Option2, "/option2", |res: Res, req: Req<'l>| async move {
+create_action!(Option2, |res: Res, req: Req<'l>| async move {
     // Handle Option 2 with a TextModel
     res.send(TextModel::new(
         req.user,

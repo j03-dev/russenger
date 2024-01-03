@@ -16,15 +16,15 @@ struct MediaAttachment<'a> {
 }
 
 #[derive(Serialize)]
-struct Attachement<'s> {
-    attachement: MediaAttachment<'s>,
+struct Attachment<'s> {
+    attachment: MediaAttachment<'s>,
 }
 
 #[derive(Serialize)]
 pub struct MediaModel<'m> {
     messaging_type: &'m str,
     recipient: Recipient<'m>,
-    message: Attachement<'m>,
+    message: Attachment<'m>,
 }
 
 impl<'m> MediaModel<'m> {
@@ -32,8 +32,8 @@ impl<'m> MediaModel<'m> {
         Self {
             messaging_type: "RESPONSE",
             recipient: Recipient { id: sender },
-            message: Attachement {
-                attachement: MediaAttachment {
+            message: Attachment {
+                attachment: MediaAttachment {
                     r#type: media_type,
                     payload: MediaPayload {
                         url,

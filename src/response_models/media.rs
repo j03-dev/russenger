@@ -16,20 +16,29 @@ struct MediaAttachment<'a> {
 }
 
 #[derive(Serialize)]
+struct Attachement<'s> {
+    attachement: MediaAttachment<'s>,
+}
+
+#[derive(Serialize)]
 pub struct MediaModel<'m> {
+    messaging_type: &'m str,
     recipient: Recipient<'m>,
-    message: MediaAttachment<'m>,
+    message: Attachement<'m>,
 }
 
 impl<'m> MediaModel<'m> {
-    pub fn new(sender: &'m str, media_type: &'m str, image_url: &'m str) -> Self {
+    pub fn new(sender: &'m str, media_type: &'m str, url: &'m str) -> Self {
         Self {
+            messaging_type: "RESPONSE",
             recipient: Recipient { id: sender },
-            message: MediaAttachment {
-                r#type: media_type,
-                payload: MediaPayload {
-                    url: image_url,
-                    is_resuable: true,
+            message: Attachement {
+                attachement: MediaAttachment {
+                    r#type: media_type,
+                    payload: MediaPayload {
+                        url,
+                        is_resuable: true,
+                    },
                 },
             },
         }

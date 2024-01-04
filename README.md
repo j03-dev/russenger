@@ -2,7 +2,9 @@
 
 ![Russenger Logo](./image.png)
 
-Russenger is a Rust library designed to simplify the handling of Facebook Messenger webhook responses. It offers a convenient way to construct and send various types of responses, including text messages, quick replies, generic templates, and media attachments.
+Russenger is a Rust library designed to simplify the handling of Facebook Messenger webhook responses. It offers a
+convenient way to construct and send various types of responses, including text messages, quick replies, generic
+templates, and media attachments.
 
 ## Features
 
@@ -21,23 +23,49 @@ To use Russenger in your Rust project, add the following dependencies to your `C
 ```toml
 [dependencies]
 russenger = { git = "https://github.com/j03-dev/russenger", branch = "main" }
-rocket = { version = "0.5.0-rc.4", features = ["json"] }
+rocket = { version = "0.5.0", features = ["json"] }
 ```
 
-Ensure that you have set up your `.env` file within your project directory. The file should contain the following configurations:
+Ensure that you have set up your `.env` file within your project directory. The file should contain the following
+configurations:
 
 ```env
 VERIFY_TOKEN=<your-verify-token>
 API=https://graph.facebook.com/v16.0/me/messages?access-token=
 PAGE_ACCESS_TOKEN=<your-page-access-token>
+```
+
+#### postgres
+
+```env
 DATABASE=postgres://<user>:<password>@<host>/<db_name>
+```
+
+#### mysql
+
+```env
+DATABASE=mysql://<user>:<password>@<host>/<db_name>
+```
+
+#### sqlite
+
+```env
+DATABASE=sqlite:<dbname>
+```
+
+### Create Static Directory
+
+```bash
+mkdir <project>/static/
+touch <project>/static/.keep
 ```
 
 ## Usage
 
 ### Example Application
 
-The following example demonstrates the usage of Russenger for creating a chatbot in Rust. It includes actions named `Main`, `Option1`, and `Option2`, along with a user scenario:
+The following example demonstrates the usage of Russenger for creating a chatbot in Rust. It includes actions
+named `Main`, `Option1`, and `Option2`, along with a user scenario:
 
 ```rust
 use russenger::{Data, Req, Res};
@@ -125,9 +153,11 @@ russenger_app!(Main, Option1, Option2);
 
 ### Endpoints
 
-- **GET `/webhook`:** Verify your chatbot with Facebook Messenger. Facebook will send a challenge, and your bot must respond correctly for verification.
+- **GET `/webhook`:** Verify your chatbot with Facebook Messenger. Facebook will send a challenge, and your bot must
+  respond correctly for verification.
 
-- **POST `/webhook`:** This is where Facebook Messenger sends messages from users. Handle incoming messages and respond accordingly here.
+- **POST `/webhook`:** This is where Facebook Messenger sends messages from users. Handle incoming messages and respond
+  accordingly here.
 
 ### License
 

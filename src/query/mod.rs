@@ -2,7 +2,6 @@ use std::env::var;
 
 use sqlx::{MySql, Pool, Postgres, Row, Sqlite};
 
-#[derive(PartialOrd, PartialEq)]
 pub enum DB {
     Mysql(Pool<MySql>),
     Postgres(Pool<Postgres>),

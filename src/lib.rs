@@ -11,6 +11,7 @@ pub use crate::response_models::media;
 pub use crate::response_models::payload;
 pub use crate::response_models::quick_replies;
 pub use crate::response_models::text;
+pub use crate::response_models::NextPrevNavigation;
 
 pub mod command;
 mod core;

@@ -19,7 +19,7 @@ pub trait GetSender<'r> {
 #[rocket::async_trait]
 pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
     async fn send_next_prev(&self, path: &str, data: Data) {
-        if let Some([start, end]) = data.get_page() {
+        let [start, end] = data.get_page().unwrap_or([0, 5]);
             let mut navigations: Vec<QuickReplie> = Vec::new();
 
             let value: String = data.get_value();
@@ -55,5 +55,4 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
             .await
             .unwrap();
         }
-    }
 }

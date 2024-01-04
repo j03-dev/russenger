@@ -48,13 +48,3 @@ macro_rules! russenger_app {
         }
     };
 }
-
-#[macro_export]
-macro_rules! action_payload {
-    (Action, $action:expr) => {
-        ressenger::payload::ActionPayload::Action(Box::new($action))
-    };
-    (Path, $path:expr) => {
-        ressenger::payload::ActionPayload::Path($path)
-    };
-}

@@ -5,25 +5,17 @@ use crate::Action;
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Payload {
-    path_action: String,
-    data: Option<Data>,
-}
-
-pub enum ActionPayload {
-    Action(Box<dyn Action>),
-    Path(String),
+    pub path_action: String,
+    pub data: Option<Data>,
 }
 
 impl Payload {
-    pub fn new(action_payload: ActionPayload, data: Option<Data>) -> Self {
-        let path_action = match action_payload {
-            ActionPayload::Action(action) => action.path(),
-            ActionPayload::Path(path) => path,
-        };
-
-        Self { path_action, data }
+    pub fn new(action: Box<dyn Action>, data: Option<Data>) -> Self {
+        Self {
+            path_action: action.path(),
+            data,
+        }
     }
-
     pub fn get_path_action(&self) -> &String {
         &self.path_action
     }
@@ -56,10 +48,10 @@ impl Payload {
         }
 
         match (path, value) {
-            (Some(path), Some(value)) => Ok(Self::new(
-                ActionPayload::Path(path),
-                Some(Data::from(value)),
-            )),
+            (Some(path), Some(value)) => Ok(Self {
+                path_action: path,
+                data: Some(Data::from(value)),
+            }),
             _ => Err("Missing fields in URI".to_string()),
         }
     }

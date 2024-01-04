@@ -21,19 +21,8 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
     async fn send_next_prev(&self, path: &str, data: Data) {
         if let Some([start, end]) = data.get_page() {
             let mut navigations: Vec<QuickReplie> = Vec::new();
-            let next = QuickReplie::new(
-                "Next",
-                "",
-                Payload::new(
-                    ActionPayload::Path(path.into()),
-                    Some(Data::new(
-                        data.get_value::<String>(),
-                        Some([start + 5, end + 5]),
-                    )),
-                ),
-            );
 
-            navigations.push(next);
+            let value: String = data.get_value();
 
             if start >= 5 && end >= 5 {
                 let prev = QuickReplie::new(
@@ -41,14 +30,22 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
                     "",
                     Payload::new(
                         ActionPayload::Path(path.into()),
-                        Some(Data::new(
-                            data.get_value::<String>(),
-                            Some([start - 5, end - 5]),
-                        )),
+                        Some(Data::new(&value, Some([start - 5, end - 5]))),
                     ),
                 );
                 navigations.push(prev);
             }
+
+            let next = QuickReplie::new(
+                "Next",
+                "",
+                Payload::new(
+                    ActionPayload::Path(path.into()),
+                    Some(Data::new(&value, Some([start + 5, end + 5]))),
+                ),
+            );
+
+            navigations.push(next);
 
             Res.send(QuickReplieModel::new(
                 self.get_sender(),

@@ -2,8 +2,9 @@ use rocket::serde::Serialize;
 
 pub use crate::Data;
 
-use super::GetSender;
 use super::{payload::Payload, recipient::Recipient};
+use super::GetSender;
+use super::NextPrevNavigation;
 
 #[derive(Debug, Serialize)]
 pub struct GenericButton<'b> {
@@ -48,8 +49,6 @@ struct Attachment<'a> {
 struct GenericMessage<'m> {
     pub attachment: Attachment<'m>,
 }
-
-use super::NextPrevNavigation;
 
 #[derive(Debug, Serialize)]
 pub struct GenericModel<'g> {

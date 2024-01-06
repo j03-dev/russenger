@@ -88,7 +88,7 @@ create_action!(Main, |res: Res, req: Req<'l>| async move {
             "Option 1",
             "",
             Payload::new(
-                ActionPayload::Action(Box::new(Option1)),
+                Box::new(Option1),
                 Some(Data::new("payload_for_option1", None))
             ),
         ),
@@ -96,7 +96,7 @@ create_action!(Main, |res: Res, req: Req<'l>| async move {
             "Option 2",
             "",
             Payload::new(
-                ActionPayload::Action(Box::new(Option2)),
+                Box::new(Option2),
                 Some(Data::new("payload_for_option2", None))
             ),
         ),
@@ -139,7 +139,7 @@ create_action!(Option2, |res: Res, req: Req<'l>| async move {
         subtitle: "Option 2 description",
         buttons: vec![GenericButton::new(
             "Choose Option 2",
-            Payload::new(ActionPayload::Action(Box::new(Main)), None),
+            Payload::new(Box::new(Main), None),
         )],
     }];
 

@@ -9,7 +9,7 @@ pub enum DB {
     Null,
 }
 
-async fn database_connection() -> DB {
+async fn establish_connection() -> DB {
     let url = var("DATABASE").expect("check your .env file \n pls spécifie your database name");
     if let Some(engine) = url.split(':').collect::<Vec<_>>().first() {
         return match &engine[..] {
@@ -44,7 +44,7 @@ pub struct Query {
 impl Query {
     pub async fn new() -> Self {
         Self {
-            db: database_connection().await,
+            db: establish_connection().await,
         }
     }
 

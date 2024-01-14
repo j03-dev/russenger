@@ -6,13 +6,13 @@ use rocket::{catch, catchers, get, post, routes, State};
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
 use action::ACTION_REGISTRY;
+use app_state::AppState;
+use data::Data;
+use deserializers::MessageDeserializer;
+use facebook_request::FacebookRequest;
 use request::Req;
 use response::Res;
 
-use crate::core::app_state::AppState;
-use crate::core::data::Data;
-use crate::core::deserializers::MessageDeserializer;
-use crate::core::facebook_request::FacebookRequest;
 use crate::query::Query;
 use crate::response_models::payload::Payload;
 use crate::response_models::text::TextModel;

@@ -2,6 +2,7 @@ use std::env::var;
 
 use sqlx::{MySql, Pool, Postgres, Row, Sqlite};
 
+#[derive(Clone)]
 pub enum DB {
     Mysql(Pool<MySql>),
     Postgres(Pool<Postgres>),
@@ -37,6 +38,7 @@ async fn establish_connection() -> DB {
     DB::Null
 }
 
+#[derive(Clone)]
 pub struct Query {
     pub db: DB,
 }

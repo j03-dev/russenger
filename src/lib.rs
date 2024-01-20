@@ -25,7 +25,7 @@ macro_rules! create_action {
 
         #[russenger::async_trait]
         impl russenger::Action for $name {
-            async fn execute<'l>(&self, res: russenger::Res, req: russenger::Req<'l>) {
+            async fn execute(&self, res: russenger::Res, req: russenger::Req) {
                 ($handler)(res, req).await;
             }
 

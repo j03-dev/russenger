@@ -51,7 +51,7 @@ async fn execute_payload(user: &str, data: &str, query: &Query) {
             {
                 let data = payload.get_data_to_string();
                 action_fn
-                    .execute(Res, Req::new(user, query, Data::from(data)))
+                    .execute(Res, Req::new(user, query.clone(), Data::from(data)))
                     .await;
             }
         }
@@ -77,7 +77,7 @@ async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) 
                 query.set_action(user, "lock").await;
                 let data = message.get_text();
                 action_fn
-                    .execute(Res, Req::new(user, query, Data::new(data, None)))
+                    .execute(Res, Req::new(user, query.clone(), Data::new(data, None)))
                     .await;
             }
         } else {

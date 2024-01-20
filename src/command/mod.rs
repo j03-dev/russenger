@@ -5,7 +5,6 @@ use crate::core::{migrate, run_server};
 
 mod arg_parse;
 
-
 fn print_usage() {
     println!("Usage: cargo run --release [runserver|migrate]");
 }

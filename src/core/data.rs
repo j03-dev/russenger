@@ -8,7 +8,6 @@ pub struct Data {
     pages: Option<Pagination>,
 }
 
-
 impl Data {
     pub fn new<T: Serialize>(value: T, pages: Option<Pagination>) -> Self {
         let value = serde_json::to_string(&value).unwrap_or_default();

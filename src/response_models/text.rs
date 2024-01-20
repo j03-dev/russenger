@@ -21,4 +21,3 @@ impl<'s> TextModel<'s> {
         }
     }
 }
-

@@ -16,6 +16,7 @@ pub use crate::response_models::NextPrevNavigation;
 pub mod command;
 mod core;
 mod query;
+mod repository;
 mod response_models;
 
 #[macro_export]

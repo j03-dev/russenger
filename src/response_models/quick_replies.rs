@@ -1,16 +1,17 @@
 use rocket::serde::Serialize;
 
 use super::{payload::Payload, recipient::Recipient};
+use super::{GetSender, NextPrevNavigation};
 
 #[derive(Serialize)]
-pub struct QuickReplie<'r> {
+pub struct QuickReply<'r> {
     content_type: &'r str,
     title: String,
     payload: String,
     image_url: String,
 }
 
-impl<'r> QuickReplie<'r> {
+impl<'r> QuickReply<'r> {
     pub fn new(title: &str, image_url: &str, payload: Payload) -> Self {
         Self {
             content_type: "text",
@@ -24,18 +25,18 @@ impl<'r> QuickReplie<'r> {
 #[derive(Serialize)]
 struct QuickMessage<'m> {
     text: String,
-    quick_replies: &'m Vec<QuickReplie<'m>>,
+    quick_replies: &'m Vec<QuickReply<'m>>,
 }
 
 #[derive(Serialize)]
-pub struct QuickReplieModel<'q> {
+pub struct QuickReplyModel<'q> {
     recipient: Recipient<'q>,
     messaging_type: String,
     message: QuickMessage<'q>,
 }
 
-impl<'q> QuickReplieModel<'q> {
-    pub fn new(sender: &'q str, message: &str, quick_replies: &'q Vec<QuickReplie>) -> Self {
+impl<'q> QuickReplyModel<'q> {
+    pub fn new(sender: &'q str, message: &str, quick_replies: &'q Vec<QuickReply>) -> Self {
         Self {
             recipient: Recipient { id: sender },
             messaging_type: "RESPONSE".into(),
@@ -46,3 +47,11 @@ impl<'q> QuickReplieModel<'q> {
         }
     }
 }
+
+impl<'q> GetSender<'q> for QuickReplyModel<'q> {
+    fn get_sender(&self) -> &'q str {
+        self.recipient.id
+    }
+}
+
+impl<'q> NextPrevNavigation<'q> for QuickReplyModel<'q> {}

@@ -2,9 +2,7 @@ use rocket::serde::Serialize;
 
 pub use crate::Data;
 
-use super::GetSender;
-use super::NextPrevNavigation;
-use super::{payload::Payload, recipient::Recipient};
+use super::{GetSender, NextPrevNavigation, payload::Payload, recipient::Recipient};
 
 #[derive(Debug, Serialize)]
 pub struct GenericButton<'b> {

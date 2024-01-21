@@ -3,7 +3,7 @@ use rocket::serde::Serialize;
 use crate::{Data, Res};
 
 use self::payload::Payload;
-use self::quick_replies::{QuickReplie, QuickReplieModel};
+use self::quick_replies::{QuickReply, QuickReplyModel};
 
 pub mod generic;
 pub mod media;
@@ -20,12 +20,12 @@ pub trait GetSender<'r> {
 pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
     async fn send_next_prev(&self, path: &str, data: Data) {
         let [start, end] = data.get_page().unwrap_or([0, 5]);
-        let mut navigations: Vec<QuickReplie> = Vec::new();
+        let mut navigations: Vec<QuickReply> = Vec::new();
 
         let value: String = data.get_value();
 
         if start >= 5 && end >= 5 {
-            let prev = QuickReplie::new(
+            let prev = QuickReply::new(
                 "Prev",
                 "",
                 Payload {
@@ -36,7 +36,7 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
             navigations.push(prev);
         }
 
-        let next = QuickReplie::new(
+        let next = QuickReply::new(
             "Next",
             "",
             Payload {
@@ -47,7 +47,7 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
 
         navigations.push(next);
 
-        Res.send(QuickReplieModel::new(
+        Res.send(QuickReplyModel::new(
             self.get_sender(),
             "Navigation",
             &navigations,

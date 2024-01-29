@@ -29,7 +29,7 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
                 "Prev",
                 "",
                 Payload {
-                    path_action: path.into(),
+                    path: path.into(),
                     data: Some(Data::new(&value, Some([start - 5, end - 5]))),
                 },
             );
@@ -40,7 +40,7 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
             "Next",
             "",
             Payload {
-                path_action: path.into(),
+                path: path.into(),
                 data: Some(Data::new(&value, Some([start + 5, end + 5]))),
             },
         );

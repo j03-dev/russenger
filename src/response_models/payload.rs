@@ -5,19 +5,19 @@ use crate::Action;
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Payload {
-    pub path_action: String,
+    pub path: String,
     pub data: Option<Data>,
 }
 
 impl Payload {
     pub fn new(action: Box<dyn Action>, data: Option<Data>) -> Self {
         Self {
-            path_action: action.path(),
+            path: action.path(),
             data,
         }
     }
-    pub fn get_path_action(&self) -> &String {
-        &self.path_action
+    pub fn get_path(&self) -> &String {
+        &self.path
     }
 
     pub fn get_data_to_string(&self) -> String {
@@ -26,7 +26,7 @@ impl Payload {
 
     pub fn to_uri_string(&self) -> String {
         form_urlencoded::Serializer::new(String::new())
-            .append_pair("action", self.get_path_action())
+            .append_pair("action", self.get_path())
             .append_pair("value", &self.get_data_to_string())
             .finish()
     }
@@ -49,7 +49,7 @@ impl Payload {
 
         match (path, value) {
             (Some(path), Some(value)) => Ok(Self {
-                path_action: path,
+                path,
                 data: Some(Data::from(value)),
             }),
             _ => Err("Missing fields in URI".to_string()),

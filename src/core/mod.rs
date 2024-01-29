@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
+use rocket::{catch, catchers, get, post, routes, State};
 use rocket::fs::FileServer;
 use rocket::serde::json::Json;
-use rocket::{catch, catchers, get, post, routes, State};
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
 use action::ACTION_REGISTRY;
@@ -41,18 +41,17 @@ async fn webhook_verify(request: FacebookRequest) -> String {
     request.0
 }
 
-async fn execute_payload(user: &str, data: &str, query: &Query) {
-    match Payload::from_uri_string(data) {
+async fn execute_payload(user: &str, uri: &str, query: &Query) {
+    match Payload::from_uri_string(uri) {
         Ok(payload) => {
-            if let Some(action_fn) = ACTION_REGISTRY
+            if let Some(action) = ACTION_REGISTRY
                 .lock()
                 .await
-                .get(payload.get_path_action().as_str())
+                .get(payload.get_path())
             {
-                let data = payload.get_data_to_string();
-                action_fn
-                    .execute(Res, Req::new(user, query.clone(), Data::from(data)))
-                    .await;
+                let data = Data::from(payload.get_data_to_string());
+                let req = Req::new(user, query.clone(), data);
+                action.execute(Res, req).await;
             }
         }
         Err(err) => {
@@ -65,27 +64,23 @@ async fn execute_payload(user: &str, data: &str, query: &Query) {
 async fn webhook_core(data: Json<MessageDeserializer>, state: &State<AppState>) -> &'static str {
     let query = &state.query;
     let user = data.get_sender();
-
     if let Some(message) = data.get_message() {
-        let action = query.get_action(user).await.unwrap_or("lock".to_string());
-
+        let action_path = query.get_action(user).await.unwrap_or("lock".to_string());
         if let Some(quick_reply) = message.get_quick_reply() {
             let uri_payload = quick_reply.get_payload();
             execute_payload(user, uri_payload, query).await;
-        } else if action.ne("lock") {
-            if let Some(action_fn) = ACTION_REGISTRY.lock().await.get(action.as_str()) {
+        } else if action_path.ne("lock") {
+            if let Some(action) = ACTION_REGISTRY.lock().await.get(action_path.as_str()) {
                 query.set_action(user, "lock").await;
-                let data = message.get_text();
-                action_fn
-                    .execute(Res, Req::new(user, query.clone(), Data::new(data, None)))
-                    .await;
+                let req = Req::new(user, query.clone(), Data::new(message.get_text(), None));
+                action.execute(Res, req).await;
             }
         } else {
             query.reset_action(user).await;
         }
     } else if let Some(postback) = data.get_postback() {
-        let uri_payload = postback.get_payload();
-        execute_payload(user, uri_payload, query).await;
+        let uri = postback.get_payload();
+        execute_payload(user, uri, query).await;
     }
     "Ok"
 }
@@ -104,8 +99,8 @@ pub async fn run_server() {
         allow_credentials: true,
         ..Default::default()
     }
-    .to_cors()
-    .expect("Failed create cors: Some thing wrong on cors");
+        .to_cors()
+        .expect("Failed create cors: Some thing wrong on cors");
 
     rocket::build()
         .attach(cors)
@@ -121,9 +116,8 @@ pub async fn run_server() {
 pub async fn migrate() {
     let query = Query::new().await;
     println!("Connexion Success");
-    if query.migrate().await {
-        println!("Migrate Success");
-    } else {
-        println!("Migrate Failed");
-    }
+    println!("{}", match query.migrate().await {
+        true => "migration succes!",
+        false => "migration failed",
+    });
 }

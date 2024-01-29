@@ -5,7 +5,10 @@ pub use crate::command::execute_command;
 pub use crate::core::action::{Action, ACTION_REGISTRY};
 pub use crate::core::data::Data;
 pub use crate::core::request::Req;
-pub use crate::core::response::Res;
+pub use crate::core::response::{
+    Res, SendResult,
+    SendResult::{Error, Okey},
+};
 pub use crate::response_models::generic;
 pub use crate::response_models::media;
 pub use crate::response_models::payload;

@@ -56,7 +56,7 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
         }
         Err(err) => {
             // If the payload is not valid, we send an error message
-            Res.send(TextModel::new(user, &err)).await.unwrap();
+            Res.send(TextModel::new(user, &err)).await;
         }
     }
 }

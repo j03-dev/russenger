@@ -52,7 +52,6 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
             "Navigation",
             &navigations,
         ))
-        .await
-        .unwrap();
+        .await;
     }
 }

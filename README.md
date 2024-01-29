@@ -76,9 +76,9 @@ use russenger::response_models::text::TextModel;
 use russenger::{create_action, russenger_app};
 
 
-create_action!(Main, |res: Res, req: Req<'l>| async move {
+create_action!(Main, |res: Res, req: Req| async move {
     // Welcome message
-    res.send(TextModel::new(req.user, "Main, I'm your chatbot!"))
+    res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
         .await
         .unwrap();
 
@@ -103,7 +103,7 @@ create_action!(Main, |res: Res, req: Req<'l>| async move {
     ];
 
     res.send(QuickReplieModel::new(
-        req.user,
+        &req.user,
         "Choose an option:",
         &quick_replies,
     ))
@@ -112,10 +112,10 @@ create_action!(Main, |res: Res, req: Req<'l>| async move {
 });
 
 // For Option1
-create_action!(Option1, |res: Res, req: Req<'l>| async move {
+create_action!(Option1, |res: Res, req: Req| async move {
     // Handle Option 1 with a TextModel
     res.send(TextModel::new(
-        req.user,
+        &req.user,
         &format!("You selected Option 1 with payload: {}", req.data.get_value::<String>()),
     ))
     .await
@@ -123,10 +123,10 @@ create_action!(Option1, |res: Res, req: Req<'l>| async move {
 });
 
 // For Option2
-create_action!(Option2, |res: Res, req: Req<'l>| async move {
+create_action!(Option2, |res: Res, req: Req| async move {
     // Handle Option 2 with a TextModel
     res.send(TextModel::new(
-        req.user,
+        &req.user,
         &format!("You selected Option 2 with payload: {}", req.data.get_value::<String>()),
     ))
     .await
@@ -143,7 +143,7 @@ create_action!(Option2, |res: Res, req: Req<'l>| async move {
         )],
     }];
 
-    res.send(GenericModel::new(req.user, &generic_elements))
+    res.send(GenericModel::new(&req.user, &generic_elements))
         .await
         .unwrap();
 });

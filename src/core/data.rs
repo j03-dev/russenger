@@ -14,7 +14,7 @@ impl Data {
         Self { value, pages }
     }
 
-    pub fn from<T: ToString>(data: T) -> Self {
+    pub fn from_string<T: ToString>(data: T) -> Self {
         serde_json::from_str(&data.to_string()).unwrap_or_default()
     }
 

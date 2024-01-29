@@ -30,6 +30,22 @@ pub struct GenericElement<'e> {
     pub buttons: Vec<GenericButton<'e>>,
 }
 
+impl<'e> GenericElement<'e> {
+    pub fn new(
+        title: &'e str,
+        image_url: &'e str,
+        subtitle: &'e str,
+        buttons: Vec<GenericButton<'e>>,
+    ) -> Self {
+        Self {
+            title,
+            image_url,
+            subtitle,
+            buttons,
+        }
+    }
+}
+
 #[derive(Debug, Serialize)]
 struct GenericPayload<'p> {
     pub template_type: &'p str,

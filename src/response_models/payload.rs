@@ -48,10 +48,10 @@ impl Payload {
         }
 
         match (path, value) {
-            (Some(path), Some(value)) => Ok(Self {
-                path,
-                data: Some(Data::from(value)),
-            }),
+            (Some(path), Some(value)) => {
+                let data = Some(Data::from_string(value));
+                Ok(Self { path, data })
+            }
             _ => Err("Missing fields in URI".to_string()),
         }
     }

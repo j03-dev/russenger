@@ -50,7 +50,7 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
         Res.send(QuickReplyModel::new(
             self.get_sender(),
             "Navigation",
-            &navigations,
+            navigations,
         ))
         .await;
     }

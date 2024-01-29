@@ -4,17 +4,17 @@ use super::{payload::Payload, recipient::Recipient};
 use super::{GetSender, NextPrevNavigation};
 
 #[derive(Serialize)]
-pub struct QuickReply<'r> {
-    content_type: &'r str,
+pub struct QuickReply {
+    content_type: String,
     title: String,
     payload: String,
     image_url: String,
 }
 
-impl<'r> QuickReply<'r> {
+impl QuickReply {
     pub fn new(title: &str, image_url: &str, payload: Payload) -> Self {
         Self {
-            content_type: "text",
+            content_type: "text".into(),
             title: title.into(),
             payload: payload.to_uri_string(),
             image_url: image_url.into(),
@@ -23,20 +23,20 @@ impl<'r> QuickReply<'r> {
 }
 
 #[derive(Serialize)]
-struct QuickMessage<'m> {
+struct QuickMessage {
     text: String,
-    quick_replies: &'m Vec<QuickReply<'m>>,
+    quick_replies: Vec<QuickReply>,
 }
 
 #[derive(Serialize)]
 pub struct QuickReplyModel<'q> {
     recipient: Recipient<'q>,
     messaging_type: String,
-    message: QuickMessage<'q>,
+    message: QuickMessage,
 }
 
 impl<'q> QuickReplyModel<'q> {
-    pub fn new(sender: &'q str, message: &str, quick_replies: &'q Vec<QuickReply>) -> Self {
+    pub fn new(sender: &'q str, message: &str, quick_replies: Vec<QuickReply>) -> Self {
         Self {
             recipient: Recipient { id: sender },
             messaging_type: "RESPONSE".into(),

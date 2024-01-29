@@ -24,10 +24,10 @@ impl<'b> GenericButton<'b> {
 
 #[derive(Debug, Serialize)]
 pub struct GenericElement<'e> {
-    pub title: &'e str,
-    pub image_url: &'e str,
-    pub subtitle: &'e str,
-    pub buttons: Vec<GenericButton<'e>>,
+    title: &'e str,
+    image_url: &'e str,
+    subtitle: &'e str,
+    buttons: Vec<GenericButton<'e>>,
 }
 
 impl<'e> GenericElement<'e> {

@@ -114,34 +114,28 @@ create_action!(Main, |res: Res, req: Req| async move {
 // For Option1
 create_action!(Option1, |res: Res, req: Req| async move {
     // Handle Option 1 with a TextModel
-    res.send(TextModel::new(
-        &req.user,
-        &format!("You selected Option 1 with payload: {}", req.data.get_value::<String>()),
-    ))
-    .await
-    .unwrap();
+    let value: String = req.data.get_value();
+    let text = TextModel::new(&req.user, &format!("You selected Option 1 with payload: {}", value));
+    res.send(text).await.unwrap();
 });
 
 // For Option2
 create_action!(Option2, |res: Res, req: Req| async move {
     // Handle Option 2 with a TextModel
-    res.send(TextModel::new(
-        &req.user,
-        &format!("You selected Option 2 with payload: {}", req.data.get_value::<String>()),
-    ))
-    .await
-    .unwrap();
+    let value: String = req.data.get_value();
+    let text = TextModel::new(&req.user, &format!("You selected Option 2 with payload: {}", value));
+    res.send(text).await.unwrap();
 
     // Handle Option 2 with a Generic Template
-    let generic_elements = vec![GenericElement {
-        title: "Option 2",
-        image_url: "https://example.com/option2.jpg",
-        subtitle: "Option 2 description",
-        buttons: vec![GenericButton::new(
+    let generic_elements = vec![GenericElement::new(
+        "Option 2",
+        "https://example.com/option2.jpg",
+        "Option 2 description",
+        vec![GenericButton::new(
             "Choose Option 2",
             Payload::new(Box::new(Main), None),
         )],
-    }];
+    )];
 
     res.send(GenericModel::new(&req.user, &generic_elements))
         .await

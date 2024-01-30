@@ -10,7 +10,7 @@ pub struct Payload {
 }
 
 impl Payload {
-    pub fn new(action: Box<dyn Action>, data: Option<Data>) -> Self {
+    pub fn new<A: Action>(action: A, data: Option<Data>) -> Self {
         Self {
             path: action.path(),
             data,

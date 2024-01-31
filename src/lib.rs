@@ -21,7 +21,7 @@ mod core;
 mod query;
 mod response_models;
 
-/// Russenger App
+/// Russenger
 ///
 /// This is a Rust lib for building Messenger bots. It provides a set of core components for receiving and sending messages, handling actions, and managing payloads and responses.
 ///
@@ -54,7 +54,7 @@ mod response_models;
 ///     res.send_text(TextModel::new(&req.user, "Hello I'm the second Action")).await
 /// });
 ///
-/// russenger_app!(Main, Second)
+/// russenger_app!(Main, Second);
 /// ```
 ///
 /// Here's another example of a bot that sends a generic message:
@@ -67,7 +67,7 @@ mod response_models;
 ///     res.send_generic(generic_message).await
 /// });
 ///
-/// russenger_app!(Main)
+/// russenger_app!(Main);
 /// ```
 
 // Define a macro to create a new action.

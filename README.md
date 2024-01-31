@@ -68,19 +68,19 @@ The following example demonstrates the usage of Russenger for creating a chatbot
 named `Main`, `Option1`, and `Option2`, along with a user scenario:
 
 ```rust
-use russenger::{Data, Req, Res};
-use russenger::response_models::generic::{GenericButton, GenericElement, GenericModel};
-use russenger::response_models::payload::{ActionPayload, Payload};
-use russenger::response_models::quick_replies::{QuickReplie, QuickReplieModel};
-use russenger::response_models::text::TextModel;
-use russenger::{create_action, russenger_app};
+use russenger::{
+    Data, Req, Res
+    generic::{GenericButton, GenericElement, GenericModel};
+    payload::{ActionPayload, Payload};
+    quick_replies::{QuickReplie, QuickReplieModel};
+    text::TextModel;
+    create_action, russenger_app
+};
 
 
 create_action!(Main, |res: Res, req: Req| async move {
     // Welcome message
-    res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
-        .await
-        .unwrap();
+    res.send(TextModel::new(&req.user, "Main, I'm your chatbot!")).await;
 
     // Example with Quick Replies
     let quick_replies = vec![
@@ -88,7 +88,7 @@ create_action!(Main, |res: Res, req: Req| async move {
             "Option 1",
             "",
             Payload::new(
-                Box::new(Option1),
+                Option1,
                 Some(Data::new("payload_for_option1", None))
             ),
         ),
@@ -96,7 +96,7 @@ create_action!(Main, |res: Res, req: Req| async move {
             "Option 2",
             "",
             Payload::new(
-                Box::new(Option2),
+                Option2,
                 Some(Data::new("payload_for_option2", None))
             ),
         ),
@@ -105,10 +105,9 @@ create_action!(Main, |res: Res, req: Req| async move {
     res.send(QuickReplieModel::new(
         &req.user,
         "Choose an option:",
-        &quick_replies,
+        quick_replies,
     ))
-    .await
-    .unwrap();
+    .await;
 });
 
 // For Option1
@@ -116,7 +115,7 @@ create_action!(Option1, |res: Res, req: Req| async move {
     // Handle Option 1 with a TextModel
     let value: String = req.data.get_value();
     let text = TextModel::new(&req.user, &format!("You selected Option 1 with payload: {}", value));
-    res.send(text).await.unwrap();
+    res.send(text).await;
 });
 
 // For Option2
@@ -124,7 +123,7 @@ create_action!(Option2, |res: Res, req: Req| async move {
     // Handle Option 2 with a TextModel
     let value: String = req.data.get_value();
     let text = TextModel::new(&req.user, &format!("You selected Option 2 with payload: {}", value));
-    res.send(text).await.unwrap();
+    res.send(text).await;
 
     // Handle Option 2 with a Generic Template
     let generic_elements = vec![GenericElement::new(
@@ -133,13 +132,12 @@ create_action!(Option2, |res: Res, req: Req| async move {
         "Option 2 description",
         vec![GenericButton::new(
             "Choose Option 2",
-            Payload::new(Box::new(Main), None),
+            Payload::new(Main, None),
         )],
     )];
 
-    res.send(GenericModel::new(&req.user, &generic_elements))
-        .await
-        .unwrap();
+    res.send(GenericModel::new(&req.user, generic_elements))
+        .await;
 });
 
 russenger_app!(Main, Option1, Option2);

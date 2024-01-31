@@ -36,8 +36,13 @@ fn server_panic() -> &'static str {
     "Server panic: 500"
 }
 
+// Define the webhook_verify function
+// This function is an asynchronous function that handles GET requests to the "/webhook" endpoint
+// It takes a FacebookRequest as an argument and returns a String
 #[get("/webhook")]
 async fn webhook_verify(request: FacebookRequest) -> String {
+    // The function simply returns the string contained in the FacebookRequest
+    // This is the "hub.challenge" parameter that Facebook sends when verifying the webhook
     request.0
 }
 

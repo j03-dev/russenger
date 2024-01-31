@@ -125,6 +125,9 @@ async fn webhook_core(
 
 // This function runs the server.
 pub async fn run_server() {
+    if !ACTION_REGISTRY.lock().await.contains_key("Main") {
+        panic!("The ACTION_REGISTRY should contain an action with path 'Main' implementing the Action trait.");
+    }
     // Define the allowed origins for CORS
     let allowed_origins = AllowedOrigins::some_regex(&["graph.facebook.com"]);
 

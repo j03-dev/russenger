@@ -21,6 +21,55 @@ mod core;
 mod query;
 mod response_models;
 
+/// Russenger App
+///
+/// This is a Rust lib for building Messenger bots. It provides a set of core components for receiving and sending messages, handling actions, and managing payloads and responses.
+///
+/// ## Features
+///
+/// - **Action Handling**: Define actions with the `create_action!` macro and register them in the `ACTION_REGISTRY`. Actions are executed based on incoming requests.
+/// - **Request and Response Handling**: `Req` and `Res` structs for handling incoming requests and outgoing responses.
+/// - **Message Models**: Various response models for different types of messages (text, generic, media, quick replies, etc.).
+///
+/// ## Usage
+///
+/// Add the following to your `Cargo.toml`:
+///
+/// ```toml
+/// [dependencies]
+/// russenger = "0.2.0"
+/// ```
+///
+/// Here's a simple example of a bot that sends a "Hello World" message:
+///
+/// ```rust
+/// use russenger::{Req, Res, Action, create_action, russenger_app, response_models::text::TextModel};
+///
+/// create_action!(Main, |res: Res, req: Req| async move {
+///     res.send_text(TextModel::new(&req.user, "Hello World")).await;
+///     Second.execute(res, req).await;
+/// });
+/// 
+/// create_action!(Second, |res: Res, req: Req| async move {
+///     res.send_text(TextModel::new(&req.user, "Hello I'm the second Action")).await
+/// });
+///
+/// russenger_app!(Main, Second)
+/// ```
+///
+/// Here's another example of a bot that sends a generic message:
+///
+/// ```rust
+/// use russenger::{Req, Res, Action, create_action, russenger_app, response_models::generic::GenericModel};
+///
+/// create_action!(Main, |res: Res, req: Req| async move {
+///     let generic_message = GenericModel::new(&req.user, "Title", "Subtitle", "https://example.com", "https://example.com/image.jpg");
+///     res.send_generic(generic_message).await
+/// });
+///
+/// russenger_app!(Main)
+/// ```
+
 // Define a macro to create a new action.
 // This macro takes a name and a handler function, and defines a new struct with the given name that implements the Action trait.
 #[macro_export]

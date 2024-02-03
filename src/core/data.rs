@@ -32,7 +32,7 @@ impl Data {
     }
 
     // Returns the pagination information of the Data.
-    pub fn get_page(&self) -> Option<Pagination> {
-        self.pages
+    pub fn get_page(&self) -> Pagination {
+        self.pages.unwrap_or([0, 5])
     }
 }

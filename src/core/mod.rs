@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
+use rocket::{catch, catchers, get, post, routes, State};
 use rocket::fs::FileServer;
 use rocket::serde::json::Json;
-use rocket::{catch, catchers, get, post, routes, State};
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
 use action::ACTION_REGISTRY;
@@ -79,6 +79,9 @@ async fn webhook_core(
     // Extract the sender from the incoming data
     let user = incoming_data.get_sender();
 
+    // Create user if user is not yet created
+    query.create(user).await;
+
     // If there is a message in the incoming data
     if let Some(message) = incoming_data.get_message() {
         // Get the action path from the query
@@ -145,8 +148,8 @@ pub async fn run_server() {
         allow_credentials: true,
         ..Default::default()
     })
-    .to_cors()
-    .expect("Failed to create CORS: Something went wrong with CORS");
+        .to_cors()
+        .expect("Failed to create CORS: Something went wrong with CORS");
 
     // Build and launch the server
     rocket::build()

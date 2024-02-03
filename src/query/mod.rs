@@ -20,7 +20,7 @@ async fn establish_connection() -> DB {
                     .expect("Database connection failed");
                 DB::Mysql(pool)
             }
-            "postgres" => {
+            "postgres" | "postgresql" => {
                 let pool: Pool<Postgres> = Pool::connect(&url)
                     .await
                     .expect("Database connection failed");

@@ -42,7 +42,7 @@ struct QuickMessage {
 /// create_action!(Main, |res: Res, req: Req| async move {
 ///     let my_data = Some(Data::new("my_value", None));
 ///     let quick_reply = QuickReply::new("Quick Reply Title", "http://url/image.jpg", Payload::new(MyAction, my_data));
-///     let model = QuickReplyModel::new("Sender ID", "Message Text", vec![quick_reply]);
+///     let model = QuickReplyModel::new(&req.user, "Message Text", vec![quick_reply]);
 ///     res.send(model).await;
 /// });
 ///

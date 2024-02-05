@@ -72,7 +72,7 @@ pub struct GenericElement {
 /// create_action!(AnAction, |res: Res, req:Req| async move {
 ///     todo!()
 /// });
-/// 
+///
 /// let button = GenericButton::new("Button Title", Payload::new(AnAction, None));
 /// let element = GenericElement::new("Element Title", "https://example.com/image.jpg", "Element Subtitle", vec![button]);
 ///
@@ -130,10 +130,10 @@ struct GenericMessage {
 ///     let my_data = Some(Data::new("my_value", None));
 ///     let button = GenericButton::new("Button Title", Payload::new(MyAction, my_data));
 ///     let element = GenericElement::new("Element Title", "https://example.com/image.jpg", "Element Subtitle", vec![button]);
-///     let model = GenericModel::new("Sender ID", vec![element]);
+///     let model = GenericModel::new(&req.user, vec![element]);
 ///     res.send(model).await;
 ///; });
-/// 
+///
 /// create_action!(MyAction, |res: Res, Req: Req| async move {
 ///     todo!()
 /// });

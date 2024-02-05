@@ -43,13 +43,13 @@ mod response_models;
 /// Here's a simple example of a bot that sends a "Hello World" message:
 ///
 /// ```rust
-/// use russenger::{Req, Res, Action, create_action, russenger_app, response_models::text::TextModel};
+/// use russenger::{Req, Res, create_action, russenger_app, text::TextModel};
 ///
 /// create_action!(Main, |res: Res, req: Req| async move {
 ///     res.send_text(TextModel::new(&req.user, "Hello World")).await;
 ///     Second.execute(res, req).await;
 /// });
-/// 
+///
 /// create_action!(Second, |res: Res, req: Req| async move {
 ///     res.send_text(TextModel::new(&req.user, "Hello I'm the second Action")).await
 /// });
@@ -60,7 +60,7 @@ mod response_models;
 /// Here's another example of a bot that sends a generic message:
 ///
 /// ```rust
-/// use russenger::{Req, Res, Action, create_action, russenger_app, response_models::generic::GenericModel};
+/// use russenger::{Req, Res, create_action, russenger_app, generic::GenericModel};
 ///
 /// create_action!(Main, |res: Res, req: Req| async move {
 ///     let generic_message = GenericModel::new(&req.user, "Title", "Subtitle", "https://example.com", "https://example.com/image.jpg");

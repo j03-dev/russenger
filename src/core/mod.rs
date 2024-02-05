@@ -13,9 +13,9 @@ use facebook_request::FacebookRequest;
 use request::Req;
 use response::Res;
 
+use crate::payload::Payload;
 use crate::query::Query;
-use crate::response_models::payload::Payload;
-use crate::response_models::text::TextModel;
+use crate::text::TextModel;
 
 pub mod action;
 pub mod data;
@@ -68,53 +68,41 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
 
 // This function is the core of the webhook.
 // It processes incoming data and updates the state accordingly.
-#[post("/webhook", format = "json", data = "<incoming_data>")]
-async fn webhook_core(
-    incoming_data: Json<MessageDeserializer>, // The incoming data from the webhook
-    app_state: &State<AppState>,              // The current state of the application
-) -> &'static str {
+#[post("/webhook", format = "json", data = "<data>")]
+async fn webhook_core(data: Json<MessageDeserializer>, app_state: &State<AppState>) -> &'static str {
     // Extract the query from the application state
     let query = &app_state.query;
 
     // Extract the sender from the incoming data
-    let user = incoming_data.get_sender();
+    let user = data.get_sender();
 
     // Create user if user is not yet created
     query.create(user).await;
 
     // If there is a message in the incoming data
-    if let Some(message) = incoming_data.get_message() {
+    if let Some(message) = data.get_message() {
         // Get the action path from the query
         let action_path = query.get_action(user).await.unwrap_or("lock".to_string());
 
         // If there is a quick reply in the message
         if let Some(quick_reply) = message.get_quick_reply() {
-            // Get the payload from the quick reply
             let uri_payload = quick_reply.get_payload();
-
-            // Execute the payload
             execute_payload(user, uri_payload, query).await;
         }
         // If the action path is not "lock"
         else if action_path.ne("lock") {
             // If there is an action corresponding to the action path
             if let Some(action) = ACTION_REGISTRY.lock().await.get(action_path.as_str()) {
-                // Set the action in the query to "lock"
                 query.set_action(user, "lock").await;
-
-                // Create a new request
                 let request = Req::new(user, query.clone(), Data::new(message.get_text(), None));
-
-                // Execute the action
                 action.execute(Res, request).await;
             }
         } else {
-            // Reset the action in the query
             query.reset_action(user).await;
         }
     }
     // If there is a postback in the incoming data
-    else if let Some(postback) = incoming_data.get_postback() {
+    else if let Some(postback) = data.get_postback() {
         // Get the payload from the postback
         let uri = postback.get_payload();
 
@@ -131,16 +119,13 @@ pub async fn run_server() {
     if !ACTION_REGISTRY.lock().await.contains_key("Main") {
         panic!("The ACTION_REGISTRY should contain an action with path 'Main' implementing the Action trait.");
     }
-    // Define the allowed origins for CORS
     let allowed_origins = AllowedOrigins::some_regex(&["graph.facebook.com"]);
 
-    // Define the allowed methods for CORS
     let allowed_methods: AllowedMethods = ["Get", "Post"]
         .iter()
         .map(|s| FromStr::from_str(s).unwrap())
         .collect();
 
-    // Set up CORS options
     let cors = (CorsOptions {
         allowed_origins,
         allowed_methods,
@@ -153,13 +138,13 @@ pub async fn run_server() {
 
     // Build and launch the server
     rocket::build()
-        .attach(cors) // Attach CORS options
-        .manage(AppState::init().await) // Manage application state
-        .mount("/", routes![webhook_verify, webhook_core]) // Mount routes
-        .mount("/static", FileServer::from("static")) // Serve static files
-        .register("/", catchers![page_not_found, server_panic]) // Register error catchers
+        .attach(cors)
+        .manage(AppState::init().await)
+        .mount("/", routes![webhook_verify, webhook_core])
+        .mount("/static", FileServer::from("static"))
+        .register("/", catchers![page_not_found, server_panic])
         .launch()
-        .await // Launch the server
+        .await
         .expect("Failed to run Rocket server");
 }
 

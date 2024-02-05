@@ -11,7 +11,7 @@ pub enum DB {
 }
 
 async fn establish_connection() -> DB {
-    let url = var("DATABASE").expect("check your .env file \n pls spécifie your database name");
+    let url = var("DATABASE").expect("check your .env file \n pls specified your database name");
     if let Some(engine) = url.split(':').collect::<Vec<_>>().first() {
         return match &engine[..] {
             "mysql" => {
@@ -52,10 +52,10 @@ impl Query {
 
     pub async fn migrate(&self) -> bool {
         let create_table_user = "
-                    create table russenger_user (
-                        facebook_user_id varchar(40) primary key unique,
-                        action varchar(20)
-                    );";
+                create table russenger_user (
+                    facebook_user_id varchar(40) primary key unique,
+                    action varchar(20)
+                );";
         match &self.db {
             DB::Mysql(pool) => sqlx::query(create_table_user).execute(pool).await.is_ok(),
             DB::Sqlite(pool) => sqlx::query(create_table_user).execute(pool).await.is_ok(),

@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use rocket::{catch, catchers, get, post, routes, State};
 use rocket::fs::FileServer;
 use rocket::serde::json::Json;
+use rocket::{catch, catchers, get, post, routes, State};
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 
 use action::ACTION_REGISTRY;
@@ -69,7 +69,10 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
 // This function is the core of the webhook.
 // It processes incoming data and updates the state accordingly.
 #[post("/webhook", format = "json", data = "<data>")]
-async fn webhook_core(data: Json<MessageDeserializer>, app_state: &State<AppState>) -> &'static str {
+async fn webhook_core(
+    data: Json<MessageDeserializer>,
+    app_state: &State<AppState>,
+) -> &'static str {
     // Extract the query from the application state
     let query = &app_state.query;
 
@@ -79,36 +82,32 @@ async fn webhook_core(data: Json<MessageDeserializer>, app_state: &State<AppStat
     // Create user if user is not yet created
     query.create(user).await;
 
-    // If there is a message in the incoming data
-    if let Some(message) = data.get_message() {
-        // Get the action path from the query
-        let action_path = query.get_action(user).await.unwrap_or("lock".to_string());
+    if app_state.action_lock.lock(user).await {
+        // If there is a message in the incoming data
+        if let Some(message) = data.get_message() {
+            // Get the action path from the query
+            let action_path = query.get_action(user).await.unwrap_or("lock".to_string());
 
-        // If there is a quick reply in the message
-        if let Some(quick_reply) = message.get_quick_reply() {
-            let uri_payload = quick_reply.get_payload();
-            execute_payload(user, uri_payload, query).await;
-        }
-        // If the action path is not "lock"
-        else if action_path.ne("lock") {
-            // If there is an action corresponding to the action path
+            // If there is a quick reply in the message
+            if let Some(quick_reply) = message.get_quick_reply() {
+                let uri_payload = quick_reply.get_payload();
+                execute_payload(user, uri_payload, query).await;
+            }
             if let Some(action) = ACTION_REGISTRY.lock().await.get(action_path.as_str()) {
-                query.set_action(user, "lock").await;
                 let request = Req::new(user, query.clone(), Data::new(message.get_text(), None));
                 action.execute(Res, request).await;
             }
-        } else {
-            query.reset_action(user).await;
+        }
+        // If there is a postback in the incoming data
+        else if let Some(postback) = data.get_postback() {
+            // Get the payload from the postback
+            let uri = postback.get_payload();
+            // Execute the payload
+            execute_payload(user, uri, query).await;
         }
     }
-    // If there is a postback in the incoming data
-    else if let Some(postback) = data.get_postback() {
-        // Get the payload from the postback
-        let uri = postback.get_payload();
 
-        // Execute the payload
-        execute_payload(user, uri, query).await;
-    }
+    app_state.action_lock.unlock(user).await;
 
     // Return "Ok" to indicate that the function has executed successfully
     "Ok"
@@ -133,8 +132,8 @@ pub async fn run_server() {
         allow_credentials: true,
         ..Default::default()
     })
-        .to_cors()
-        .expect("Failed to create CORS: Something went wrong with CORS");
+    .to_cors()
+    .expect("Failed to create CORS: Something went wrong with CORS");
 
     // Build and launch the server
     rocket::build()

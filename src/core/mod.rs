@@ -92,8 +92,7 @@ async fn webhook_core(
             if let Some(quick_reply) = message.get_quick_reply() {
                 let uri_payload = quick_reply.get_payload();
                 execute_payload(user, uri_payload, query).await;
-            }
-            if let Some(action) = ACTION_REGISTRY.lock().await.get(action_path.as_str()) {
+            } else if let Some(action) = ACTION_REGISTRY.lock().await.get(action_path.as_str()) {
                 let request = Req::new(user, query.clone(), Data::new(message.get_text(), None));
                 action.execute(Res, request).await;
             }

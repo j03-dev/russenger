@@ -124,13 +124,13 @@ pub async fn run_server() {
         .map(|s| FromStr::from_str(s).unwrap())
         .collect();
 
-    let cors = (CorsOptions {
+    let cors = CorsOptions {
         allowed_origins,
         allowed_methods,
         allowed_headers: AllowedHeaders::all(),
         allow_credentials: true,
         ..Default::default()
-    })
+    }
     .to_cors()
     .expect("Failed to create CORS: Something went wrong with CORS");
 

@@ -12,30 +12,46 @@ pub enum DB {
 
 async fn establish_connection() -> DB {
     let url = var("DATABASE").expect("check your .env file \n pls specified your database name");
+    let msg = "Database connection failed";
     if let Some(engine) = url.split(':').collect::<Vec<_>>().first() {
         return match &engine[..] {
             "mysql" => {
                 let pool: Pool<MySql> = Pool::connect(&url)
                     .await
-                    .expect("Database connection failed");
+                    .expect(msg);
                 DB::Mysql(pool)
             }
             "postgres" | "postgresql" => {
                 let pool: Pool<Postgres> = Pool::connect(&url)
                     .await
-                    .expect("Database connection failed");
+                    .expect(msg);
                 DB::Postgres(pool)
             }
             "sqlite" => {
                 let pool: Pool<Sqlite> = Pool::connect(&url)
                     .await
-                    .expect("Database connection failed");
+                    .expect(msg);
                 DB::Sqlite(pool)
             }
             _ => DB::Null,
         };
     }
     DB::Null
+}
+
+
+macro_rules! execute_query {
+	($pool:expr, $sql:expr, $params:expr) => {
+		{
+			let mut query = sqlx::query($sql);
+			for parm in $params {
+				query = query.bind(parm);	
+			}
+			query.execute($pool)
+				.await
+				.is_ok()		
+		}
+	}
 }
 
 #[derive(Clone)]
@@ -68,30 +84,15 @@ impl Query {
         match &self.db {
             DB::Mysql(pool) => {
                 let sql = "insert into russenger_user (facebook_user_id, action) values (?, ?)";
-                sqlx::query(sql)
-                    .bind(user_id)
-                    .bind("Main")
-                    .execute(pool)
-                    .await
-                    .is_ok()
+				execute_query!(pool, sql, [user_id, "Main"])
             }
             DB::Sqlite(pool) => {
                 let sql = "insert into russenger_user (facebook_user_id, action) values ($1, $2)";
-                sqlx::query(sql)
-                    .bind(user_id)
-                    .bind("Main")
-                    .execute(pool)
-                    .await
-                    .is_ok()
+				execute_query!(pool, sql, [user_id, "Main"])
             }
             DB::Postgres(pool) => {
                 let sql = "insert into russenger_user (facebook_user_id, action) values ($1, $2)";
-                sqlx::query(sql)
-                    .bind(user_id)
-                    .bind("Main")
-                    .execute(pool)
-                    .await
-                    .is_ok()
+				execute_query!(pool, sql, [user_id, "Main"])
             }
             DB::Null => false,
         }
@@ -101,30 +102,15 @@ impl Query {
         match &self.db {
             DB::Mysql(pool) => {
                 let sql = "update russenger_user set action=? where facebook_user_id=?";
-                sqlx::query(sql)
-                    .bind(action)
-                    .bind(user_id)
-                    .execute(pool)
-                    .await
-                    .is_ok()
+ 				execute_query!(pool, sql, [action, user_id])               
             }
             DB::Sqlite(pool) => {
                 let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
-                sqlx::query(sql)
-                    .bind(action)
-                    .bind(user_id)
-                    .execute(pool)
-                    .await
-                    .is_ok()
+				execute_query!(pool, sql, [action, user_id])               
             }
             DB::Postgres(pool) => {
                 let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
-                sqlx::query(sql)
-                    .bind(action)
-                    .bind(user_id)
-                    .execute(pool)
-                    .await
-                    .is_ok()
+				execute_query!(pool, sql, [action, user_id])               
             }
             DB::Null => false,
         }

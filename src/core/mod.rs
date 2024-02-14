@@ -86,7 +86,7 @@ async fn webhook_core(
         // If there is a message in the incoming data
         if let Some(message) = data.get_message() {
             // Get the action path from the query
-            let action_path = query.get_action(user).await.unwrap_or("lock".to_string());
+            let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
 
             // If there is a quick reply in the message
             if let Some(quick_reply) = message.get_quick_reply() {

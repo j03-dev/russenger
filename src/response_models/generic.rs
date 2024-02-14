@@ -14,7 +14,7 @@ use super::{GetSender, NextPrevNavigation, payload::Payload, recipient::Recipien
 /// # Example
 ///
 /// ```rust
-/// use russenger::create_action;
+/// use russenger::{Res, Req, create_action};
 /// use russenger::generic::GenericButton;
 /// use russenger::payload::Payload;
 ///
@@ -65,7 +65,7 @@ pub struct GenericElement {
 /// # Example
 ///
 /// ```rust
-/// use russenger::create_action;
+/// use russenger::{Res, Req, create_action};
 /// use russenger::generic::{GenericButton, GenericElement};
 /// use russenger::payload::Payload;
 ///
@@ -123,10 +123,10 @@ struct GenericMessage {
 ///
 /// ```rust
 /// use russenger::generic::{GenericButton, GenericElement, GenericModel};
-/// use russenger::{create_action, Data};
+/// use russenger::{create_action, Data, Req, Res};
 /// use russenger::payload::Payload;
 ///
-/// create_action!(Main, |res: Res, Req: Req| async move {
+/// create_action!(Main, |res: Res, req: Req| async move {
 ///     let my_data = Some(Data::new("my_value", None));
 ///     let button = GenericButton::new("Button Title", Payload::new(MyAction, my_data));
 ///     let element = GenericElement::new("Element Title", "https://example.com/image.jpg", "Element Subtitle", vec![button]);
@@ -134,7 +134,7 @@ struct GenericMessage {
 ///     res.send(model).await;
 ///; });
 ///
-/// create_action!(MyAction, |res: Res, Req: Req| async move {
+/// create_action!(MyAction, |res: Res, req: Req| async move {
 ///     todo!()
 /// });
 /// ```

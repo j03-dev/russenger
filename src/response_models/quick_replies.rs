@@ -37,7 +37,7 @@ struct QuickMessage {
 /// ```rust
 /// use russenger::payload::Payload;
 /// use russenger::quick_replies::{QuickReply, QuickReplyModel};
-/// use russenger::{create_action, Data};
+/// use russenger::{create_action, Data, Res, Req};
 ///
 /// create_action!(Main, |res: Res, req: Req| async move {
 ///     let my_data = Some(Data::new("my_value", None));

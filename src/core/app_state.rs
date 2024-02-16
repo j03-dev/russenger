@@ -2,7 +2,7 @@ use crate::query::Query;
 use std::collections::HashSet;
 use std::sync::Arc;
 
-use rocket::tokio::sync::Mutex;
+use tokio::sync::Mutex;
 
 pub struct ActionLock {
     pub locked_users: Arc<Mutex<HashSet<String>>>,

@@ -1,4 +1,4 @@
-use rocket::serde::Deserialize;
+use serde::Deserialize;
 
 #[derive(Debug, Default, Deserialize)]
 pub struct Sender {
@@ -56,11 +56,11 @@ pub struct Entry {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct MessageDeserializer {
+pub struct CommingData {
     entry: Vec<Entry>,
 }
 
-impl MessageDeserializer {
+impl CommingData {
     pub fn get_sender(&self) -> &String {
         &self.entry[0].messaging[0].sender.id
     }

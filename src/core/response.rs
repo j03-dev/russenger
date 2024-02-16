@@ -1,6 +1,6 @@
 use std::env;
 
-use rocket::serde::Serialize;
+use serde::Serialize;
 
 pub struct Res;
 

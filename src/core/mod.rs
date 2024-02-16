@@ -1,15 +1,11 @@
-use std::str::FromStr;
-
-use rocket::fs::FileServer;
-use rocket::serde::json::Json;
-use rocket::{catch, catchers, get, post, routes, State};
-use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
+use actix_web::{get, post, web, App, HttpResponse, HttpServer};
+use serde::Deserialize;
+use std::env;
 
 use action::ACTION_REGISTRY;
 use app_state::AppState;
 use data::Data;
-use deserializers::MessageDeserializer;
-use facebook_request::FacebookRequest;
+use deserializers::CommingData;
 use request::Req;
 use response::Res;
 
@@ -24,28 +20,41 @@ pub mod response;
 
 mod app_state;
 mod deserializers;
-mod facebook_request;
 
-#[catch(404)]
-fn page_not_found() -> &'static str {
-    "Page not found: 404"
+#[derive(Debug, Deserialize)]
+struct WebhookQuery {
+    #[serde(rename = "hub.mode")]
+    hub_mode: Option<String>,
+    #[serde(rename = "hub.challenge")]
+    hub_challenge: Option<String>,
+    #[serde(rename = "hub.verify_token")]
+    hub_verify_token: Option<String>,
 }
 
-#[catch(500)]
-fn server_panic() -> &'static str {
-    "Server panic: 500"
+impl WebhookQuery {
+    fn verify(&self) -> HttpResponse {
+        match (
+            self.hub_mode.clone(),
+            self.hub_challenge.clone(),
+            self.hub_verify_token.clone(),
+        ) {
+            (Some(hub_mode), Some(hub_challenge), Some(token)) => {
+                if hub_mode.eq("subscribe") && env::var("VERIFY_TOKEN").unwrap().eq(&token) {
+                    HttpResponse::Ok().body(hub_challenge)
+                } else {
+                    HttpResponse::Unauthorized().body("Token mismatch")
+                }
+            }
+            _ => HttpResponse::Unauthorized().body("Arguments not enough"),
+        }
+    }
 }
 
-// Define the webhook_verify function
-// This function is an asynchronous function that handles GET requests to the "/webhook" endpoint
-// It takes a FacebookRequest as an argument and returns a String
 #[get("/webhook")]
-async fn webhook_verify(request: FacebookRequest) -> String {
-    request.0
+async fn webhook_verify(query: web::Query<WebhookQuery>) -> HttpResponse {
+    query.verify()
 }
 
-// This function executes the payload.
-// It takes a user, a URI, and a query as parameters.
 async fn execute_payload(user: &str, uri: &str, query: &Query) {
     match Payload::from_uri_string(uri) {
         Ok(payload) => {
@@ -61,10 +70,8 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
     }
 }
 
-// This function is the core of the webhook.
-// It processes incoming data and updates the state accordingly.
-#[post("/webhook", format = "json", data = "<data>")]
-async fn webhook_core(data: Json<MessageDeserializer>, app_state: &State<AppState>) -> &'static str {
+#[post("/webhook")]
+async fn webhook_core(data: web::Json<CommingData>, app_state: web::Data<AppState>) -> String {
     let query = &app_state.query;
     let user = data.get_sender();
     query.create(user).await;
@@ -78,48 +85,30 @@ async fn webhook_core(data: Json<MessageDeserializer>, app_state: &State<AppStat
                 let request = Req::new(user, query.clone(), Data::new(message.get_text(), None));
                 action.execute(Res, request).await;
             }
-        }
-        else if let Some(postback) = data.get_postback() {
+        } else if let Some(postback) = data.get_postback() {
             let uri = postback.get_payload();
             execute_payload(user, uri, query).await;
         }
     }
     app_state.action_lock.unlock(user).await;
-    "Ok"
+    "Ok".into()
 }
 
-// This function runs the server.
-pub async fn run_server() {
+pub async fn run_server() -> Result<(), std::io::Error> {
     if !ACTION_REGISTRY.lock().await.contains_key("Main") {
         panic!("The ACTION_REGISTRY should contain an action with path 'Main' implementing the Action trait.");
     }
-    let allowed_origins = AllowedOrigins::some_regex(&["graph.facebook.com"]);
-
-    let allowed_methods: AllowedMethods = ["Get", "Post"]
-        .iter()
-        .map(|s| FromStr::from_str(s).unwrap())
-        .collect();
-
-    let cors = CorsOptions {
-        allowed_origins,
-        allowed_methods,
-        allowed_headers: AllowedHeaders::all(),
-        allow_credentials: true,
-        ..Default::default()
-    }
-    .to_cors()
-    .expect("Failed to create CORS: Something went wrong with CORS");
-
-    // Build and launch the server
-    rocket::build()
-        .attach(cors)
-        .manage(AppState::init().await)
-        .mount("/", routes![webhook_verify, webhook_core])
-        .mount("/static", FileServer::from("static"))
-        .register("/", catchers![page_not_found, server_panic])
-        .launch()
-        .await
-        .expect("Failed to run Rocket server");
+    let host = env::var("HOST").unwrap_or("127.0.0.1".into());
+    let port = env::var("PORT").unwrap_or("8080".into()).parse().unwrap_or(8080);
+    HttpServer::new(|| {
+        App::new()
+            .app_data(web::Data::new(AppState::init()))
+            .service(webhook_verify)
+            .service(webhook_core)
+    })
+    .bind((host, port))?
+    .run()
+    .await
 }
 
 // This function handles the database migration.

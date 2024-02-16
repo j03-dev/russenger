@@ -1,4 +1,4 @@
-use rocket::serde::Serialize;
+use serde::Serialize;
 
 pub use crate::Data;
 

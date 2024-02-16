@@ -10,8 +10,6 @@ path = "src/lib.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rocket = { version = "0.5.0", features = ["json"] }
-rocket_cors = { git = "https://github.com/j03-dev/rocket_cors", branch = "master" }
 reqwest = { version = "0.11.18", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 dotenv = "0.15.0"
@@ -21,8 +19,10 @@ sqlx = { version = "0.7.1", features = [
   "sqlite",
   "mysql",
   "macros",
-  "any",
 ] }
 lazy_static = "1.4.0"
 url = "2.4.1"
 serde_json = "1.0.107"
+actix-web = "4"
+async-trait = "0.1.77"
+tokio = "1.36.0"

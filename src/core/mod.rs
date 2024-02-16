@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer};
+use actix_web::{get, post, web, App, HttpResponse, HttpServer,fs};
 use serde::Deserialize;
 use std::env;
 
@@ -72,10 +72,12 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
 
 #[post("/webhook")]
 async fn webhook_core(data: web::Json<CommingData>, app_state: web::Data<AppState>) -> String {
+    println!("{data:#?}");
     let query = &app_state.query;
     let user = data.get_sender();
     query.create(user).await;
     if app_state.action_lock.lock(user).await {
+        println!("unlock");
         if let Some(message) = data.get_message() {
             let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
             if let Some(quick_reply) = message.get_quick_reply() {
@@ -91,6 +93,7 @@ async fn webhook_core(data: web::Json<CommingData>, app_state: web::Data<AppStat
         }
     }
     app_state.action_lock.unlock(user).await;
+    println!("remove lock");
     "Ok".into()
 }
 
@@ -99,12 +102,16 @@ pub async fn run_server() -> Result<(), std::io::Error> {
         panic!("The ACTION_REGISTRY should contain an action with path 'Main' implementing the Action trait.");
     }
     let host = env::var("HOST").unwrap_or("127.0.0.1".into());
-    let port = env::var("PORT").unwrap_or("8080".into()).parse().unwrap_or(8080);
+    let port = env::var("PORT")
+        .unwrap_or("8080".into())
+        .parse()
+        .unwrap_or(8080);
     HttpServer::new(|| {
         App::new()
             .app_data(web::Data::new(AppState::init()))
             .service(webhook_verify)
             .service(webhook_core)
+            .service(fs::Files::new("/static", ".").show_files_listing())
     })
     .bind((host, port))?
     .run()

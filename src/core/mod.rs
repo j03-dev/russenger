@@ -72,9 +72,9 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
 }
 
 #[post("/webhook")]
-async fn webhook_core(data: web::Json<CommingData>, app_state: web::Data<AppState>) -> String {
+async fn webhook_core(data: web::Json<CommingData>) -> String {
     println!("{data:#?}");
-    let query = &app_state.query;
+/*     let query = &app_state.query;
     let user = data.get_sender();
     query.create(user).await;
     if app_state.action_lock.lock(user).await {
@@ -94,7 +94,7 @@ async fn webhook_core(data: web::Json<CommingData>, app_state: web::Data<AppStat
         }
     }
     app_state.action_lock.unlock(user).await;
-    println!("remove lock");
+    println!("remove lock"); */
     "Ok".into()
 }
 

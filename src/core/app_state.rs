@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use tokio::sync::Mutex;
 
+#[derive(Clone)]
 pub struct ActionLock {
     pub locked_users: Arc<Mutex<HashSet<String>>>,
 }
@@ -25,6 +26,7 @@ impl ActionLock {
     }
 }
 
+#[derive(Clone)]
 pub struct AppState {
     pub query: Query,
     pub action_lock: ActionLock,

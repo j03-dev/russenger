@@ -98,7 +98,7 @@ async fn webhook_core(data: web::Json<CommingData>, app_state: web::Data<AppStat
     "Ok".into()
 }
 
-pub async fn run_server() -> Result<(), std::io::Error> {
+pub async fn run_server() {
     if !ACTION_REGISTRY.lock().await.contains_key("Main") {
         panic!("The ACTION_REGISTRY should contain an action with path 'Main' implementing the Action trait.");
     }
@@ -107,16 +107,21 @@ pub async fn run_server() -> Result<(), std::io::Error> {
         .unwrap_or("8080".into())
         .parse()
         .unwrap_or(8080);
-    HttpServer::new(|| {
+    match HttpServer::new(|| {
         App::new()
             .app_data(web::Data::new(AppState::init()))
             .service(webhook_verify)
             .service(webhook_core)
             .service(fs::Files::new("/static", ".").show_files_listing())
     })
-    .bind((host, port))?
-    .run()
-    .await
+    .bind((host.clone(), port))
+    {
+        Ok(app) => {
+            app.run().await.expect("server crashed");
+            println!("server is running on {host}:{port}");
+        }
+        Err(_) => println!("Failed to run server"),
+    };
 }
 
 // This function handles the database migration.

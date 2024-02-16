@@ -16,7 +16,7 @@ pub async fn execute_command() {
         let command_option = args.command_option();
 
         match command_option.as_str() {
-            "runserver" => run_server().await.expect("Failed to runserver"),
+            "runserver" => run_server().await,
             "migrate" => migrate().await,
             _ => print_usage(),
         }

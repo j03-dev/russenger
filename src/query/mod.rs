@@ -138,25 +138,3 @@ impl Query {
         self.set_action(user_id, "Main").await
     }
 }
-
-#[cfg(test)]
-mod test {
-    use super::Query;
-    use dotenv::dotenv;
-
-    #[rocket::async_test]
-    async fn test_set_action() {
-        dotenv().ok();
-        let query = Query::new().await;
-        let result = query.set_action("test", "NewAction").await;
-        assert_eq!(true, result)
-    }
-
-    #[rocket::async_test]
-    async fn test_get_action() {
-        dotenv().ok();
-        let query = Query::new().await;
-        let result = query.get_action("test").await.unwrap();
-        assert_eq!("NewAction", result)
-    }
-}

@@ -7,16 +7,16 @@ use crate::Action;
 // It contains a path and optional data.
 #[derive(Debug, Default, Clone)]
 pub struct Payload {
-    pub path: String,  // The path of the action
-    pub data: Option<Data>,  // The data associated with the action
+    pub path: String,
+    pub data: Option<Data>,
 }
 
 impl Payload {
     // Constructs a new Payload with the given action and data.
     pub fn new<A: Action>(action: A, data: Option<Data>) -> Self {
         Self {
-            path: action.path(),  // Set the path to the action's path
-            data,  // Set the data to the given data
+            path: action.path(),
+            data,
         }
     }
 
@@ -34,8 +34,8 @@ impl Payload {
     // Converts the Payload to a URI-encoded string.
     pub fn to_uri_string(&self) -> String {
         form_urlencoded::Serializer::new(String::new())
-            .append_pair("action", self.get_path())  // Add the path as the "action" parameter
-            .append_pair("value", &self.get_data_to_string())  // Add the data as the "value" parameter
+            .append_pair("action", self.get_path())
+            .append_pair("value", &self.get_data_to_string())
             .finish()
     }
 
@@ -51,9 +51,9 @@ impl Payload {
 
         for (name, val) in parsed {
             match name.as_str() {
-                "action" => path = Some(val),  // Set the path to the value of the "action" parameter
-                "value" => value = Some(val),  // Set the value to the value of the "value" parameter
-                _ => return Err(format!("Unknown field in URI: {}", name)),  // Return an error if an unknown field is encountered
+                "action" => path = Some(val),
+                "value" => value = Some(val),
+                _ => return Err(format!("Unknown field in URI: {}", name)),
             }
         }
 

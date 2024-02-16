@@ -41,8 +41,6 @@ fn server_panic() -> &'static str {
 // It takes a FacebookRequest as an argument and returns a String
 #[get("/webhook")]
 async fn webhook_verify(request: FacebookRequest) -> String {
-    // The function simply returns the string contained in the FacebookRequest
-    // This is the "hub.challenge" parameter that Facebook sends when verifying the webhook
     request.0
 }
 
@@ -51,16 +49,13 @@ async fn webhook_verify(request: FacebookRequest) -> String {
 async fn execute_payload(user: &str, uri: &str, query: &Query) {
     match Payload::from_uri_string(uri) {
         Ok(payload) => {
-            // If the payload is valid, we get the corresponding action from the registry
             if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
-                // We create a new request and execute the action
                 let data = Data::from_string(payload.get_data_to_string());
                 let request = Req::new(user, query.clone(), data);
                 action.execute(Res, request).await;
             }
         }
         Err(err) => {
-            // If the payload is not valid, we send an error message
             Res.send(TextModel::new(user, &err)).await;
         }
     }
@@ -69,26 +64,13 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
 // This function is the core of the webhook.
 // It processes incoming data and updates the state accordingly.
 #[post("/webhook", format = "json", data = "<data>")]
-async fn webhook_core(
-    data: Json<MessageDeserializer>,
-    app_state: &State<AppState>,
-) -> &'static str {
-    // Extract the query from the application state
+async fn webhook_core(data: Json<MessageDeserializer>, app_state: &State<AppState>) -> &'static str {
     let query = &app_state.query;
-
-    // Extract the sender from the incoming data
     let user = data.get_sender();
-
-    // Create user if user is not yet created
     query.create(user).await;
-
     if app_state.action_lock.lock(user).await {
-        // If there is a message in the incoming data
         if let Some(message) = data.get_message() {
-            // Get the action path from the query
             let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
-
-            // If there is a quick reply in the message
             if let Some(quick_reply) = message.get_quick_reply() {
                 let uri_payload = quick_reply.get_payload();
                 execute_payload(user, uri_payload, query).await;
@@ -97,18 +79,12 @@ async fn webhook_core(
                 action.execute(Res, request).await;
             }
         }
-        // If there is a postback in the incoming data
         else if let Some(postback) = data.get_postback() {
-            // Get the payload from the postback
             let uri = postback.get_payload();
-            // Execute the payload
             execute_payload(user, uri, query).await;
         }
     }
-
     app_state.action_lock.unlock(user).await;
-
-    // Return "Ok" to indicate that the function has executed successfully
     "Ok"
 }
 
@@ -148,17 +124,11 @@ pub async fn run_server() {
 
 // This function handles the database migration.
 pub async fn migrate() {
-    // Create a new query instance
     let query = Query::new().await;
-
-    // Print a success message if the connection is successful
     println!("Connection successful!");
-
-    // Perform the migration and print a success or failure message
     let migration_result = match query.migrate().await {
         true => "Migration successful!",
         false => "Migration failed",
     };
-
     println!("{}", migration_result);
 }

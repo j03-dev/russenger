@@ -14,7 +14,7 @@ async fn establish_connection() -> DB {
     let url = var("DATABASE").expect("check your .env file \n pls specified your database name");
     let msg = "Database connection failed";
     if let Some(engine) = url.split(':').next() {
-        return match &engine[..] {
+        return match engine {
             "mysql" => {
                 let pool: Pool<MySql> = Pool::connect(&url).await.expect(msg);
                 DB::Mysql(pool)

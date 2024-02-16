@@ -1,4 +1,5 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer,fs};
+use actix_files as fs;
+use actix_web::{get, post, web, App, HttpResponse, HttpServer};
 use serde::Deserialize;
 use std::env;
 

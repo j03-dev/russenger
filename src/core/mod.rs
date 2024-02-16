@@ -117,7 +117,7 @@ pub async fn run_server() {
     {
         Ok(app) => {
             if let Err(err) = app.run().await {
-                eprintln!("Server is not running cause: {err}");
+                eprintln!("Server is crashed cause: {err}");
             };
         }
         Err(_) => println!("Failed to run server"),

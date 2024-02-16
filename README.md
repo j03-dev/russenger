@@ -22,8 +22,8 @@ To use Russenger in your Rust project, add the following dependencies to your `C
 
 ```toml
 [dependencies]
-russenger = { git = "https://github.com/j03-dev/russenger", branch = "main" }
-rocket = { version = "0.5.0", features = ["json"] }
+russenger = { git = "https://github.com/j03-dev/russenger", branch = "actix" }
+actix = "4"
 ```
 
 Ensure that you have set up your `.env` file within your project directory. The file should contain the following
@@ -33,6 +33,8 @@ configurations:
 VERIFY_TOKEN=<your-verify-token>
 API=https://graph.facebook.com/v16.0/me/messages?access-token=
 PAGE_ACCESS_TOKEN=<your-page-access-token>
+HOST=0.0.0.0
+PORT=8000
 ```
 
 #### postgres

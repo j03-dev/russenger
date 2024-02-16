@@ -107,6 +107,7 @@ pub async fn run_server() {
         .unwrap_or("8080".into())
         .parse()
         .unwrap_or(8080);
+    println!("server start on {host}:{port}");
     match HttpServer::new(|| {
         App::new()
             .app_data(web::Data::new(AppState::init()))
@@ -117,8 +118,9 @@ pub async fn run_server() {
     .bind((host.clone(), port))
     {
         Ok(app) => {
-            app.run().await.expect("server crashed");
-            println!("server is running on {host}:{port}");
+            if let Err(err) = app.run().await {
+                eprintln!("Server is not running cause: {err}");
+            };
         }
         Err(_) => println!("Failed to run server"),
     };

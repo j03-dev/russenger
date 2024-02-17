@@ -9,7 +9,7 @@ use action::ACTION_REGISTRY;
 use app_state::AppState;
 use data::Data;
 use deserializers::MessageDeserializer;
-use facebook_request::FacebookRequest;
+use webhook_query::WebHookQuery;
 use request::Req;
 use response::Res;
 
@@ -24,7 +24,7 @@ pub mod response;
 
 mod app_state;
 mod deserializers;
-mod facebook_request;
+mod webhook_query;
 
 #[catch(404)]
 fn page_not_found() -> &'static str {
@@ -36,16 +36,11 @@ fn server_panic() -> &'static str {
     "Server panic: 500"
 }
 
-// Define the webhook_verify function
-// This function is an asynchronous function that handles GET requests to the "/webhook" endpoint
-// It takes a FacebookRequest as an argument and returns a String
 #[get("/webhook")]
-async fn webhook_verify(request: FacebookRequest) -> String {
-    request.0
+async fn webhook_verify(webhook_query: WebHookQuery) -> String {
+    webhook_query.hub_challenge
 }
 
-// This function executes the payload.
-// It takes a user, a URI, and a query as parameters.
 async fn execute_payload(user: &str, uri: &str, query: &Query) {
     match Payload::from_uri_string(uri) {
         Ok(payload) => {
@@ -61,13 +56,12 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
     }
 }
 
-// This function is the core of the webhook.
-// It processes incoming data and updates the state accordingly.
 #[post("/webhook", format = "json", data = "<data>")]
 async fn webhook_core(data: Json<MessageDeserializer>, app_state: &State<AppState>) -> &'static str {
     let query = &app_state.query;
     let user = data.get_sender();
     query.create(user).await;
+    
     if app_state.action_lock.lock(user).await {
         if let Some(message) = data.get_message() {
             let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
@@ -85,10 +79,10 @@ async fn webhook_core(data: Json<MessageDeserializer>, app_state: &State<AppStat
         }
     }
     app_state.action_lock.unlock(user).await;
+    
     "Ok"
 }
 
-// This function runs the server.
 pub async fn run_server() {
     if !ACTION_REGISTRY.lock().await.contains_key("Main") {
         panic!("The ACTION_REGISTRY should contain an action with path 'Main' implementing the Action trait.");
@@ -110,7 +104,6 @@ pub async fn run_server() {
     .to_cors()
     .expect("Failed to create CORS: Something went wrong with CORS");
 
-    // Build and launch the server
     rocket::build()
         .attach(cors)
         .manage(AppState::init().await)
@@ -122,7 +115,6 @@ pub async fn run_server() {
         .expect("Failed to run Rocket server");
 }
 
-// This function handles the database migration.
 pub async fn migrate() {
     let query = Query::new().await;
     println!("Connection successful!");

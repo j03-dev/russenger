@@ -2,28 +2,8 @@ use rocket::serde::Serialize;
 
 pub use crate::Data;
 
-use super::{GetSender, NextPrevNavigation, payload::Payload, recipient::Recipient};
+use super::{payload::Payload, recipient::Recipient, GetSender, NextPrevNavigation};
 
-/// Creates a new `GenericButton`.
-///
-/// # Arguments
-///
-/// * `title` - The title of the button.
-/// * `payload` - The payload of the button.
-///
-/// # Example
-///
-/// ```rust
-/// use russenger::{Res, Req, create_action};
-/// use russenger::generic::GenericButton;
-/// use russenger::payload::Payload;
-///
-/// create_action!(AnAction, |res: Res, req: Req| async move {
-///     todo!()
-/// });
-///
-/// let button = GenericButton::new("Button Title", Payload::new(AnAction, None));
-/// ```
 #[derive(Debug, Serialize)]
 pub struct GenericButton {
     #[serde(rename = "type")]
@@ -42,9 +22,6 @@ impl GenericButton {
     }
 }
 
-/// `GenericElement` represents an element in a generic template.
-///
-/// It has a title, image URL, subtitle, and a list of buttons.
 #[derive(Debug, Serialize)]
 pub struct GenericElement {
     title: String,
@@ -53,38 +30,8 @@ pub struct GenericElement {
     buttons: Vec<GenericButton>,
 }
 
-/// Creates a new `GenericElement`.
-///
-/// # Arguments
-///
-/// * `title` - The title of the element.
-/// * `image_url` - The image URL of the element.
-/// * `subtitle` - The subtitle of the element.
-/// * `buttons` - The buttons of the element.
-///
-/// # Example
-///
-/// ```rust
-/// use russenger::{Res, Req, create_action};
-/// use russenger::generic::{GenericButton, GenericElement};
-/// use russenger::payload::Payload;
-///
-/// create_action!(AnAction, |res: Res, req:Req| async move {
-///     todo!()
-/// });
-///
-/// let button = GenericButton::new("Button Title", Payload::new(AnAction, None));
-/// let element = GenericElement::new("Element Title", "https://example.com/image.jpg", "Element Subtitle", vec![button]);
-///
-/// ```
-///
 impl GenericElement {
-    pub fn new(
-        title: &str,
-        image_url: &str,
-        subtitle: &str,
-        buttons: Vec<GenericButton>,
-    ) -> Self {
+    pub fn new(title: &str, image_url: &str, subtitle: &str, buttons: Vec<GenericButton>) -> Self {
         Self {
             title: title.into(),
             image_url: image_url.into(),
@@ -112,36 +59,6 @@ struct GenericMessage {
     pub attachment: Attachment,
 }
 
-/// Creates a new `GenericModel`.
-///
-/// # Arguments
-///
-/// * `sender` - The sender of the message.
-/// * `elements` - The elements of the generic template.
-///
-/// # Example
-///
-/// ```rust
-/// use russenger::generic::{GenericButton, GenericElement, GenericModel};
-/// use russenger::{create_action, Data, Req, Res};
-/// use russenger::payload::Payload;
-///
-/// create_action!(Main, |res: Res, req: Req| async move {
-///     let my_data = Some(Data::new("my_value", None));
-///     let button = GenericButton::new("Button Title", Payload::new(MyAction, my_data));
-///     let element = GenericElement::new("Element Title", "https://example.com/image.jpg", "Element Subtitle", vec![button]);
-///     let model = GenericModel::new(&req.user, vec![element]);
-///     res.send(model).await;
-///; });
-///
-/// create_action!(MyAction, |res: Res, req: Req| async move {
-///     todo!()
-/// });
-/// ```
-///
-/// In this example, a `GenericButton` is created with a title and a `Payload`. The `Payload` includes an `Action` and an optional `Data`.
-/// Then, a `GenericElement` is created with a title, image URL, subtitle, and a vector of `GenericButton`.
-/// Finally, a `GenericModel` is created with a sender ID and a vector of `GenericElement`.
 #[derive(Debug, Serialize)]
 pub struct GenericModel<'g> {
     recipient: Recipient<'g>,
@@ -171,6 +88,4 @@ impl<'g> GetSender<'g> for GenericModel<'g> {
     }
 }
 
-impl<'g> NextPrevNavigation<'g> for GenericModel<'g> {
-    // This struct implements the `NextPrevNavigation` trait but does not provide any additional methods.
-}
+impl<'g> NextPrevNavigation<'g> for GenericModel<'g> {}

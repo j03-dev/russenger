@@ -1,0 +1,10 @@
+[package]
+name = "{{project-name}}"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+russenger = { git = "https://github.com/j03-dev/russenger", branch = "main" }
+rocket = "0.5"

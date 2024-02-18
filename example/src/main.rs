@@ -9,15 +9,22 @@ use russenger::{
 };
 
 create_action!(Main, |res: Res, req: Req| async move {
-    res.send(TextModel::new(&req.user, "Main, I'm your chatbot!")).await;
+    res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
+        .await;
+
+    let payload_1 = Payload::new(Option1, Some(Data::new("payload_for_option_1", None)));
+    let payload_2 = Payload::new(Option1, Some(Data::new("payload_for_option_2", None)));
 
     let replies = vec![
-        QuickReply::new("Option1", "", Payload::new(Option1, Some(Data::new("payload_for_option_1", None)))),
-        QuickReply::new("Option2", "", Payload::new(Option1, Some(Data::new("payload_for_option_2", None)))),
+        QuickReply::new("Option1", "", payload_1),
+        QuickReply::new("Option2", "", payload_2),
     ];
-
-    res.send(QuickReplyModel::new(&req.user, "Choose an option:", replies)).await;
-
+    res.send(QuickReplyModel::new(
+        &req.user,
+        "Choose an option:",
+        replies,
+    ))
+    .await;
 });
 
 create_action!(Option1, |res: Res, req: Req| async move {

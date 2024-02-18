@@ -9,7 +9,7 @@ use action::ACTION_REGISTRY;
 use app_state::AppState;
 use data::Data;
 use request::Req;
-use response::Res;
+use response::Res as res;
 use webhook_query::WebHookQuery;
 
 use crate::payload::Payload;
@@ -48,11 +48,11 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
             if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
                 let data = Data::from_string(payload.get_data_to_string());
                 let request = Req::new(user, query.clone(), data);
-                action.execute(Res, request).await;
+                action.execute(res, request).await;
             }
         }
         Err(err) => {
-            Res.send(TextModel::new(user, &err)).await;
+            res.send(TextModel::new(user, &err)).await;
         }
     }
 }
@@ -71,7 +71,7 @@ async fn webhook_core(data: Json<InComingData>, app_state: &State<AppState>) -> 
                 execute_payload(user, uri_payload, query).await;
             } else if let Some(action) = ACTION_REGISTRY.lock().await.get(action_path.as_str()) {
                 let request = Req::new(user, query.clone(), Data::new(message.get_text(), None));
-                action.execute(Res, request).await;
+                action.execute(res, request).await;
             }
         } else if let Some(postback) = data.get_postback() {
             let uri = postback.get_payload();

@@ -9,7 +9,6 @@ use data::Data;
 use incoming_data::InComingData;
 use request::Req;
 use response::Res as res;
-use webhook_query::WebHookQuery;
 
 use crate::payload::Payload;
 use crate::query::Query;
@@ -73,7 +72,10 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
 }
 
 #[post("/webhook")]
-async fn webhook_core(data: web::Json<CommingData>, app_state: web::Data<AppState>) -> String {
+async fn webhook_core(
+    data: web::Json<InComingData>,
+    app_state: web::Data<AppState>,
+) -> &'static str {
     let query = &app_state.query;
     let user = data.get_sender();
     query.create(user).await;
@@ -94,7 +96,7 @@ async fn webhook_core(data: web::Json<CommingData>, app_state: web::Data<AppStat
         }
     }
     app_state.action_lock.unlock(user).await;
-    "Ok".into()
+    "Ok"
 }
 
 pub async fn run_server() {

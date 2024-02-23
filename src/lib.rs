@@ -1,5 +1,6 @@
+pub use actix_web::main;
+pub use async_trait::async_trait;
 pub use dotenv::dotenv;
-pub use rocket::{async_trait, main};
 
 pub use crate::command::execute_command;
 pub use crate::core::action::{Action, ACTION_REGISTRY};

@@ -1,4 +1,4 @@
-use rocket::serde::Serialize;
+use serde::Serialize;
 
 use crate::{Data, Res};
 
@@ -16,7 +16,7 @@ pub trait GetSender<'r> {
     fn get_sender(&self) -> &'r str;
 }
 
-#[rocket::async_trait]
+#[async_trait::async_trait]
 pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
     async fn send_next_prev(&self, path: &str, data: Data) {
         let [start, end] = data.get_page();

@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use rocket::tokio::sync::Mutex;
+use tokio::sync::Mutex;
 
 use crate::{Req, Res};
 
-#[rocket::async_trait]
+#[async_trait::async_trait]
 pub trait Action: Send + Sync {
     async fn execute(&self, res: Res, req: Req);
 

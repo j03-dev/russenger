@@ -8,6 +8,7 @@ use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
 use action::ACTION_REGISTRY;
 use app_state::AppState;
 use data::Data;
+use incoming_data::InComingData;
 use request::Req;
 use response::Res as res;
 use webhook_query::WebHookQuery;
@@ -15,8 +16,6 @@ use webhook_query::WebHookQuery;
 use crate::payload::Payload;
 use crate::query::Query;
 use crate::text::TextModel;
-
-use incoming_data::InComingData;
 
 pub mod action;
 pub mod data;

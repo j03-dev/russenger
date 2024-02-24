@@ -2,13 +2,13 @@ use std::env;
 
 use rocket::serde::Serialize;
 
-pub struct Res;
-
 #[derive(Debug)]
 pub enum SendResult {
     Okey(reqwest::Response),
     Error(reqwest::Error),
 }
+
+pub struct Res;
 
 impl Res {
     pub async fn send<T: Serialize>(&self, value: T) -> SendResult {

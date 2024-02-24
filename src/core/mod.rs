@@ -45,9 +45,11 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
     match Payload::from_uri_string(uri) {
         Ok(payload) => {
             if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
+                println!("Payload => {action:?}", action = action.path());
                 let data = Data::from_string(payload.get_data_to_string());
                 let request = Req::new(user, query.clone(), data);
                 action.execute(res, request).await;
+                println!("finish execute paylaod");
             }
         }
         Err(err) => {

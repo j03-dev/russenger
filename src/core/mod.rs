@@ -110,7 +110,7 @@ pub async fn run_server() {
         .parse()
         .unwrap_or(8080);
     println!("server start on {host}:{port}");
-    match HttpServer::new(move || {
+    HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))
             .service(webhook_verify)
@@ -118,14 +118,10 @@ pub async fn run_server() {
             .service(fs::Files::new("/static", ".").show_files_listing())
     })
     .bind((host.clone(), port))
-    {
-        Ok(app) => {
-            if let Err(err) = app.run().await {
-                eprintln!("Server is crashed cause: {err}");
-            };
-        }
-        Err(_) => println!("Failed to run server"),
-    };
+    .expect("Failed to run this server: pls check the port if it's already used!")
+    .run()
+    .await
+    .expect("sever is crashed");
 }
 
 pub async fn migrate() {

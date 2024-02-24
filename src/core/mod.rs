@@ -45,11 +45,9 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
     match Payload::from_uri_string(uri) {
         Ok(payload) => {
             if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
-                println!("Payload => {action:?}", action = action.path());
                 let data = Data::from_string(payload.get_data_to_string());
                 let request = Req::new(user, query.clone(), data);
                 action.execute(res, request).await;
-                println!("finish execute paylaod");
             }
         }
         Err(err) => {
@@ -65,10 +63,8 @@ async fn webhook_core(data: Json<InComingData>, app_state: &State<AppState>) -> 
     query.create(user).await;
 
     if ACTION_LOCK.lock(user).await {
-        println!("lock");
         if let Some(message) = data.get_message() {
             let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
-            println!("{action_path}");
             if let Some(quick_reply) = message.get_quick_reply() {
                 let uri_payload = quick_reply.get_payload();
                 execute_payload(user, uri_payload, query).await;
@@ -82,7 +78,6 @@ async fn webhook_core(data: Json<InComingData>, app_state: &State<AppState>) -> 
         }
     }
     ACTION_LOCK.unlock(user).await;
-    println!("unlock");
     "Ok"
 }
 

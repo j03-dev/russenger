@@ -1,9 +1,7 @@
-use std::str::FromStr;
-
-use rocket::fs::FileServer;
-use rocket::serde::json::Json;
-use rocket::{catch, catchers, get, post, routes, State};
-use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
+use actix_files as fs;
+use actix_web::{get, post, web, App, HttpResponse, HttpServer};
+use serde::Deserialize;
+use std::env;
 
 use action::{ACTION_LOCK, ACTION_REGISTRY};
 use app_state::AppState;
@@ -11,7 +9,6 @@ use data::Data;
 use incoming_data::InComingData;
 use request::Req;
 use response::Res as res;
-use webhook_query::WebHookQuery;
 
 use crate::payload::Payload;
 use crate::query::Query;
@@ -24,21 +21,39 @@ pub mod response;
 
 mod app_state;
 mod incoming_data;
-mod webhook_query;
 
-#[catch(404)]
-fn page_not_found() -> &'static str {
-    "Page not found: 404"
+#[derive(Debug, Deserialize)]
+struct WebhookQuery {
+    #[serde(rename = "hub.mode")]
+    hub_mode: Option<String>,
+    #[serde(rename = "hub.challenge")]
+    hub_challenge: Option<String>,
+    #[serde(rename = "hub.verify_token")]
+    hub_verify_token: Option<String>,
 }
 
-#[catch(500)]
-fn server_panic() -> &'static str {
-    "Server panic: 500"
+impl WebhookQuery {
+    fn verify(&self) -> HttpResponse {
+        match (
+            self.hub_mode.clone(),
+            self.hub_challenge.clone(),
+            self.hub_verify_token.clone(),
+        ) {
+            (Some(hub_mode), Some(hub_challenge), Some(token)) => {
+                if hub_mode.eq("subscribe") && env::var("VERIFY_TOKEN").unwrap().eq(&token) {
+                    HttpResponse::Ok().body(hub_challenge)
+                } else {
+                    HttpResponse::Unauthorized().body("Token mismatch")
+                }
+            }
+            _ => HttpResponse::Unauthorized().body("Arguments not enough"),
+        }
+    }
 }
 
 #[get("/webhook")]
-async fn webhook_verify(webhook_query: WebHookQuery) -> String {
-    webhook_query.hub_challenge
+async fn webhook_verify(query: web::Query<WebhookQuery>) -> HttpResponse {
+    query.verify()
 }
 
 async fn execute_payload(user: &str, uri: &str, query: &Query) {
@@ -56,8 +71,11 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
     }
 }
 
-#[post("/webhook", format = "json", data = "<data>")]
-async fn webhook_core(data: Json<InComingData>, app_state: &State<AppState>) -> &'static str {
+#[post("/webhook")]
+async fn webhook_core(
+    data: web::Json<InComingData>,
+    app_state: web::Data<AppState>,
+) -> &'static str {
     let query = &app_state.query;
     let user = data.get_sender();
     query.create(user).await;
@@ -85,32 +103,25 @@ pub async fn run_server() {
     if !ACTION_REGISTRY.lock().await.contains_key("Main") {
         panic!("The ACTION_REGISTRY should contain an action with path 'Main' implementing the Action trait.");
     }
-    let allowed_origins = AllowedOrigins::some_regex(&["graph.facebook.com"]);
-
-    let allowed_methods: AllowedMethods = ["Get", "Post"]
-        .iter()
-        .map(|s| FromStr::from_str(s).unwrap())
-        .collect();
-
-    let cors = CorsOptions {
-        allowed_origins,
-        allowed_methods,
-        allowed_headers: AllowedHeaders::all(),
-        allow_credentials: true,
-        ..Default::default()
-    }
-    .to_cors()
-    .expect("Failed to create CORS: Something went wrong with CORS");
-
-    rocket::build()
-        .attach(cors)
-        .manage(AppState::init().await)
-        .mount("/", routes![webhook_verify, webhook_core])
-        .mount("/static", FileServer::from("static"))
-        .register("/", catchers![page_not_found, server_panic])
-        .launch()
-        .await
-        .expect("Failed to run Rocket server");
+    let app_state = AppState::init().await;
+    let host = env::var("HOST").unwrap_or("127.0.0.1".into());
+    let port = env::var("PORT")
+        .unwrap_or("8080".into())
+        .parse()
+        .unwrap_or(8080);
+    println!("server start on {host}:{port}");
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(app_state.clone()))
+            .service(webhook_verify)
+            .service(webhook_core)
+            .service(fs::Files::new("/static", ".").show_files_listing())
+    })
+    .bind((host.clone(), port))
+    .expect("Failed to run this server: pls check the port if it's already used!")
+    .run()
+    .await
+    .expect("sever is crashed");
 }
 
 pub async fn migrate() {

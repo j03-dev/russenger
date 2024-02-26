@@ -1,4 +1,4 @@
-use rocket::serde::Serialize;
+use serde::Serialize;
 
 use super::{payload::Payload, recipient::Recipient};
 use super::{GetSender, NextPrevNavigation};

@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 russenger = { git = "https://github.com/j03-dev/russenger", branch = "main" }
-rocket = "0.5"
+actix-web = "4"

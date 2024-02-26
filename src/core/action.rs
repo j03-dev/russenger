@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-use rocket::tokio::sync::Mutex;
+use tokio::sync::Mutex;
 
 use crate::{Req, Res};
 
@@ -26,7 +26,7 @@ impl ActionLock {
     }
 }
 
-#[rocket::async_trait]
+#[async_trait::async_trait]
 pub trait Action: Send + Sync {
     async fn execute(&self, res: Res, req: Req);
 

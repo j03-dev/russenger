@@ -6,12 +6,9 @@ pub use crate::core::action::{Action, ACTION_REGISTRY};
 pub use crate::core::data::Data;
 pub use crate::core::request::Req;
 pub use crate::core::response::{Res, SendResult};
-pub use crate::response_models::generic;
-pub use crate::response_models::media;
-pub use crate::response_models::payload;
-pub use crate::response_models::quick_replies;
-pub use crate::response_models::text;
-pub use crate::response_models::NextPrevNavigation;
+pub use crate::response_models::{
+    generic, media, payload, quick_replies, text, NextPrevNavigation,
+};
 
 pub mod command;
 mod core;

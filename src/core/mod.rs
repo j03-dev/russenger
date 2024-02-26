@@ -3,11 +3,6 @@ use actix_web::{get, post, web, App, HttpResponse, HttpServer};
 use serde::Deserialize;
 use std::env;
 
-use rocket::fs::FileServer;
-use rocket::serde::json::Json;
-use rocket::{catch, catchers, get, post, routes, State};
-use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
-
 use action::{ACTION_LOCK, ACTION_REGISTRY};
 use app_state::AppState;
 use data::Data;

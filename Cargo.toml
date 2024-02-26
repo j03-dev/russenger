@@ -12,11 +12,16 @@ path = "src/lib.rs"
 [dependencies]
 reqwest = { version = "^0.11.18", features = ["json"] }
 serde = { version = "^1.0", features = ["derive"] }
+async-trait = "^0.1.77"
 serde_json = "^1.0.107"
 lazy_static = "^1.4.0"
 rocket_cors = "0.6"
 dotenv = "^0.15.0"
+tokio = "^1.36.0"
 url = "^2.4.1"
+# actix
+actix-files = "^0.6.5"
+actix-web = "4"
 
 [dependencies.sqlx]
 version = "^0.7.1"
@@ -25,11 +30,5 @@ features = [
   "postgres",
   "sqlite",
   "mysql",
-] }
-lazy_static = "^1.4.0"
-url = "^2.4.1"
-serde_json = "^1.0.107"
-actix-web = "4"
-async-trait = "^0.1.77"
-tokio = "^1.36.0"
-actix-files = "^0.6.5"
+]
+

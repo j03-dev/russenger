@@ -70,14 +70,9 @@ impl<'g> GenericModel<'g> {
     pub fn new(sender: &'g str, mut elements: Vec<GenericElement>, pages: Pagination) -> Self {
         if let Some(pages) = pages {
             let [start, end] = pages;
-            elements = elements
-                .iter()
-                .skip(start)
-                .take(end - start)
-                .map(|e| e.clone())
-                .collect();
+            elements = elements.into_iter().skip(start).take(end - start).collect();
         } else if elements.len() >= 10 {
-            elements = elements[..10].to_vec();
+            elements.truncate(10);
         }
         Self {
             recipient: Recipient { id: sender },

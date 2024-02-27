@@ -118,5 +118,5 @@ pub async fn migrate() {
         true => "Migration successful!",
         false => "Migration failed",
     };
-    println!("{}", migration_result);
+    println!("{migration_result}");
 }

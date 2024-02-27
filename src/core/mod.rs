@@ -37,7 +37,7 @@ fn server_panic() -> &'static str {
 }
 
 #[get("/webhook")]
-async fn webhook_verify(webhook_query: WebHookQuery) -> String {
+async fn webhook_verify<'l>(webhook_query: WebHookQuery<'l>) -> &'l str {
     webhook_query.hub_challenge
 }
 
@@ -66,15 +66,13 @@ async fn webhook_core(data: Json<InComingData>, app_state: &State<AppState>) -> 
         if let Some(message) = data.get_message() {
             let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
             if let Some(quick_reply) = message.get_quick_reply() {
-                let uri_payload = quick_reply.get_payload();
-                execute_payload(user, uri_payload, query).await;
+                execute_payload(user, quick_reply.get_payload(), query).await;
             } else if let Some(action) = ACTION_REGISTRY.lock().await.get(action_path.as_str()) {
-                let request = Req::new(user, query.clone(), Data::new(message.get_text(), None));
-                action.execute(res, request).await;
+                let req = Req::new(user, query.clone(), Data::new(message.get_text(), None));
+                action.execute(res, req).await;
             }
         } else if let Some(postback) = data.get_postback() {
-            let uri = postback.get_payload();
-            execute_payload(user, uri, query).await;
+            execute_payload(user, postback.get_payload(), query).await;
         }
     }
     ACTION_LOCK.unlock(user).await;

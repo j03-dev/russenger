@@ -12,12 +12,12 @@ pub enum WebHookError<'a> {
     ArgsNotEnough,
 }
 
-pub struct WebHookQuery {
-    pub hub_challenge: String,
+pub struct WebHookQuery<'w> {
+    pub hub_challenge: &'w str,
 }
 
 #[rocket::async_trait]
-impl<'a> FromRequest<'a> for WebHookQuery {
+impl<'a> FromRequest<'a> for WebHookQuery<'a> {
     type Error = WebHookError<'a>;
 
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
@@ -44,9 +44,7 @@ impl<'a> FromRequest<'a> for WebHookQuery {
         match (hub_mode, hub_challenge, token) {
             (Some(hub_mode), Some(hub_challenge), Some(token)) => {
                 if hub_mode.eq("subscribe") && env::var("VERIFY_TOKEN").unwrap().eq(token) {
-                    Outcome::Success(Self {
-                        hub_challenge: hub_challenge.to_string(),
-                    })
+                    Outcome::Success(Self { hub_challenge })
                 } else {
                     Outcome::Error((
                         Status::Unauthorized,

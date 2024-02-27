@@ -76,6 +76,8 @@ impl<'g> GenericModel<'g> {
                 .take(end - start)
                 .map(|e| e.clone())
                 .collect();
+        } else if elements.len() >= 10 {
+            elements = elements[..10].to_vec();
         }
         Self {
             recipient: Recipient { id: sender },

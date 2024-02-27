@@ -1,11 +1,11 @@
 use rocket::serde::{Deserialize, Serialize};
 
-pub type Pagination = [usize; 2];
+pub type Pagination = Option<[usize; 2]>;
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize, PartialEq)]
 pub struct Data {
     value: String,
-    pages: Option<Pagination>,
+    pages: Pagination,
 }
 
 const MAX: usize = 500;
@@ -25,7 +25,7 @@ impl Verify for String {
 }
 
 impl Data {
-    pub fn new<T: Serialize>(value: T, pages: Option<Pagination>) -> Self {
+    pub fn new<T: Serialize>(value: T, pages: Pagination) -> Self {
         let value = serde_json::to_string(&value).unwrap_or_default().verify();
         Self { value, pages }
     }
@@ -39,6 +39,6 @@ impl Data {
     }
 
     pub fn get_page(&self) -> Pagination {
-        self.pages.unwrap_or([0, 5])
+        self.pages
     }
 }

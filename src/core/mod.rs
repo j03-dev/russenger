@@ -41,13 +41,13 @@ async fn webhook_verify<'l>(webhook_query: WebHookQuery<'l>) -> &'l str {
     webhook_query.hub_challenge
 }
 
-async fn execute_payload(user: &str, uri: &str, query: &Query) {
+async fn execute_payload(user: &str, uri: &str, query: Query) {
     match Payload::from_uri_string(uri) {
         Ok(payload) => {
             if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
                 let data = Data::from_string(payload.get_data_to_string());
-                let request = Req::new(user, query.clone(), data);
-                action.execute(res, request).await;
+                let req = Req::new(user, query, data);
+                action.execute(res, req).await;
             }
         }
         Err(err) => {
@@ -58,7 +58,7 @@ async fn execute_payload(user: &str, uri: &str, query: &Query) {
 
 #[post("/webhook", format = "json", data = "<data>")]
 async fn webhook_core(data: Json<InComingData>, app_state: &State<AppState>) -> &'static str {
-    let query = &app_state.query;
+    let query = app_state.query.clone();
     let user = data.get_sender();
     query.create(user).await;
 
@@ -68,7 +68,7 @@ async fn webhook_core(data: Json<InComingData>, app_state: &State<AppState>) -> 
             if let Some(quick_reply) = message.get_quick_reply() {
                 execute_payload(user, quick_reply.get_payload(), query).await;
             } else if let Some(action) = ACTION_REGISTRY.lock().await.get(action_path.as_str()) {
-                let req = Req::new(user, query.clone(), Data::new(message.get_text(), None));
+                let req = Req::new(user, query, Data::new(message.get_text(), None));
                 action.execute(res, req).await;
             }
         } else if let Some(postback) = data.get_postback() {

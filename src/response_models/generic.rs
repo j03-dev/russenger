@@ -1,10 +1,11 @@
 use rocket::serde::Serialize;
 
+use crate::core::data::Pagination;
 pub use crate::Data;
 
 use super::{payload::Payload, recipient::Recipient, GetSender, NextPrevNavigation};
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct GenericButton {
     #[serde(rename = "type")]
     r#type: String,
@@ -22,7 +23,7 @@ impl GenericButton {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct GenericElement {
     title: String,
     image_url: String,
@@ -66,7 +67,16 @@ pub struct GenericModel<'g> {
 }
 
 impl<'g> GenericModel<'g> {
-    pub fn new(sender: &'g str, elements: Vec<GenericElement>) -> Self {
+    pub fn new(sender: &'g str, mut elements: Vec<GenericElement>, pages: Pagination) -> Self {
+        if let Some(pages) = pages {
+            let [start, end] = pages;
+            elements = elements
+                .iter()
+                .skip(start)
+                .take(end - start)
+                .map(|e| e.clone())
+                .collect();
+        }
         Self {
             recipient: Recipient { id: sender },
             message: GenericMessage {

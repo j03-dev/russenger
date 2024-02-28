@@ -2,12 +2,6 @@ use rocket::serde::{Deserialize, Serialize};
 
 pub type Pagination = Option<[usize; 2]>;
 
-#[derive(Debug, Default, Clone, Deserialize, Serialize, PartialEq)]
-pub struct Data {
-    value: String,
-    pages: Pagination,
-}
-
 const MAX: usize = 500;
 
 trait Verify: ToString {
@@ -22,6 +16,12 @@ impl Verify for String {
             self.clone()
         }
     }
+}
+
+#[derive(Debug, Default, Clone, Deserialize, Serialize, PartialEq)]
+pub struct Data {
+    value: String,
+    pages: Pagination,
 }
 
 impl Data {

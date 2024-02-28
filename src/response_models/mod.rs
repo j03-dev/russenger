@@ -1,6 +1,6 @@
 use rocket::serde::Serialize;
 
-use crate::{Data, Res};
+use crate::{Action, Data, Res};
 
 use self::payload::Payload;
 use self::quick_replies::{QuickReply, QuickReplyModel};
@@ -20,7 +20,7 @@ const PAGE: usize = 10;
 
 #[rocket::async_trait]
 pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
-    async fn send_next_prev(&self, path: &str, data: Data) {
+    async fn send_next_prev<T: Action>(&self, action: T, data: Data) {
         let [start, end] = data.get_page().unwrap_or([0, PAGE]);
         let mut navigations: Vec<QuickReply> = Vec::new();
 
@@ -31,7 +31,7 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
                 "Prev",
                 "",
                 Payload {
-                    path: path.into(),
+                    path: action.path(),
                     data: Some(Data::new(&value, Some([start - PAGE, end - PAGE]))),
                 },
             );
@@ -42,7 +42,7 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
             "Next",
             "",
             Payload {
-                path: path.into(),
+                path: action.path(),
                 data: Some(Data::new(&value, Some([start + PAGE, end + PAGE]))),
             },
         );

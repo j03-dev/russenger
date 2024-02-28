@@ -16,21 +16,23 @@ pub trait GetSender<'r> {
     fn get_sender(&self) -> &'r str;
 }
 
-#[async_trait::async_trait]
+const PAGE: usize = 10;
+
+#[rocket::async_trait]
 pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
     async fn send_next_prev(&self, path: &str, data: Data) {
-        let [start, end] = data.get_page();
+        let [start, end] = data.get_page().unwrap_or([0, PAGE]);
         let mut navigations: Vec<QuickReply> = Vec::new();
 
         let value: String = data.get_value();
 
-        if start >= 5 && end >= 5 {
+        if start >= PAGE && end >= PAGE {
             let prev = QuickReply::new(
                 "Prev",
                 "",
                 Payload {
                     path: path.into(),
-                    data: Some(Data::new(&value, Some([start - 5, end - 5]))),
+                    data: Some(Data::new(&value, Some([start - PAGE, end - PAGE]))),
                 },
             );
             navigations.push(prev);
@@ -41,7 +43,7 @@ pub trait NextPrevNavigation<'n>: Serialize + GetSender<'n> {
             "",
             Payload {
                 path: path.into(),
-                data: Some(Data::new(&value, Some([start + 5, end + 5]))),
+                data: Some(Data::new(&value, Some([start + PAGE, end + PAGE]))),
             },
         );
 

@@ -56,13 +56,13 @@ async fn webhook_verify(query: web::Query<WebhookQuery>) -> HttpResponse {
     query.verify()
 }
 
-async fn execute_payload(user: &str, uri: &str, query: &Query) {
+async fn execute_payload(user: &str, uri: &str, query: Query) {
     match Payload::from_uri_string(uri) {
         Ok(payload) => {
             if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
                 let data = Data::from_string(payload.get_data_to_string());
-                let request = Req::new(user, query.clone(), data);
-                action.execute(res, request).await;
+                let req = Req::new(user, query, data);
+                action.execute(res, req).await;
             }
         }
         Err(err) => {
@@ -84,15 +84,13 @@ async fn webhook_core(
         if let Some(message) = data.get_message() {
             let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
             if let Some(quick_reply) = message.get_quick_reply() {
-                let uri_payload = quick_reply.get_payload();
-                execute_payload(user, uri_payload, query).await;
+                execute_payload(user, quick_reply.get_payload(), query).await;
             } else if let Some(action) = ACTION_REGISTRY.lock().await.get(action_path.as_str()) {
-                let request = Req::new(user, query.clone(), Data::new(message.get_text(), None));
-                action.execute(res, request).await;
+                let req = Req::new(user, query, Data::new(message.get_text(), None));
+                action.execute(res, req).await;
             }
         } else if let Some(postback) = data.get_postback() {
-            let uri = postback.get_payload();
-            execute_payload(user, uri, query).await;
+            execute_payload(user, postback.get_payload(), query).await;
         }
     }
     ACTION_LOCK.unlock(user).await;
@@ -131,5 +129,5 @@ pub async fn migrate() {
         true => "Migration successful!",
         false => "Migration failed",
     };
-    println!("{}", migration_result);
+    println!("{migration_result}");
 }

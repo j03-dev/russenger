@@ -2,14 +2,12 @@ pub use actix_web::main;
 pub use async_trait::async_trait;
 pub use dotenv::dotenv;
 
-pub use crate::command::execute_command;
-pub use crate::core::action::{Action, ACTION_REGISTRY};
-pub use crate::core::data::Data;
-pub use crate::core::request::Req;
-pub use crate::core::response::{Res, SendResult};
-pub use crate::response_models::{
-    generic, media, payload, quick_replies, text, NextPrevNavigation,
-};
+pub use command::execute_command;
+pub use core::action::{Action, ACTION_REGISTRY};
+pub use core::data::Data;
+pub use core::request::Req;
+pub use core::response::{Res, SendResult};
+pub use response_models::{generic, media, payload, quick_replies, text, NextPrevNavigation};
 
 pub mod command;
 mod core;

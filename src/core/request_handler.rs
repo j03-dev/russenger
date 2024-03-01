@@ -7,18 +7,19 @@ use rocket::{
 };
 
 #[derive(Debug)]
-pub enum WebHookError<'a> {
-    VerificationFailed(&'a str),
+pub enum HandleRequestError<'a> {
     ArgsNotEnough,
+    HostNotFound,
+    VerificationFailed(&'a str),
 }
 
-pub struct WebHookQuery<'w> {
+pub struct WebQuery<'w> {
     pub hub_challenge: &'w str,
 }
 
 #[rocket::async_trait]
-impl<'a> FromRequest<'a> for WebHookQuery<'a> {
-    type Error = WebHookError<'a>;
+impl<'a> FromRequest<'a> for WebQuery<'a> {
+    type Error = HandleRequestError<'a>;
 
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
         let query = request
@@ -26,13 +27,11 @@ impl<'a> FromRequest<'a> for WebHookQuery<'a> {
             .query()
             .expect("failed to get query from request");
 
-        let args: Vec<_> = query.segments().collect();
-
         let mut hub_mode = None;
         let mut hub_challenge = None;
         let mut token = None;
 
-        for (key, value) in args {
+        for (key, value) in query.segments() {
             match key {
                 "hub.mode" => hub_mode = Some(value),
                 "hub.challenge" => hub_challenge = Some(value),
@@ -42,35 +41,35 @@ impl<'a> FromRequest<'a> for WebHookQuery<'a> {
         }
 
         match (hub_mode, hub_challenge, token) {
-            (Some(hub_mode), Some(hub_challenge), Some(token)) => {
-                if hub_mode.eq("subscribe") && env::var("VERIFY_TOKEN").unwrap().eq(token) {
+            (Some("subscribe"), Some(hub_challenge), Some(token)) => {
+                if env::var("VERIFY_TOKEN").ok() == Some(token.to_string()) {
                     Outcome::Success(Self { hub_challenge })
                 } else {
                     Outcome::Error((
                         Status::Unauthorized,
-                        WebHookError::VerificationFailed("Token mismatch"),
+                        HandleRequestError::VerificationFailed("Token mismatch"),
                     ))
                 }
             }
-            _ => Outcome::Error((Status::Unauthorized, WebHookError::ArgsNotEnough)),
+            _ => Outcome::Error((Status::Unauthorized, HandleRequestError::ArgsNotEnough)),
         }
     }
 }
 
-pub struct RussengerRequest {
+pub struct WebRequest {
     pub host: String,
 }
 
 #[rocket::async_trait]
-impl<'a> FromRequest<'a> for RussengerRequest {
-    type Error = ();
+impl<'a> FromRequest<'a> for WebRequest {
+    type Error = HandleRequestError<'a>;
 
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
         match request.host() {
             Some(host) => Outcome::Success(Self {
                 host: host.to_string(),
             }),
-            None => Outcome::Error((Status::BadRequest, ())),
+            None => Outcome::Error((Status::BadRequest, HandleRequestError::HostNotFound)),
         }
     }
 }

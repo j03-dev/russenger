@@ -10,7 +10,7 @@ use app_state::AppState;
 use data::Data;
 use incoming_data::InComingData;
 use request::Req;
-use request_handler::{RussengerRequest, WebHookQuery};
+use request_handler::{WebQuery, WebRequest};
 use response::Res as res;
 
 use crate::payload::Payload;
@@ -36,7 +36,7 @@ fn server_panic() -> &'static str {
 }
 
 #[get("/webhook")]
-async fn webhook_verify<'l>(webhook_query: WebHookQuery<'l>) -> &'l str {
+async fn webhook_verify<'l>(webhook_query: WebQuery<'l>) -> &'l str {
     webhook_query.hub_challenge
 }
 
@@ -71,11 +71,11 @@ async fn run(executable: Executable<'_>) {
 async fn webhook_core(
     data: Json<InComingData>,
     app_state: &State<AppState>,
-    russenger_request: RussengerRequest,
+    request: WebRequest,
 ) -> &'static str {
     let query = app_state.query.clone();
     let user = data.get_sender();
-    let host = russenger_request.host;
+    let host = request.host;
     query.create(user).await;
 
     if ACTION_LOCK.lock(user).await {

@@ -33,7 +33,7 @@ impl<'a> FromRequest<'a> for RussengerUri {
 
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
         Outcome::Success(Self {
-            uri_path: request.uri().path().to_string(),
+            uri_path: request.uri().to_string(),
         })
     }
 }

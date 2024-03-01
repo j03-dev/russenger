@@ -1,3 +1,4 @@
+use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use rocket::Request;
 
@@ -9,22 +10,22 @@ pub struct Req {
     pub user: String,
     pub query: Query,
     pub data: Data,
-    pub uri: String,
+    pub host: String,
 }
 
 impl Req {
-    pub fn new(user: &str, query: Query, data: Data, uri: &str) -> Self {
+    pub fn new(user: &str, query: Query, data: Data, host: &str) -> Self {
         Self {
             user: user.into(),
             query,
             data,
-            uri: uri.into(),
+            host: host.into(),
         }
     }
 }
 
 pub struct RussengerUri {
-    pub uri_path: String,
+    pub host: String,
 }
 
 #[rocket::async_trait]
@@ -32,8 +33,11 @@ impl<'a> FromRequest<'a> for RussengerUri {
     type Error = ();
 
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
-        Outcome::Success(Self {
-            uri_path: request.uri().to_string(),
-        })
+        match request.host() {
+            Some(host) => Outcome::Success(Self {
+                host: host.to_string(),
+            }),
+            None => Outcome::Error((Status::BadRequest, ())),
+        }
     }
 }

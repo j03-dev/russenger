@@ -50,12 +50,12 @@ pub enum Executable<'a> {
 
 async fn run(executable: Executable<'_>) {
     match executable {
-        Executable::Payload(user, uri_payload, uri_path, query) => {
+        Executable::Payload(user, uri_payload, host, query) => {
             match Payload::from_uri_string(uri_payload) {
                 Ok(payload) => {
                     if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
                         let data = Data::from_string(payload.get_data_to_string());
-                        let req = Req::new(user, query, data, uri_path);
+                        let req = Req::new(user, query, data, host);
                         action.execute(res, req).await;
                     }
                 }
@@ -64,9 +64,9 @@ async fn run(executable: Executable<'_>) {
                 }
             }
         }
-        Executable::TextMessage(user, text_message, uri_path, query) => {
+        Executable::TextMessage(user, text_message, host, query) => {
             let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
-            let req = Req::new(user, query, Data::new(text_message, None), uri_path);
+            let req = Req::new(user, query, Data::new(text_message, None), host);
             if let Some(action) = ACTION_REGISTRY.lock().await.get(&action_path) {
                 action.execute(res, req).await;
             }
@@ -88,14 +88,14 @@ async fn webhook_core(
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {
                 let paylaod = quick_reply.get_payload();
-                run(Executable::Payload(user, &paylaod, &uri.uri_path, query)).await;
+                run(Executable::Payload(user, &paylaod, &uri.host, query)).await;
             } else {
                 let text = message.get_text();
-                run(Executable::TextMessage(user, &text, &uri.uri_path, query)).await;
+                run(Executable::TextMessage(user, &text, &uri.host, query)).await;
             }
         } else if let Some(postback) = data.get_postback() {
             let payload = postback.get_payload();
-            run(Executable::Payload(user, &payload, &uri.uri_path, query)).await;
+            run(Executable::Payload(user, &payload, &uri.host, query)).await;
         }
     }
     ACTION_LOCK.unlock(user).await;

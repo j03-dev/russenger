@@ -48,8 +48,12 @@ create_action!(Option2, |res: Res, req: Req| async move {
         )],
     )];
 
-    res.send(GenericModel::new(&req.user, generic_elements))
-        .await;
+    res.send(GenericModel::new(
+        &req.user,
+        generic_elements,
+        req.data.get_page(),
+    ))
+    .await;
 });
 
 russenger_app!(Main, Option1, Option2);

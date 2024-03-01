@@ -15,7 +15,6 @@ use response::Res as res;
 
 use crate::payload::Payload;
 use crate::query::Query;
-use crate::text::TextModel;
 
 pub mod action;
 pub mod data;
@@ -49,16 +48,12 @@ pub enum Executable<'a> {
 async fn run(executable: Executable<'_>) {
     match executable {
         Executable::Payload(user, uri_payload, host, query) => {
-            match Payload::from_uri_string(uri_payload) {
-                Ok(payload) => {
-                    if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
-                        let data = Data::from_string(payload.get_data_to_string());
-                        let req = Req::new(user, query, data, host);
-                        action.execute(res, req).await;
-                    }
-                }
-                Err(err) => {
-                    res.send(TextModel::new(&user, &err)).await;
+            let payload = Payload::from_uri_string(uri_payload).unwrap_or_default();
+            {
+                if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
+                    let data = Data::from_string(payload.get_data_to_string());
+                    let req = Req::new(user, query, data, host);
+                    action.execute(res, req).await;
                 }
             }
         }

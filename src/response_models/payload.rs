@@ -3,7 +3,7 @@ use url::form_urlencoded;
 pub use crate::core::data::Data;
 use crate::Action;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct Payload {
     pub path: String,
     pub data: Option<Data>,
@@ -54,6 +54,15 @@ impl Payload {
                 Ok(Self { path, data })
             }
             _ => Err("Missing fields in URI".to_string()),
+        }
+    }
+}
+
+impl Default for Payload {
+    fn default() -> Self {
+        Payload {
+            path: "Main".into(),
+            data: None,
         }
     }
 }

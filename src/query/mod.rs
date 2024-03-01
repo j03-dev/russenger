@@ -1,3 +1,4 @@
+use core::panic;
 use std::env::var;
 
 use sqlx::{MySql, Pool, Postgres, Row, Sqlite};
@@ -10,27 +11,22 @@ pub enum DB {
     Null,
 }
 
-async fn establish_connection() -> DB {
-    let url = var("DATABASE").expect("check your .env file \n pls specified your database name");
+type DbResult<T> = Result<T, Box<dyn std::error::Error>>;
+
+async fn establish_connection() -> DbResult<DB> {
+    let url = var("DATABASE").expect("Database name not found in .env file");
     let msg = "Database connection failed";
-    if let Some(engine) = url.split(':').next() {
-        return match engine {
-            "mysql" => {
-                let pool: Pool<MySql> = Pool::connect(&url).await.expect(msg);
-                DB::Mysql(pool)
-            }
-            "postgres" | "postgresql" => {
-                let pool: Pool<Postgres> = Pool::connect(&url).await.expect(msg);
-                DB::Postgres(pool)
-            }
-            "sqlite" => {
-                let pool: Pool<Sqlite> = Pool::connect(&url).await.expect(msg);
-                DB::Sqlite(pool)
-            }
-            _ => DB::Null,
-        };
-    }
-    DB::Null
+
+    let engine = url.split(':').next().ok_or(msg)?;
+
+    let pool = match engine {
+        "mysql" => Pool::connect(&url).await.map(DB::Mysql)?,
+        "postgres" | "postgresql" => Pool::connect(&url).await.map(DB::Postgres)?,
+        "sqlite" => Pool::connect(&url).await.map(DB::Sqlite)?,
+        _ => return Ok(DB::Null),
+    };
+
+    Ok(pool)
 }
 
 macro_rules! execute_query {
@@ -50,8 +46,9 @@ pub struct Query {
 
 impl Query {
     pub async fn new() -> Self {
-        Self {
-            db: establish_connection().await,
+        match establish_connection().await {
+            Ok(db) => return Self { db },
+            Err(err) => panic!("Can't estabilish the connection {err:?}"),
         }
     }
 

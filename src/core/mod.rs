@@ -41,17 +41,31 @@ async fn webhook_verify<'l>(webhook_query: WebHookQuery<'l>) -> &'l str {
     webhook_query.hub_challenge
 }
 
-async fn execute_payload(user: &str, uri: &str, query: Query) {
-    match Payload::from_uri_string(uri) {
-        Ok(payload) => {
-            if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
-                let data = Data::from_string(payload.get_data_to_string());
-                let req = Req::new(user, query, data);
+pub enum Exec<'e> {
+    Payload(&'e str, &'e str, Query),
+    MessageText(&'e str, &'e str, Query),
+}
+
+async fn exec<'ex>(excutable: Exec<'ex>) {
+    match excutable {
+        Exec::Payload(user, uri_payload, query) => match Payload::from_uri_string(uri_payload) {
+            Ok(payload) => {
+                if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
+                    let data = Data::from_string(payload.get_data_to_string());
+                    let req = Req::new(user, query, data);
+                    action.execute(res, req).await;
+                }
+            }
+            Err(err) => {
+                res.send(TextModel::new(&user, &err)).await;
+            }
+        },
+        Exec::MessageText(user, text_message, query) => {
+            let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
+            let req = Req::new(user, query, Data::new(text_message, None));
+            if let Some(action) = ACTION_REGISTRY.lock().await.get(&action_path) {
                 action.execute(res, req).await;
             }
-        }
-        Err(err) => {
-            res.send(TextModel::new(user, &err)).await;
         }
     }
 }
@@ -64,15 +78,13 @@ async fn webhook_core(data: Json<InComingData>, app_state: &State<AppState>) -> 
 
     if ACTION_LOCK.lock(user).await {
         if let Some(message) = data.get_message() {
-            let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
             if let Some(quick_reply) = message.get_quick_reply() {
-                execute_payload(user, quick_reply.get_payload(), query).await;
-            } else if let Some(action) = ACTION_REGISTRY.lock().await.get(action_path.as_str()) {
-                let req = Req::new(user, query, Data::new(message.get_text(), None));
-                action.execute(res, req).await;
+                exec(Exec::Payload(user, quick_reply.get_payload(), query)).await;
+            } else {
+                exec(Exec::MessageText(user, &message.get_text(), query)).await;
             }
         } else if let Some(postback) = data.get_postback() {
-            execute_payload(user, postback.get_payload(), query).await;
+            exec(Exec::Payload(user, &postback.get_payload(), query)).await;
         }
     }
     ACTION_LOCK.unlock(user).await;

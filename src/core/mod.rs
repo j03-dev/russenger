@@ -17,6 +17,8 @@ use crate::payload::Payload;
 use crate::query::Query;
 use crate::text::TextModel;
 
+use self::request::RussengerUri;
+
 pub mod action;
 pub mod data;
 pub mod request;
@@ -41,28 +43,30 @@ async fn webhook_verify<'l>(webhook_query: WebHookQuery<'l>) -> &'l str {
     webhook_query.hub_challenge
 }
 
-pub enum Exec<'e> {
-    Payload(&'e str, &'e str, Query),
-    MessageText(&'e str, &'e str, Query),
+pub enum Executable<'a> {
+    Payload(&'a str, &'a str, &'a str, Query),
+    TextMessage(&'a str, &'a str, &'a str, Query),
 }
 
-async fn exec<'ex>(excutable: Exec<'ex>) {
-    match excutable {
-        Exec::Payload(user, uri_payload, query) => match Payload::from_uri_string(uri_payload) {
-            Ok(payload) => {
-                if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
-                    let data = Data::from_string(payload.get_data_to_string());
-                    let req = Req::new(user, query, data);
-                    action.execute(res, req).await;
+async fn run(executable: Executable<'_>) {
+    match executable {
+        Executable::Payload(user, uri_payload, uri_path, query) => {
+            match Payload::from_uri_string(uri_payload) {
+                Ok(payload) => {
+                    if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
+                        let data = Data::from_string(payload.get_data_to_string());
+                        let req = Req::new(user, query, data, uri_path);
+                        action.execute(res, req).await;
+                    }
+                }
+                Err(err) => {
+                    res.send(TextModel::new(&user, &err)).await;
                 }
             }
-            Err(err) => {
-                res.send(TextModel::new(&user, &err)).await;
-            }
-        },
-        Exec::MessageText(user, text_message, query) => {
+        }
+        Executable::TextMessage(user, text_message, uri_path, query) => {
             let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
-            let req = Req::new(user, query, Data::new(text_message, None));
+            let req = Req::new(user, query, Data::new(text_message, None), uri_path);
             if let Some(action) = ACTION_REGISTRY.lock().await.get(&action_path) {
                 action.execute(res, req).await;
             }
@@ -71,7 +75,11 @@ async fn exec<'ex>(excutable: Exec<'ex>) {
 }
 
 #[post("/webhook", format = "json", data = "<data>")]
-async fn webhook_core(data: Json<InComingData>, app_state: &State<AppState>) -> &'static str {
+async fn webhook_core(
+    data: Json<InComingData>,
+    app_state: &State<AppState>,
+    uri: RussengerUri,
+) -> &'static str {
     let query = app_state.query.clone();
     let user = data.get_sender();
     query.create(user).await;
@@ -79,12 +87,15 @@ async fn webhook_core(data: Json<InComingData>, app_state: &State<AppState>) -> 
     if ACTION_LOCK.lock(user).await {
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {
-                exec(Exec::Payload(user, quick_reply.get_payload(), query)).await;
+                let paylaod = quick_reply.get_payload();
+                run(Executable::Payload(user, &paylaod, &uri.uri_path, query)).await;
             } else {
-                exec(Exec::MessageText(user, &message.get_text(), query)).await;
+                let text = message.get_text();
+                run(Executable::TextMessage(user, &text, &uri.uri_path, query)).await;
             }
         } else if let Some(postback) = data.get_postback() {
-            exec(Exec::Payload(user, &postback.get_payload(), query)).await;
+            let payload = postback.get_payload();
+            run(Executable::Payload(user, &payload, &uri.uri_path, query)).await;
         }
     }
     ACTION_LOCK.unlock(user).await;

@@ -10,14 +10,12 @@ use app_state::AppState;
 use data::Data;
 use incoming_data::InComingData;
 use request::Req;
+use request_handler::{RussengerRequest, WebHookQuery};
 use response::Res as res;
-use webhook_query::WebHookQuery;
 
 use crate::payload::Payload;
 use crate::query::Query;
 use crate::text::TextModel;
-
-use self::request::RussengerUri;
 
 pub mod action;
 pub mod data;
@@ -26,7 +24,7 @@ pub mod response;
 
 mod app_state;
 mod incoming_data;
-mod webhook_query;
+mod request_handler;
 
 #[catch(404)]
 fn page_not_found() -> &'static str {
@@ -78,24 +76,25 @@ async fn run(executable: Executable<'_>) {
 async fn webhook_core(
     data: Json<InComingData>,
     app_state: &State<AppState>,
-    uri: RussengerUri,
+    russenger_request: RussengerRequest,
 ) -> &'static str {
     let query = app_state.query.clone();
     let user = data.get_sender();
+    let host = russenger_request.host;
     query.create(user).await;
 
     if ACTION_LOCK.lock(user).await {
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {
                 let paylaod = quick_reply.get_payload();
-                run(Executable::Payload(user, &paylaod, &uri.host, query)).await;
+                run(Executable::Payload(user, &paylaod, &host, query)).await;
             } else {
                 let text = message.get_text();
-                run(Executable::TextMessage(user, &text, &uri.host, query)).await;
+                run(Executable::TextMessage(user, &text, &host, query)).await;
             }
         } else if let Some(postback) = data.get_postback() {
             let payload = postback.get_payload();
-            run(Executable::Payload(user, &payload, &uri.host, query)).await;
+            run(Executable::Payload(user, &payload, &host, query)).await;
         }
     }
     ACTION_LOCK.unlock(user).await;

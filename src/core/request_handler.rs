@@ -56,3 +56,21 @@ impl<'a> FromRequest<'a> for WebHookQuery<'a> {
         }
     }
 }
+
+pub struct RussengerRequest {
+    pub host: String,
+}
+
+#[rocket::async_trait]
+impl<'a> FromRequest<'a> for RussengerRequest {
+    type Error = ();
+
+    async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
+        match request.host() {
+            Some(host) => Outcome::Success(Self {
+                host: host.to_string(),
+            }),
+            None => Outcome::Error((Status::BadRequest, ())),
+        }
+    }
+}

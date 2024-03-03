@@ -1,9 +1,14 @@
 use rocket::serde::Serialize;
 
-use crate::core::data::Pagination;
-pub use crate::Data;
+use crate::{
+    core::{data::Pagination, response::Res as res},
+    quick_replies::QuickReply,
+    Action, Data,
+};
 
-use super::{payload::Payload, recipient::Recipient, GetSender, NextPrevNavigation};
+use super::{payload::Payload, quick_replies::QuickReplyModel, recipient::Recipient};
+
+const MAX_ELEMENT: usize = 10;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct GenericButton {
@@ -68,11 +73,10 @@ pub struct GenericModel<'g> {
 
 impl<'g> GenericModel<'g> {
     pub fn new(sender: &'g str, mut elements: Vec<GenericElement>, pages: Pagination) -> Self {
-        if let Some(pages) = pages {
-            let [start, end] = pages;
+        if let Some([start, end]) = pages {
             elements = elements.into_iter().skip(start).take(end - start).collect();
-        } else if elements.len() >= 10 {
-            elements.truncate(10);
+        } else if elements.len() >= MAX_ELEMENT {
+            elements.truncate(MAX_ELEMENT);
         }
         Self {
             recipient: Recipient { id: sender },
@@ -89,10 +93,53 @@ impl<'g> GenericModel<'g> {
     }
 }
 
-impl<'g> GetSender<'g> for GenericModel<'g> {
+impl<'g> GenericModel<'g> {
     fn get_sender(&self) -> &'g str {
         self.recipient.id
     }
-}
 
-impl<'g> NextPrevNavigation<'g> for GenericModel<'g> {}
+    fn is_element_empty(&self) -> bool {
+        self.message.attachment.payload.elements.is_empty()
+    }
+
+    pub async fn send_next_prev<A: Action>(&self, action: A, data: Data) {
+        let mut navigations: Vec<QuickReply> = Vec::new();
+        if !self.is_element_empty() {
+            let [start, end] = data.get_page().unwrap_or([0, MAX_ELEMENT]);
+            let value: String = data.get_value();
+            if start & end >= MAX_ELEMENT {
+                navigations.push(QuickReply::new(
+                    "Prev",
+                    "",
+                    Payload {
+                        path: action.path(),
+                        data: Some(Data::new(
+                            &value,
+                            Some([start - MAX_ELEMENT, end - MAX_ELEMENT]),
+                        )),
+                    },
+                ));
+            }
+
+            navigations.push(QuickReply::new(
+                "Next",
+                "",
+                Payload {
+                    path: action.path(),
+                    data: Some(Data::new(
+                        &value,
+                        Some([start + MAX_ELEMENT, end + MAX_ELEMENT]),
+                    )),
+                },
+            ));
+        } else {
+            navigations.push(QuickReply::new("Back", "", Payload::default()));
+        }
+        res.send(QuickReplyModel::new(
+            self.get_sender(),
+            "Navigation",
+            navigations,
+        ))
+        .await;
+    }
+}

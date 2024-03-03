@@ -1,7 +1,6 @@
 use rocket::serde::Serialize;
 
 use super::{payload::Payload, recipient::Recipient};
-use super::{GetSender, NextPrevNavigation};
 
 #[derive(Serialize, Debug)]
 pub struct QuickReply {
@@ -47,11 +46,3 @@ impl<'q> QuickReplyModel<'q> {
         }
     }
 }
-
-impl<'q> GetSender<'q> for QuickReplyModel<'q> {
-    fn get_sender(&self) -> &'q str {
-        self.recipient.id
-    }
-}
-
-impl<'q> NextPrevNavigation<'q> for QuickReplyModel<'q> {}

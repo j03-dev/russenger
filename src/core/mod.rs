@@ -50,9 +50,9 @@ async fn run(executable: Executable<'_>) {
         Executable::Payload(user, uri_payload, host, query) => {
             let payload = Payload::from_uri_string(uri_payload).unwrap_or_default();
             {
+                let data = Data::from_string(payload.get_data_to_string());
+                let req = Req::new(user, query, data, host);
                 if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
-                    let data = Data::from_string(payload.get_data_to_string());
-                    let req = Req::new(user, query, data, host);
                     action.execute(res, req).await;
                 }
             }

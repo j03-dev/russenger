@@ -2,7 +2,7 @@ use rocket::serde::{Deserialize, Serialize};
 
 pub type Pagination = Option<[usize; 2]>;
 
-const MAX: usize = 500;
+const MAX_VALUE_AUTORIZED: usize = 500;
 
 trait Verify: ToString {
     fn verify(&self) -> String;
@@ -10,8 +10,8 @@ trait Verify: ToString {
 
 impl Verify for String {
     fn verify(&self) -> String {
-        if self.len() >= MAX {
-            self[..MAX].to_string()
+        if self.len() >= MAX_VALUE_AUTORIZED {
+            self[..MAX_VALUE_AUTORIZED].to_string()
         } else {
             self.clone()
         }

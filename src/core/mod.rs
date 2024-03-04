@@ -1,3 +1,4 @@
+use std::env::var;
 use std::str::FromStr;
 
 use rocket::fs::FileServer;
@@ -116,7 +117,17 @@ pub async fn run_server() {
     .to_cors()
     .expect("Failed to create CORS: Something went wrong with CORS");
 
-    rocket::build()
+    let port: i32 = var("PORT")
+        .unwrap_or("2424".into())
+        .parse()
+        .expect("Failed to convert string to int");
+    let addr = var("HOST").unwrap_or("0.0.0.0".into());
+
+    let figment = rocket::Config::figment()
+        .merge(("port", port))
+        .merge(("address", addr));
+
+    rocket::custom(figment)
         .attach(cors)
         .manage(AppState::init().await)
         .mount("/", routes![webhook_verify, webhook_core])

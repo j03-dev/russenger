@@ -120,7 +120,7 @@ pub async fn run_server() {
     let port: i32 = var("PORT")
         .unwrap_or("2424".into())
         .parse()
-        .expect("Failed to convert string to int");
+        .expect("Should Containt number");
     let addr = var("HOST").unwrap_or("0.0.0.0".into());
 
     let figment = rocket::Config::figment()

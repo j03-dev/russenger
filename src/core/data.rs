@@ -31,22 +31,6 @@ pub struct Data {
     page: Option<Page>,
 }
 
-const MAX: usize = 500;
-
-trait Verify: ToString {
-    fn verify(&self) -> String;
-}
-
-impl Verify for String {
-    fn verify(&self) -> String {
-        if self.len() >= MAX {
-            self[..MAX].to_string()
-        } else {
-            self.clone()
-        }
-    }
-}
-
 impl Data {
     pub fn new<T: Serialize>(value: T, page: Option<Page>) -> Self {
         let value = serde_json::to_string(&value).unwrap_or_default().verify();

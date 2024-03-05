@@ -1,5 +1,5 @@
 use actix_files as fs;
-use actix_web::{get, post, web, App, HttpResponse, HttpServer};
+use actix_web::{get, post, web, App, HttpRequest, HttpResponse, HttpServer};
 use serde::Deserialize;
 use std::env;
 
@@ -8,7 +8,6 @@ use app_state::AppState;
 use data::Data;
 use incoming_data::InComingData;
 use request::Req;
-use request_handler::{WebQuery, WebRequest};
 use response::Res as res;
 
 use crate::payload::Payload;
@@ -87,10 +86,11 @@ async fn run(executable: Executable<'_>) {
 async fn webhook_core(
     data: web::Json<InComingData>,
     app_state: web::Data<AppState>,
+    request: HttpRequest
 ) -> &'static str {
-    let query = &app_state.query;
+    let query = app_state.query.clone();
     let user = data.get_sender();
-    let host = request.host;
+    let host = request.uri().host().unwrap();
     query.create(user).await;
     if ACTION_LOCK.lock(user).await {
         if let Some(message) = data.get_message() {

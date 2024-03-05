@@ -1,7 +1,7 @@
 use rocket::serde::Serialize;
 
 use crate::{
-    core::{data::Pagination, response::Res as res},
+    core::{data::Page, response::Res as res},
     quick_replies::QuickReply,
     Action, Data,
 };
@@ -72,9 +72,9 @@ pub struct GenericModel<'g> {
 }
 
 impl<'g> GenericModel<'g> {
-    pub fn new(sender: &'g str, mut elements: Vec<GenericElement>, pages: Pagination) -> Self {
-        if let Some([start, end]) = pages {
-            elements = elements.into_iter().skip(start).take(end - start).collect();
+    pub fn new(sender: &'g str, mut elements: Vec<GenericElement>, page: Option<Page>) -> Self {
+        if let Some(p) = page {
+            elements = elements.into_iter().skip(p.0).take(p.1 - p.0).collect();
         } else if elements.len() >= MAX_ELEMENT {
             elements.truncate(MAX_ELEMENT);
         }
@@ -102,25 +102,11 @@ impl<'g> GenericModel<'g> {
         self.message.attachment.payload.elements.is_empty()
     }
 
-    pub async fn send_next_prev<A: Action>(&self, action: A, data: Data) {
+    pub async fn send_next<A: Action>(&self, action: A, data: Data) {
         let mut navigations: Vec<QuickReply> = Vec::new();
         if !self.is_element_empty() {
-            let [start, end] = data.get_page().unwrap_or([0, MAX_ELEMENT]);
+            let page = data.get_page().unwrap_or_default();
             let value: String = data.get_value();
-            if start & end >= MAX_ELEMENT {
-                navigations.push(QuickReply::new(
-                    "Prev",
-                    "",
-                    Payload {
-                        path: action.path(),
-                        data: Some(Data::new(
-                            &value,
-                            Some([start - MAX_ELEMENT, end - MAX_ELEMENT]),
-                        )),
-                    },
-                ));
-            }
-
             navigations.push(QuickReply::new(
                 "Next",
                 "",
@@ -128,7 +114,7 @@ impl<'g> GenericModel<'g> {
                     path: action.path(),
                     data: Some(Data::new(
                         &value,
-                        Some([start + MAX_ELEMENT, end + MAX_ELEMENT]),
+                        Some(Page(page.0 + MAX_ELEMENT, page.1 + MAX_ELEMENT)),
                     )),
                 },
             ));

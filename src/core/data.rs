@@ -1,8 +1,15 @@
 use rocket::serde::{Deserialize, Serialize};
 
-pub type Pagination = Option<[usize; 2]>;
-
 const MAX_VALUE_AUTORIZED: usize = 500;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Page(pub usize, pub usize);
+
+impl Default for Page {
+    fn default() -> Self {
+        Self(0, 10)
+    }
+}
 
 trait Verify: ToString {
     fn verify(&self) -> String;
@@ -18,16 +25,16 @@ impl Verify for String {
     }
 }
 
-#[derive(Debug, Default, Clone, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Default, Clone, Deserialize, Serialize)]
 pub struct Data {
     value: String,
-    pages: Pagination,
+    page: Option<Page>,
 }
 
 impl Data {
-    pub fn new<T: Serialize>(value: T, pages: Pagination) -> Self {
+    pub fn new<T: Serialize>(value: T, page: Option<Page>) -> Self {
         let value = serde_json::to_string(&value).unwrap_or_default().verify();
-        Self { value, pages }
+        Self { value, page }
     }
 
     pub fn from_string<T: ToString>(s: T) -> Self {
@@ -38,7 +45,7 @@ impl Data {
         serde_json::from_str::<T>(&self.value).unwrap_or_default()
     }
 
-    pub fn get_page(&self) -> Pagination {
-        self.pages
+    pub fn get_page(&self) -> Option<Page> {
+        self.page.clone()
     }
 }

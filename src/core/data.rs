@@ -1,4 +1,4 @@
-use rocket::serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 const MAX_VALUE_AUTORIZED: usize = 500;
 
@@ -29,6 +29,22 @@ impl Verify for String {
 pub struct Data {
     value: String,
     page: Option<Page>,
+}
+
+const MAX: usize = 500;
+
+trait Verify: ToString {
+    fn verify(&self) -> String;
+}
+
+impl Verify for String {
+    fn verify(&self) -> String {
+        if self.len() >= MAX {
+            self[..MAX].to_string()
+        } else {
+            self.clone()
+        }
+    }
 }
 
 impl Data {

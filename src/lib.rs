@@ -1,5 +1,6 @@
+pub use actix_web::main;
+pub use async_trait::async_trait;
 pub use dotenv::dotenv;
-pub use rocket::{async_trait, main};
 
 pub use command::execute_command;
 pub use core::{

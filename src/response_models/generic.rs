@@ -1,4 +1,4 @@
-use rocket::serde::Serialize;
+use serde::Serialize;
 
 use crate::{
     core::{data::Page, response::Res as res},

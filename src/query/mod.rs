@@ -1,6 +1,7 @@
 use core::panic;
 use std::env::var;
 
+use libsql::{params, Connection, Database};
 use sqlx::{MySql, Pool, Postgres, Row, Sqlite};
 
 #[derive(Clone)]
@@ -8,21 +9,28 @@ pub enum DB {
     Mysql(Pool<MySql>),
     Postgres(Pool<Postgres>),
     Sqlite(Pool<Sqlite>),
+    Turso(Connection),
     Null,
 }
 
 type DbResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 async fn establish_connection() -> DbResult<DB> {
-    let url = var("DATABASE").expect("Database name not found in .env file");
+    let database_url = var("DATABASE").expect("Database name not found in .env file");
     let msg = "Database connection failed";
 
-    let engine = url.split(':').next().ok_or(msg)?;
+    let engine = database_url.split(':').next().ok_or(msg)?;
 
     let pool = match engine {
-        "mysql" => Pool::connect(&url).await.map(DB::Mysql)?,
-        "postgres" | "postgresql" => Pool::connect(&url).await.map(DB::Postgres)?,
-        "sqlite" => Pool::connect(&url).await.map(DB::Sqlite)?,
+        "mysql" => Pool::connect(&database_url).await.map(DB::Mysql)?,
+        "postgres" | "postgresql" => Pool::connect(&database_url).await.map(DB::Postgres)?,
+        "sqlite" => Pool::connect(&database_url).await.map(DB::Sqlite)?,
+        "libsql" => {
+            let auth_token = var("TURSO_AUTH_TOKEN").expect("Token for turso is not found");
+            Database::open_remote(database_url, auth_token)?
+                .connect()
+                .map(DB::Turso)?
+        }
         _ => return Ok(DB::Null),
     };
 
@@ -53,7 +61,7 @@ impl Query {
     }
 
     pub async fn migrate(&self) -> bool {
-        let create_table_user = "
+        let sql = "
             create table russenger_user (
                 facebook_user_id varchar(40) primary key unique,
                 action varchar(20)
@@ -61,9 +69,10 @@ impl Query {
 
         let no_params = Vec::<&str>::new();
         match &self.db {
-            DB::Mysql(pool) => execute_query!(pool, create_table_user, no_params),
-            DB::Sqlite(pool) => execute_query!(pool, create_table_user, no_params),
-            DB::Postgres(pool) => execute_query!(pool, create_table_user, no_params),
+            DB::Mysql(pool) => execute_query!(pool, sql, no_params),
+            DB::Sqlite(pool) => execute_query!(pool, sql, no_params),
+            DB::Postgres(pool) => execute_query!(pool, sql, no_params),
+            DB::Turso(conn) => conn.execute(sql, ()).await.is_ok(),
             DB::Null => false,
         }
     }
@@ -82,6 +91,10 @@ impl Query {
                 let sql = "insert into russenger_user (facebook_user_id, action) values ($1, $2)";
                 execute_query!(pool, sql, [user_id, "Main"])
             }
+            DB::Turso(conn) => {
+                let sql = "insert into russenger_user (facebook_user_id, action) values (?1, ?2)";
+                conn.execute(sql, params![user_id, "Main"]).await.is_ok()
+            }
             DB::Null => false,
         }
     }
@@ -99,6 +112,10 @@ impl Query {
             DB::Postgres(pool) => {
                 let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
                 execute_query!(pool, sql, [action, user_id])
+            }
+            DB::Turso(conn) => {
+                let sql = "update russenger_user set action=?1 where facebook_user_id=?2";
+                conn.execute(sql, params![action, user_id]).await.is_ok()
             }
             DB::Null => false,
         }
@@ -124,6 +141,19 @@ impl Query {
                 let sql = "select action from russenger_user where facebook_user_id=$1";
                 match sqlx::query(sql).bind(user_id).fetch_one(pool).await {
                     Ok(row) => row.get(0),
+                    Err(_) => None,
+                }
+            }
+            DB::Turso(conn) => {
+                let sql = "select action from russenger_user where facebook_user_id=?1";
+                match conn.query(sql, params![user_id]).await {
+                    Ok(mut rows) => {
+                        if let Ok(row) = rows.next() {
+                            row.unwrap().get(0).unwrap_or_default()
+                        } else {
+                            None
+                        }
+                    }
                     Err(_) => None,
                 }
             }

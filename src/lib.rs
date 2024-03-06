@@ -1,3 +1,8 @@
+pub mod command;
+mod core;
+mod query;
+mod response_models;
+
 pub use dotenv::dotenv;
 pub use rocket::{async_trait, main};
 
@@ -9,11 +14,6 @@ pub use core::{
     response::{Res, SendResult},
 };
 pub use response_models::{generic, media, payload, quick_replies, text};
-
-pub mod command;
-mod core;
-mod query;
-mod response_models;
 
 #[macro_export]
 macro_rules! create_action {

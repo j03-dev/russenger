@@ -1,3 +1,12 @@
+pub mod action;
+pub mod data;
+pub mod request;
+pub mod response;
+
+mod app_state;
+mod incoming_data;
+mod request_handler;
+
 use std::env::var;
 use std::str::FromStr;
 
@@ -16,15 +25,6 @@ use response::Res as res;
 
 use crate::payload::Payload;
 use crate::query::Query;
-
-pub mod action;
-pub mod data;
-pub mod request;
-pub mod response;
-
-mod app_state;
-mod incoming_data;
-mod request_handler;
 
 #[catch(404)]
 fn page_not_found() -> &'static str {

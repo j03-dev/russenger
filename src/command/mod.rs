@@ -1,9 +1,10 @@
+mod arg_parse;
+
 use dotenv::dotenv;
 
-use crate::command::arg_parse::parser;
 use crate::core::{migrate, run_server};
 
-mod arg_parse;
+use arg_parse::parser;
 
 fn print_usage() {
     println!("Usage: cargo run --release [runserver|migrate]");

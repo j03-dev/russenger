@@ -149,7 +149,7 @@ impl Query {
                 match conn.query(sql, params![user_id]).await {
                     Ok(mut rows) => {
                         if let Ok(row) = rows.next() {
-                            row.unwrap().get(0).unwrap_or_default()
+                            row.unwrap().get(0).ok()
                         } else {
                             None
                         }

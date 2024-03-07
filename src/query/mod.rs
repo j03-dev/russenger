@@ -3,6 +3,8 @@ use std::env::var;
 
 use sqlx::{MySql, Pool, Postgres, Row, Sqlite};
 
+use crate::Action;
+
 #[derive(Clone)]
 pub enum DB {
     Mysql(Pool<MySql>),
@@ -69,14 +71,15 @@ impl Query {
     }
 
     pub async fn create(&self, user_id: &str) -> bool {
+        let params = [user_id, "Main"];
         match &self.db {
             DB::Mysql(pool) => {
                 let sql = "insert into russenger_user (facebook_user_id, action) values (?, ?)";
-                execute_query!(pool, sql, [user_id, "Main"])
+                execute_query!(pool, sql, params)
             }
             DB::Sqlite(pool) => {
                 let sql = "insert into russenger_user (facebook_user_id, action) values ($1, $2)";
-                execute_query!(pool, sql, [user_id, "Main"])
+                execute_query!(pool, sql, params)
             }
             DB::Postgres(pool) => {
                 let sql = "insert into russenger_user (facebook_user_id, action) values ($1, $2)";
@@ -86,19 +89,20 @@ impl Query {
         }
     }
 
-    pub async fn set_action(&self, user_id: &str, action: &str) -> bool {
+    pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {
+        let params = [action.path(), user_id.to_string()];
         match &self.db {
             DB::Mysql(pool) => {
                 let sql = "update russenger_user set action=? where facebook_user_id=?";
-                execute_query!(pool, sql, [action, user_id])
+                execute_query!(pool, sql, params)
             }
             DB::Sqlite(pool) => {
                 let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
-                execute_query!(pool, sql, [action, user_id])
+                execute_query!(pool, sql, params)
             }
             DB::Postgres(pool) => {
                 let sql = "update russenger_user set action=$1 where facebook_user_id=$2";
-                execute_query!(pool, sql, [action, user_id])
+                execute_query!(pool, sql, params)
             }
             DB::Null => false,
         }
@@ -129,9 +133,5 @@ impl Query {
             }
             DB::Null => None,
         }
-    }
-
-    pub async fn reset_action(&self, user_id: &str) -> bool {
-        self.set_action(user_id, "Main").await
     }
 }

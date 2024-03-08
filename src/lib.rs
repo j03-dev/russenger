@@ -2,6 +2,8 @@ pub mod command;
 mod core;
 mod query;
 mod response_models;
+#[cfg(test)]
+mod test;
 
 pub use dotenv::dotenv;
 pub use rocket::{async_trait, main};

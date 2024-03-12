@@ -12,12 +12,12 @@ use super::{payload::Payload, quick_replies::QuickReplyModel, recipient::Recipie
 const MAX_ELEMENT: usize = 10;
 
 #[derive(Clone, Debug)]
-pub enum GenericButton {
-    Postback { title: String, payload: Payload },
-    WebUrl { title: String, url: String },
+pub enum GenericButton<'gb> {
+    Postback { title: &'gb str, payload: Payload },
+    WebUrl { title: &'gb str, url: String },
 }
 
-impl GenericButton {
+impl<'gb> GenericButton<'gb> {
     fn to_value(&self) -> Value {
         match self.clone() {
             Self::Postback { title, payload } => json!({

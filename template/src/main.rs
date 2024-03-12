@@ -42,10 +42,10 @@ create_action!(Option2, |res: Res, req: Req| async move {
         "Option 2",
         "https://example.com/option2.jpg",
         "Option 2 description",
-        vec![GenericButton::new(
-            "Choose Option 2",
-            Payload::new(Main, None),
-        )],
+        vec![GenericButton::Postback {
+            title: "Choose Option 2",
+            payload: Payload::new(Main, None),
+        }],
     )];
 
     res.send(GenericModel::new(

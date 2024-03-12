@@ -1,3 +1,4 @@
+use rocket::serde::json::{json, Value};
 use rocket::serde::Serialize;
 
 use crate::{
@@ -10,20 +11,25 @@ use super::{payload::Payload, quick_replies::QuickReplyModel, recipient::Recipie
 
 const MAX_ELEMENT: usize = 10;
 
-#[derive(Debug, Clone, Serialize)]
-pub struct GenericButton {
-    #[serde(rename = "type")]
-    r#type: String,
-    title: String,
-    payload: String,
+#[derive(Clone, Debug)]
+pub enum GenericButton {
+    Postback { title: String, payload: Payload },
+    WebUrl { title: String, url: String },
 }
 
 impl GenericButton {
-    pub fn new(title: &str, payload: Payload) -> Self {
-        Self {
-            r#type: "postback".into(),
-            title: title.into(),
-            payload: payload.to_uri_string(),
+    fn to_value(&self) -> Value {
+        match self.clone() {
+            Self::Postback { title, payload } => json!({
+                "type": "postback",
+                "title": title,
+                "payload": payload.to_uri_string()
+            }),
+            Self::WebUrl { title, url } => json!({
+                "type": "web_url",
+                "title": title,
+                "url": url
+            }),
         }
     }
 }
@@ -33,11 +39,12 @@ pub struct GenericElement {
     title: String,
     image_url: String,
     subtitle: String,
-    buttons: Vec<GenericButton>,
+    buttons: Vec<Value>,
 }
 
 impl GenericElement {
     pub fn new(title: &str, image_url: &str, subtitle: &str, buttons: Vec<GenericButton>) -> Self {
+        let buttons: Vec<_> = buttons.iter().map(|btn| btn.to_value()).collect();
         Self {
             title: title.into(),
             image_url: image_url.into(),

@@ -12,7 +12,7 @@ pub struct Res;
 
 impl Res {
     pub async fn send<T: Serialize>(&self, value: T) -> SendResult {
-        let version = env::var("API_VERSION").unwrap_or("v15.0".into());
+        let version = env::var("FACEBOOK_API_VERSION").unwrap_or("v15.0".into());
         let page_access_token =
             env::var("PAGE_ACCESS_TOKEN").expect("PAGE_ACCESS_TOKEN not found on .env file");
         let facebook_api = format!(

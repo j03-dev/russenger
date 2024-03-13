@@ -30,7 +30,7 @@ struct QuickMessage {
 #[derive(Debug, Serialize)]
 pub struct QuickReplyModel<'q> {
     recipient: Recipient<'q>,
-    messaging_type: String,
+    messaging_type: &'q str,
     message: QuickMessage,
 }
 
@@ -38,7 +38,7 @@ impl<'q> QuickReplyModel<'q> {
     pub fn new(sender: &'q str, message: &str, quick_replies: Vec<QuickReply>) -> Self {
         Self {
             recipient: Recipient { id: sender },
-            messaging_type: "RESPONSE".into(),
+            messaging_type: "RESPONSE",
             message: QuickMessage {
                 text: message.into(),
                 quick_replies,

@@ -75,6 +75,7 @@ struct GenericMessage {
 #[derive(Debug, Serialize)]
 pub struct GenericModel<'g> {
     recipient: Recipient<'g>,
+    messaging_type: &'g str,
     message: GenericMessage,
 }
 
@@ -87,6 +88,7 @@ impl<'g> GenericModel<'g> {
         }
         Self {
             recipient: Recipient { id: sender },
+            messaging_type: "RESPONSE",
             message: GenericMessage {
                 attachment: Attachment {
                     r#type: "template".into(),

@@ -1,12 +1,12 @@
-use url::form_urlencoded;
+use rocket::serde::{Deserialize, Serialize};
 
 pub use crate::core::data::Data;
 use crate::Action;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Payload {
-    pub path: String,
-    pub data: Option<Data>,
+    path: String,
+    data: Option<Data>,
 }
 
 impl Payload {
@@ -17,44 +17,22 @@ impl Payload {
         }
     }
 
-    pub fn get_path(&self) -> &String {
-        &self.path
+    pub fn get_path(&self) -> String {
+        self.path.clone()
     }
 
-    pub fn get_data_to_string(&self) -> String {
-        serde_json::to_string(&self.data).unwrap_or_default()
+    pub fn get_data(&self) -> Data {
+        self.data.clone().unwrap_or_default()
     }
 
-    pub fn to_uri_string(&self) -> String {
-        form_urlencoded::Serializer::new(String::new())
-            .append_pair("action", self.get_path())
-            .append_pair("value", &self.get_data_to_string())
-            .finish()
+    pub fn from_str(payload: &str) -> Result<Self, String> {
+        serde_json::from_str(payload).map_err(|_| "Failed to Convert str to Payload".into())
     }
+}
 
-    pub fn from_uri_string(uri: &str) -> Result<Self, String> {
-        let parsed: Vec<(String, String)> = form_urlencoded::parse(uri.as_bytes())
-            .into_owned()
-            .collect();
-
-        let mut path = None;
-        let mut value = None;
-
-        for (name, val) in parsed {
-            match name.as_str() {
-                "action" => path = Some(val),
-                "value" => value = Some(val),
-                _ => return Err(format!("Unknown field in URI: {}", name)),
-            }
-        }
-
-        match (path, value) {
-            (Some(path), Some(value)) => {
-                let data = Some(Data::from_string(value));
-                Ok(Self { path, data })
-            }
-            _ => Err("Missing fields in URI".to_string()),
-        }
+impl ToString for Payload {
+    fn to_string(&self) -> String {
+        serde_json::to_string(self).unwrap_or_default()
     }
 }
 

@@ -15,7 +15,7 @@ impl QuickReply {
         Self {
             content_type: "text".into(),
             title: title.into(),
-            payload: payload.to_uri_string(),
+            payload: payload.to_string(),
             image_url: image_url.into(),
         }
     }

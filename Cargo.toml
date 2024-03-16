@@ -17,7 +17,6 @@ serde_json = "^1.0.107"
 lazy_static = "^1.4.0"
 rocket_cors = "0.6"
 dotenv = "^0.15.0"
-url = "^2.4.1"
 
 [dependencies.sqlx]
 version = "^0.7.1"

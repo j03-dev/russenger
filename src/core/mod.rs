@@ -48,12 +48,12 @@ pub enum Executable<'a> {
 
 async fn run(executable: Executable<'_>) {
     match executable {
-        Executable::Payload(user, uri_payload, host, query) => {
-            let payload = Payload::from_uri_string(uri_payload).unwrap_or_default();
+        Executable::Payload(user, payload, host, query) => {
+            let payload = Payload::from_str(payload).unwrap_or_default();
             {
-                let data = Data::from_string(payload.get_data_to_string());
+                let data = payload.get_data();
                 let req = Req::new(user, query, data, host);
-                if let Some(action) = ACTION_REGISTRY.lock().await.get(payload.get_path()) {
+                if let Some(action) = ACTION_REGISTRY.lock().await.get(&payload.get_path()) {
                     action.execute(res, req).await;
                 }
             }

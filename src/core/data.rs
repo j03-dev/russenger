@@ -2,12 +2,22 @@ use rocket::serde::{Deserialize, Serialize};
 
 const MAX_VALUE_AUTORIZED: usize = 500;
 
+const MIN_PAGE: usize = 0;
+pub const MAX_PAGE: usize = 10;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Page(pub usize, pub usize);
 
+impl Page {
+    pub fn next(&mut self) {
+        self.0 += MAX_PAGE;
+        self.1 += MAX_PAGE;
+    }
+}
+
 impl Default for Page {
     fn default() -> Self {
-        Self(0, 10)
+        Self(MIN_PAGE, MAX_PAGE)
     }
 }
 
@@ -35,10 +45,6 @@ impl Data {
     pub fn new<T: Serialize>(value: T, page: Option<Page>) -> Self {
         let value = serde_json::to_string(&value).unwrap_or_default().verify();
         Self { value, page }
-    }
-
-    pub fn from_string<T: ToString>(s: T) -> Self {
-        serde_json::from_str(&s.to_string()).unwrap_or_default()
     }
 
     pub fn get_value<T: for<'a> Deserialize<'a> + Default>(&self) -> T {

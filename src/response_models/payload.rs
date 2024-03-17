@@ -39,7 +39,7 @@ impl ToString for Payload {
 impl Default for Payload {
     fn default() -> Self {
         Payload {
-            path: "Main".into(),
+            path: "Main".to_owned(),
             data: None,
         }
     }

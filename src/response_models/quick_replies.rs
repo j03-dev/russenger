@@ -13,10 +13,10 @@ pub struct QuickReply {
 impl QuickReply {
     pub fn new(title: &str, image_url: &str, payload: Payload) -> Self {
         Self {
-            content_type: "text".into(),
-            title: title.into(),
+            content_type: "text".to_owned(),
+            title: title.to_owned(),
             payload: payload.to_string(),
-            image_url: image_url.into(),
+            image_url: image_url.to_owned(),
         }
     }
 }

@@ -92,9 +92,9 @@ impl<'g> GenericModel<'g> {
             messaging_type: "RESPONSE",
             message: GenericMessage {
                 attachment: Attachment {
-                    r#type: "template".into(),
+                    r#type: "template".to_owned(),
                     payload: GenericPayload {
-                        template_type: "generic".into(),
+                        template_type: "generic".to_owned(),
                         elements,
                     },
                 },

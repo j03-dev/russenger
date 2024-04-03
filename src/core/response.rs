@@ -39,11 +39,11 @@ impl Res {
         send(persistent_menu, "custom_user_settings").await
     }
 
-    pub async fn send_get_started(&self, payload: Payload) {
+    pub async fn send_get_started(&self, payload: Payload) -> SendResult {
         send(
             json!({"get_started": {"payload": payload.to_string()}}),
             "messenger_profile",
         )
-        .await;
+        .await
     }
 }

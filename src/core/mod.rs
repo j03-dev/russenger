@@ -51,11 +51,12 @@ async fn run(executable: Executable<'_>) {
         Executable::Payload(user, payload, host, query) => {
             let payload = Payload::from_str(payload).unwrap_or_default();
             {
-                println!("payload {} is execute ", &payload.get_path());
                 let data = payload.get_data();
                 let req = Req::new(user, query, data, host);
                 if let Some(action) = ACTION_REGISTRY.lock().await.get(&payload.get_path()) {
+                    println!("try to run payload");
                     action.execute(res, req).await;
+                    println!("finish to run payload");
                 }
             }
         }

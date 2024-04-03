@@ -1,6 +1,7 @@
 use russenger::{
+    button::Button,
     create_action,
-    generic::{GenericButton, GenericElement, GenericModel},
+    generic::{GenericElement, GenericModel},
     payload::Payload,
     quick_replies::{QuickReply, QuickReplyModel},
     russenger_app,
@@ -42,7 +43,7 @@ create_action!(Option2, |res: Res, req: Req| async move {
         "Option 2",
         "https://example.com/option2.jpg",
         "Option 2 description",
-        vec![GenericButton::Postback {
+        vec![Button::Postback {
             title: "Choose Option 2",
             payload: Payload::new(Main, None),
         }],

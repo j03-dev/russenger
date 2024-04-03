@@ -15,7 +15,7 @@ pub use core::{
     request::Req,
     response::{Res, SendResult},
 };
-pub use response_models::{generic, media, payload, quick_replies, text};
+pub use response_models::{button, generic, media, payload, persistent_menu, quick_replies, text};
 
 #[macro_export]
 macro_rules! create_action {

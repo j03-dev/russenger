@@ -33,7 +33,7 @@ pub struct Res;
 
 impl Res {
     pub async fn send<T: Serialize>(&self, value: T) -> SendResult {
-        send(value, "message").await
+        send(value, "messages").await
     }
     pub async fn send_user_setting(&self, persistent_menu: PersistentMenu<'_>) -> SendResult {
         send(persistent_menu, "custom_user_settings").await

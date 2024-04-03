@@ -11,14 +11,16 @@ struct Menu<'m> {
 
 #[derive(Serialize)]
 pub struct PersistentMenu<'p> {
+    psid: &'p str,
     persistent_menu: Vec<Menu<'p>>,
 }
 
 impl<'p> PersistentMenu<'p> {
-    pub fn new(buttons: Vec<Button>) -> Self {
+    pub fn new(sender: &'p str, buttons: Vec<Button>) -> Self {
         let buttons: Vec<_> = buttons.iter().map(|btn| btn.to_value()).collect();
 
         Self {
+            psid: sender,
             persistent_menu: vec![Menu {
                 locale: "default",
                 composer_input_disabled: false,

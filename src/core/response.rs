@@ -2,30 +2,39 @@ use std::env;
 
 use rocket::serde::Serialize;
 
+use crate::persistent_menu::PersistentMenu;
+
 #[derive(Debug)]
 pub enum SendResult {
     Okey(reqwest::Response),
     Error(reqwest::Error),
 }
 
+async fn send<T: Serialize>(data: T, endpoint: &str) -> SendResult {
+    let version = env::var("FACEBOOK_API_VERSION").unwrap_or("v15.0".into());
+    let page_access_token =
+        env::var("PAGE_ACCESS_TOKEN").expect("env variable `PAGE_ACCESS_TOKEN` should be set");
+    let url_api = format!(
+        "https://graph.facebook.com/{version}/me/{endpoint}?access_token={page_access_token}"
+    );
+    match reqwest::Client::new()
+        .post(url_api)
+        .json(&data)
+        .send()
+        .await
+    {
+        Ok(response) => SendResult::Okey(response),
+        Err(error) => SendResult::Error(error),
+    }
+}
+
 pub struct Res;
 
 impl Res {
     pub async fn send<T: Serialize>(&self, value: T) -> SendResult {
-        let version = env::var("FACEBOOK_API_VERSION").unwrap_or("v15.0".into());
-        let page_access_token =
-            env::var("PAGE_ACCESS_TOKEN").expect("env variable `PAGE_ACCESS_TOKEN` should be set");
-        let facebook_api = format!(
-            "https://graph.facebook.com/{version}/me/messages?access_token={page_access_token}"
-        );
-        match reqwest::Client::new()
-            .post(&facebook_api)
-            .json(&value)
-            .send()
-            .await
-        {
-            Ok(response) => SendResult::Okey(response),
-            Err(error) => SendResult::Error(error),
-        }
+        send(value, "message").await
+    }
+    pub async fn send_user_setting(persistent_menu: PersistentMenu<'_>) -> SendResult {
+        send(persistent_menu, "custom_user_settings").await
     }
 }

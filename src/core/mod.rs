@@ -74,7 +74,6 @@ async fn webhook_core(
     app_state: &State<AppState>,
     request: WebRequest,
 ) -> &'static str {
-    println!("{data:#?}");
     let query = app_state.query.clone();
     let user = data.get_sender();
     let host = request.host;

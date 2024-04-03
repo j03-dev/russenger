@@ -1,8 +1,9 @@
 use std::env;
 
 use rocket::serde::Serialize;
+use serde_json::json;
 
-use crate::persistent_menu::PersistentMenu;
+use crate::{payload::Payload, persistent_menu::PersistentMenu};
 
 #[derive(Debug)]
 pub enum SendResult {
@@ -36,5 +37,13 @@ impl Res {
     }
     pub async fn send_user_setting(&self, persistent_menu: PersistentMenu<'_>) -> SendResult {
         send(persistent_menu, "custom_user_settings").await
+    }
+
+    pub async fn send_gretting(&self, payload: Payload) {
+        send(
+            json!({"get_started": {"payload": payload.to_string()}}),
+            "messenger_profile",
+        )
+        .await;
     }
 }

@@ -120,7 +120,7 @@ impl<'g> GenericModel<'g> {
             QuickReply::new(
                 "Next",
                 "",
-                Payload::new(action, Some(Data::new(&value, Some(page)))),
+                Payload::new(action, Some(Data::new(value, Some(page)))),
             )
         } else {
             QuickReply::new("Back", "", Payload::default())

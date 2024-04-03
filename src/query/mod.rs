@@ -49,7 +49,7 @@ pub struct Query {
 impl Query {
     pub async fn new() -> Self {
         match establish_connection().await {
-            Ok(db) => return Self { db },
+            Ok(db) => Self { db },
             Err(err) => panic!("Can't estabilish the connection {err:?}"),
         }
     }

@@ -37,7 +37,7 @@ fn server_panic() -> &'static str {
 }
 
 #[get("/webhook")]
-async fn webhook_verify<'l>(webhook_query: WebQuery<'l>) -> &'l str {
+fn webhook_verify(webhook_query: WebQuery<'_>) -> &str {
     webhook_query.hub_challenge
 }
 
@@ -83,14 +83,14 @@ async fn webhook_core(
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {
                 let paylaod = quick_reply.get_payload();
-                run(Executable::Payload(user, &paylaod, &host, query)).await;
+                run(Executable::Payload(user, paylaod, &host, query)).await;
             } else {
                 let text = message.get_text();
                 run(Executable::TextMessage(user, &text, &host, query)).await;
             }
         } else if let Some(postback) = data.get_postback() {
             let payload = postback.get_payload();
-            run(Executable::Payload(user, &payload, &host, query)).await;
+            run(Executable::Payload(user, payload, &host, query)).await;
         }
     }
     ACTION_LOCK.unlock(user).await;

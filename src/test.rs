@@ -6,7 +6,7 @@ use crate::Action;
 
 use crate::query::Query;
 
-static USER_TEST: &'static str = "TEST";
+static USER_TEST: &str = "TEST";
 
 struct TestAction;
 
@@ -24,7 +24,7 @@ async fn test_migrate() {
     dotenv().ok();
     let query = Query::new().await;
     let result = query.migrate().await;
-    assert_eq!(true, result);
+    assert!(result);
 }
 
 #[rocket::async_test]
@@ -32,7 +32,7 @@ async fn test_create_user() {
     dotenv().ok();
     let query = Query::new().await;
     let result = query.create(USER_TEST).await;
-    assert_eq!(true, result);
+    assert!(result);
 }
 
 #[rocket::async_test]
@@ -40,7 +40,7 @@ async fn test_set_action() {
     dotenv().ok();
     let query = Query::new().await;
     let result = query.set_action(USER_TEST, TestAction).await;
-    assert_eq!(true, result);
+    assert!(result);
 }
 
 #[rocket::async_test]

@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use rocket::serde::{Deserialize, Serialize};
 
 pub use crate::core::data::Data;
@@ -24,8 +26,12 @@ impl Payload {
     pub fn get_data(&self) -> Data {
         self.data.clone().unwrap_or_default()
     }
+}
 
-    pub fn from_str(payload: &str) -> Result<Self, String> {
+impl FromStr for Payload {
+    type Err = String;
+
+    fn from_str(payload: &str) -> Result<Self, String> {
         serde_json::from_str(payload).map_err(|_| "Failed to Convert str to Payload".into())
     }
 }

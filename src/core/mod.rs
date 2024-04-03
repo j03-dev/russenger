@@ -54,9 +54,7 @@ async fn run(executable: Executable<'_>) {
                 let data = payload.get_data();
                 let req = Req::new(user, query, data, host);
                 if let Some(action) = ACTION_REGISTRY.lock().await.get(&payload.get_path()) {
-                    println!("try to run payload");
                     action.execute(res, req).await;
-                    println!("finish to run payload");
                 }
             }
         }
@@ -76,7 +74,6 @@ async fn webhook_core(
     app_state: &State<AppState>,
     request: WebRequest,
 ) -> &'static str {
-    println!("{data:#?}");
     let query = app_state.query.clone();
     let user = data.get_sender();
     let host = request.host;

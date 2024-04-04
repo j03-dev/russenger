@@ -32,8 +32,8 @@ async fn send<T: Serialize>(data: T, endpoint: &str) -> SendResult {
 pub struct Res;
 
 impl Res {
-    pub async fn send<T: Serialize>(&self, value: T) -> SendResult {
-        send(value, "messages").await
+    pub async fn send<T: Serialize>(&self, response_model: T) -> SendResult {
+        send(response_model, "messages").await
     }
     pub async fn send_user_setting(&self, persistent_menu: PersistentMenu<'_>) -> SendResult {
         send(persistent_menu, "custom_user_settings").await

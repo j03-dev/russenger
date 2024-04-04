@@ -3,15 +3,24 @@ use rocket::serde::json::{json, Value};
 use crate::payload::Payload;
 
 #[derive(Clone, Debug)]
-pub enum Button<'gb> {
-    Postback { title: &'gb str, payload: Payload },
-    WebUrl { title: &'gb str, url: String },
+pub enum Button<'b> {
+    AccountUnlink,
+    AccountLink { url: String },
+    WebUrl { title: &'b str, url: String },
+    Postback { title: &'b str, payload: Payload },
+    PhoneNumber { title: &'b str, payload: Payload },
 }
 
-impl<'gb> Button<'gb> {
+impl<'b> Button<'b> {
     pub fn to_value(&self) -> Value {
         match self.clone() {
-            Self::Postback { title, payload } => json!({
+            Self::AccountLink { url } => {
+                json!({"type": "account_link", "url": url})
+            }
+            Self::AccountUnlink => {
+                json!({"type": "account_unlink"})
+            }
+            Self::Postback { title, payload } | Self::PhoneNumber { title, payload } => json!({
                 "type": "postback",
                 "title": title,
                 "payload": payload.to_string()

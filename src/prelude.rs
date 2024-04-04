@@ -1,5 +1,6 @@
 pub use crate::button::Button;
 pub use crate::generic::{GenericElement, GenericModel};
+pub use crate::media::MediaModel;
 pub use crate::payload::Payload;
 pub use crate::persistent_menu::PersistentMenu;
 pub use crate::quick_replies::{QuickReply, QuickReplyModel};

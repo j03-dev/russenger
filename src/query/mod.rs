@@ -61,7 +61,7 @@ impl Query {
                 action varchar(20)
             );";
 
-        let no_params = Vec::<&str>::new();
+        let no_params: [&str; 0] = [];
         match &self.db {
             DB::Mysql(pool) => execute_query!(pool, sql, no_params),
             DB::Sqlite(pool) => execute_query!(pool, sql, no_params),

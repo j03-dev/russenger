@@ -1,5 +1,6 @@
 pub mod command;
 mod core;
+pub mod prelude;
 mod query;
 mod response_models;
 #[cfg(test)]
@@ -15,7 +16,7 @@ pub use core::{
     request::Req,
     response::{Res, SendResult},
 };
-pub use response_models::{button, generic, media, payload, persistent_menu, quick_replies, text};
+pub use response_models::*;
 
 #[macro_export]
 macro_rules! create_action {

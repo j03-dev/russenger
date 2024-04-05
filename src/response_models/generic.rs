@@ -36,25 +36,25 @@ impl GenericElement {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 struct GenericPayload {
     pub template_type: String,
     pub elements: Vec<GenericElement>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 struct Attachment {
     #[serde(rename = "type")]
     pub r#type: String,
     pub payload: GenericPayload,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 struct GenericMessage {
     pub attachment: Attachment,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct GenericModel<'g> {
     recipient: Recipient<'g>,
     messaging_type: &'g str,

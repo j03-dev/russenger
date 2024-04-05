@@ -24,5 +24,5 @@ cargo install cargo-generate
 ```
 ### Create project with template
 ```bash
-cargo generate --git https://github.com/j03-dev/russenger
+cargo generate --git https://github.com/j03-dev/russenger_template
 ```

@@ -1,6 +1,6 @@
 use rocket::serde::{json::Value, Serialize};
 
-use crate::button::Button;
+use crate::{button::Button, ResponseModel};
 
 #[derive(Serialize)]
 struct Menu<'m> {
@@ -28,4 +28,8 @@ impl<'p> PersistentMenu<'p> {
             }],
         }
     }
+}
+
+impl ResponseModel for PersistentMenu<'_> {
+    const END_POINT: &'static str = "custom_user_settings";
 }

@@ -1,5 +1,7 @@
 use rocket::serde::Serialize;
 
+use crate::ResponseModel;
+
 use super::{payload::Payload, recipient::Recipient};
 
 #[derive(Serialize, Debug)]
@@ -45,4 +47,8 @@ impl<'q> QuickReplyModel<'q> {
             },
         }
     }
+}
+
+impl ResponseModel for QuickReplyModel<'_> {
+    const END_POINT: &'static str = "messages";
 }

@@ -1,5 +1,7 @@
 use rocket::serde::Serialize;
 
+use crate::ResponseModel;
+
 use super::recipient::Recipient;
 
 #[derive(Serialize)]
@@ -43,4 +45,8 @@ impl<'m> MediaModel<'m> {
             },
         }
     }
+}
+
+impl ResponseModel for MediaModel<'_> {
+    const END_POINT: &'static str = "messages";
 }

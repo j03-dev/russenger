@@ -1,5 +1,7 @@
 use rocket::serde::Serialize;
 
+use crate::ResponseModel;
+
 use super::recipient::Recipient;
 
 #[derive(Serialize)]
@@ -22,4 +24,8 @@ impl<'s> TextModel<'s> {
             message: Text { text },
         }
     }
+}
+
+impl ResponseModel for TextModel<'_> {
+    const END_POINT: &'static str = "messages";
 }

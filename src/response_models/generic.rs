@@ -6,7 +6,7 @@ use crate::{
         data::{Page, MAX_PAGE},
         response::Res as res,
     },
-    Action, Data,
+    Action, Data, ResponseModel,
 };
 
 use super::{
@@ -113,4 +113,8 @@ impl<'g> GenericModel<'g> {
         ))
         .await;
     }
+}
+
+impl ResponseModel for GenericModel<'_> {
+    const END_POINT: &'static str = "messages";
 }

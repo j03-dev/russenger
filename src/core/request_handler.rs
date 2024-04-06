@@ -66,9 +66,10 @@ impl<'a> FromRequest<'a> for WebRequest {
 
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
         match request.host() {
-            Some(host) => Outcome::Success(Self {
-                host: host.to_string(),
-            }),
+            Some(host) => {
+                let uri = host.to_absolute("https", &[]).unwrap().to_string();
+                Outcome::Success(Self { host: uri })
+            }
             None => Outcome::Error((Status::BadRequest, HandleRequestError::HostNotFound)),
         }
     }

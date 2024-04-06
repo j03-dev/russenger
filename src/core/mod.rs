@@ -96,8 +96,8 @@ async fn webhook_core(
     "Ok"
 }
 
-#[post("/test", format = "json")]
-async fn test_post(request: WebRequest) -> String {
+#[get("/test")]
+fn test_post(request: WebRequest) -> String {
     request.host
 }
 

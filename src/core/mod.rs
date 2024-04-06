@@ -96,11 +96,6 @@ async fn webhook_core(
     "Ok"
 }
 
-#[get("/test")]
-fn test_post(request: WebRequest) -> String {
-    request.host
-}
-
 pub async fn run_server() {
     if !ACTION_REGISTRY.lock().await.contains_key("Main") {
         panic!("The ACTION_REGISTRY should contain an action with path 'Main' implementing the Action trait.");
@@ -135,7 +130,7 @@ pub async fn run_server() {
     rocket::custom(figment)
         .attach(cors)
         .manage(AppState::init().await)
-        .mount("/", routes![webhook_verify, webhook_core, test_post])
+        .mount("/", routes![webhook_verify, webhook_core])
         .mount("/static", FileServer::from("static"))
         .register("/", catchers![page_not_found, server_panic])
         .launch()

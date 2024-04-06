@@ -12,10 +12,10 @@ pub struct Req {
 impl Req {
     pub fn new(user: &str, query: Query, data: Data, host: &str) -> Self {
         Self {
-            user: user.into(),
+            user: user.to_owned(),
             query,
             data,
-            host: host.into(),
+            host: host.to_owned(),
         }
     }
 }

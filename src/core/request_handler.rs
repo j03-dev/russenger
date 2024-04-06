@@ -65,7 +65,7 @@ impl<'a> FromRequest<'a> for WebRequest {
     type Error = HandleRequestError<'a>;
 
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
-        match request.host().and_then(|h| h.to_absolute("https", &[])) {
+        match request.host() {
             Some(host) => Outcome::Success(Self {
                 host: host.to_string(),
             }),

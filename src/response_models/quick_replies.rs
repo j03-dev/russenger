@@ -1,7 +1,6 @@
 use rocket::serde::Serialize;
 
-use crate::ResponseModel;
-
+use super::ResponseModel;
 use super::{payload::Payload, recipient::Recipient};
 
 #[derive(Serialize, Debug)]

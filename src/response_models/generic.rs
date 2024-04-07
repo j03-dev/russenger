@@ -3,12 +3,13 @@ use core::panic;
 use rocket::serde::json::Value;
 use rocket::serde::Serialize;
 
+use super::ResponseModel;
 use crate::{
     core::{
-        data::{Page, MAX_PAGE},
+        data::{Data, Page, MAX_PAGE},
         response::Res as res,
     },
-    Action, Data, ResponseModel,
+    Action,
 };
 
 use super::{

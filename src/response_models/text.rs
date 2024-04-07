@@ -1,8 +1,7 @@
 use rocket::serde::Serialize;
 
-use crate::ResponseModel;
-
 use super::recipient::Recipient;
+use super::ResponseModel;
 
 #[derive(Serialize)]
 struct Text<'t> {

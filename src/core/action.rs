@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use rocket::tokio::sync::Mutex;
 
-use crate::{Req, Res};
+use super::{request::Req, response::Res};
 
 pub struct ActionLock {
     pub locked_users: Arc<Mutex<HashSet<String>>>,

@@ -1,6 +1,6 @@
 use rocket::serde::Serialize;
 
-use crate::{payload::Payload, ResponseModel};
+use super::{payload::Payload, ResponseModel};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct GetStarted {

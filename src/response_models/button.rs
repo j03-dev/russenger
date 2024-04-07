@@ -1,6 +1,6 @@
 use rocket::serde::json::{json, Value};
 
-use crate::payload::Payload;
+use super::payload::Payload;
 
 #[derive(Clone, Debug)]
 pub enum Button<'b> {

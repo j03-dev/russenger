@@ -23,8 +23,8 @@ use request::Req;
 use request_handler::{WebQuery, WebRequest};
 use response::Res as res;
 
-use crate::payload::Payload;
 use crate::query::Query;
+use crate::response_models::payload::Payload;
 
 #[catch(404)]
 fn page_not_found() -> &'static str {

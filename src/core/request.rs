@@ -1,5 +1,5 @@
+use super::Data;
 use crate::query::Query;
-use crate::Data;
 
 #[derive(Clone)]
 pub struct Req {

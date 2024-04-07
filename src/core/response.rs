@@ -1,6 +1,6 @@
 use std::env;
 
-use crate::ResponseModel;
+use crate::response_models::ResponseModel;
 
 #[derive(Debug)]
 pub enum SendResult {

@@ -5,8 +5,8 @@ use super::payload::Payload;
 #[derive(Clone, Debug)]
 pub enum Button<'b> {
     AccountUnlink,
-    AccountLink { url: String },
-    WebUrl { title: &'b str, url: String },
+    AccountLink { url: &'b str },
+    WebUrl { title: &'b str, url: &'b str },
     Postback { title: &'b str, payload: Payload },
     PhoneNumber { title: &'b str, payload: Payload },
 }

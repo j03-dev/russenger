@@ -1,4 +1,4 @@
-use super::data::Data;
+use crate::response_models::data::Data;
 use crate::query::Query;
 
 #[derive(Clone)]

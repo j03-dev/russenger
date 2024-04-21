@@ -7,6 +7,7 @@ pub mod persistent_menu;
 pub mod quick_replies;
 pub mod recipient;
 pub mod text;
+pub mod data;
 
 use rocket::serde::Serialize;
 

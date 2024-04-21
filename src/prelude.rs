@@ -1,10 +1,10 @@
 pub use crate::core::{
-    data::Data,
     request::Req,
     response::{Res, SendResult},
 };
 pub use crate::response_models::{
     button::Button,
+    data::Data,
     generic::{GenericElement, GenericModel},
     get_started::GetStarted,
     media::MediaModel,

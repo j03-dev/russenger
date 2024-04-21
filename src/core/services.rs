@@ -5,14 +5,13 @@ use rocket::{catch, get, post, State};
 
 use super::action::{ACTION_LOCK, ACTION_REGISTRY};
 use super::app_state::AppState;
-use super::data::Data;
 use super::incoming_data::InComingData;
 use super::request::Req;
 use super::request_handler::{WebQuery, WebRequest};
 use super::response::Res as res;
 
 use crate::query::Query;
-use crate::response_models::payload::Payload;
+use crate::response_models::{data::Data, payload::Payload};
 
 #[catch(404)]
 pub fn page_not_found() -> &'static str {

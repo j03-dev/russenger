@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use rocket::serde::{Deserialize, Serialize};
 
-pub use crate::core::data::Data;
+use super::data::Data;
 use crate::Action;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

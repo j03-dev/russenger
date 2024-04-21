@@ -1,4 +1,4 @@
-use super::Data;
+use super::data::Data;
 use crate::query::Query;
 
 #[derive(Clone)]

@@ -1,6 +1,5 @@
 use core::panic;
 
-use super::data::{Data, Page, MAX_PAGE};
 use rocket::serde::json::Value;
 use rocket::serde::Serialize;
 
@@ -9,6 +8,7 @@ use crate::{core::response::Res as res, Action};
 
 use super::{
     button::Button,
+    data::{Data, Page, MAX_PAGE},
     payload::Payload,
     quick_replies::{QuickReply, QuickReplyModel},
     recipient::Recipient,

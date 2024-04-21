@@ -7,7 +7,7 @@ use std::str::FromStr;
 use crate::core::{
     action::ACTION_REGISTRY,
     app_state::AppState,
-    services::{page_not_found, server_panic, webhook_core, webhook_verify}, // core service
+    services::{page_not_found, server_panic, webhook_core, webhook_verify}, // core services
 };
 use crate::query::Query;
 

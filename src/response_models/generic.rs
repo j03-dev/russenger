@@ -94,16 +94,10 @@ impl<'g> GenericModel<'g> {
         self.message.attachment.payload.elements.is_empty()
     }
 
-    pub async fn send_next<A: Action>(&self, action: A, data: Data) {
+    pub async fn send_next<A: Action>(&self, action: A, mut data: Data) {
         let quick_reply = if !self.is_element_empty() {
-            let mut page = data.get_page().unwrap_or_default();
-            page.next();
-            let value: String = data.get_value();
-            QuickReply::new(
-                "Next",
-                "",
-                Payload::new(action, Some(Data::new(value, Some(page)))),
-            )
+            data.next_page();
+            QuickReply::new("Next", "", Payload::new(action, Some(data)))
         } else {
             QuickReply::new("Back", "", Payload::default())
         };

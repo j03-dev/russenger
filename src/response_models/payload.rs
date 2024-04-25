@@ -32,7 +32,7 @@ impl FromStr for Payload {
     type Err = String;
 
     fn from_str(payload: &str) -> Result<Self, String> {
-        serde_json::from_str(payload).map_err(|_| "Failed to Convert str to Payload".into())
+        serde_json::from_str(payload).map_err(|err| err.to_string())
     }
 }
 

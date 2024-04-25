@@ -3,7 +3,6 @@ use core::panic;
 use rocket::serde::json::Value;
 use rocket::serde::Serialize;
 
-use super::{text::TextModel, ResponseModel};
 use crate::{core::response::Res as res, Action};
 
 use super::{
@@ -12,6 +11,8 @@ use super::{
     payload::Payload,
     quick_replies::{QuickReply, QuickReplyModel},
     recipient::Recipient,
+    text::TextModel,
+    ResponseModel,
 };
 
 #[derive(Debug, Clone, Serialize)]

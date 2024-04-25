@@ -98,17 +98,19 @@ impl<'g> GenericModel<'g> {
     pub async fn send_next<A: Action>(&self, action: A, mut data: Data) {
         if !self.is_element_empty() {
             data.next_page();
-            let quick_reply = QuickReply::new("Next", "", Payload::new(action, Some(data)));
-
-            res.send(QuickReplyModel::new(
+            let quick_reply: QuickReplyModel<'_> = QuickReplyModel::new(
                 self.get_sender(),
                 "Navigation",
-                vec![quick_reply],
-            ))
-            .await;
+                vec![QuickReply::new(
+                    "Next",
+                    "",
+                    Payload::new(action, Some(data)),
+                )],
+            );
+            res.send(quick_reply).await;
         } else {
-            res.send(TextModel::new(self.get_sender(), "No more elements"))
-                .await;
+            let text: TextModel<'_> = TextModel::new(self.get_sender(), "No more elements");
+            res.send(text).await;
         };
     }
 }

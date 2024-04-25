@@ -3,7 +3,7 @@ use core::panic;
 use rocket::serde::json::Value;
 use rocket::serde::Serialize;
 
-use super::ResponseModel;
+use super::{text::TextModel, ResponseModel};
 use crate::{core::response::Res as res, Action};
 
 use super::{
@@ -95,18 +95,20 @@ impl<'g> GenericModel<'g> {
     }
 
     pub async fn send_next<A: Action>(&self, action: A, mut data: Data) {
-        let quick_reply = if !self.is_element_empty() {
+        if !self.is_element_empty() {
             data.next_page();
-            QuickReply::new("Next", "", Payload::new(action, Some(data)))
+            let quick_reply = QuickReply::new("Next", "", Payload::new(action, Some(data)));
+
+            res.send(QuickReplyModel::new(
+                self.get_sender(),
+                "Navigation",
+                vec![quick_reply],
+            ))
+            .await;
         } else {
-            QuickReply::new("Back", "", Payload::default())
+            res.send(TextModel::new(self.get_sender(), "No more elements"))
+                .await;
         };
-        res.send(QuickReplyModel::new(
-            self.get_sender(),
-            "Navigation",
-            vec![quick_reply],
-        ))
-        .await;
     }
 }
 

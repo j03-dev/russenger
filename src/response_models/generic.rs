@@ -95,16 +95,20 @@ impl<'g> GenericModel<'g> {
         self.message.attachment.payload.elements.is_empty()
     }
 
-    pub async fn send_next<A: Action>(&self, action: A, mut data: Data) {
+    pub async fn send_next<A: Action>(&self, action: A, data: Data) {
         if !self.is_element_empty() {
-            data.next_page();
+            let mut page = data.get_page().unwrap_or_default();
+            page.next();
             let quick_reply: QuickReplyModel<'_> = QuickReplyModel::new(
                 self.get_sender(),
                 "Navigation",
                 vec![QuickReply::new(
                     "Next",
                     "",
-                    Payload::new(action, Some(data)),
+                    Payload::new(
+                        action,
+                        Some(Data::new(data.get_value::<String>(), Some(page))),
+                    ),
                 )],
             );
             res.send(quick_reply).await;

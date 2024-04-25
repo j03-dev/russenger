@@ -74,12 +74,5 @@ pub mod data {
         pub fn get_page(&self) -> Option<Page> {
             self.page.clone()
         }
-
-        pub fn next_page(&mut self) {
-            if let Some(mut page) = self.page.clone() {
-                page.next();
-                self.page = Some(page);
-            }
-        }
     }
 }

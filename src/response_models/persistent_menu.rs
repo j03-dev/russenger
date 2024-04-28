@@ -11,12 +11,12 @@ struct Menu<'m> {
 }
 
 #[derive(Serialize)]
-pub struct PersistentMenu<'p> {
+pub struct PersistentMenuModel<'p> {
     psid: &'p str,
     persistent_menu: Vec<Menu<'p>>,
 }
 
-impl<'p> PersistentMenu<'p> {
+impl<'p> PersistentMenuModel<'p> {
     pub fn new(sender: &'p str, buttons: Vec<Button>) -> Self {
         let buttons: Vec<_> = buttons.iter().map(|btn| btn.to_value()).collect();
 
@@ -31,6 +31,6 @@ impl<'p> PersistentMenu<'p> {
     }
 }
 
-impl ResponseModel for PersistentMenu<'_> {
+impl ResponseModel for PersistentMenuModel<'_> {
     const END_POINT: &'static str = "custom_user_settings";
 }

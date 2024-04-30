@@ -11,6 +11,7 @@ pub use crate::response_models::{
     payload::Payload,
     persistent_menu::PersistentMenuModel,
     quick_replies::{QuickReply, QuickReplyModel},
+    sender_action::{Actions::*, SenderActionModel},
     text::TextModel,
     ResponseModel,
 };

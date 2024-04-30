@@ -1,4 +1,5 @@
 pub mod button;
+pub mod sender_action;
 pub mod generic;
 pub mod get_started;
 pub mod media;

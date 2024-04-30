@@ -1,9 +1,9 @@
 [package]
 name = "russenger"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "A Rust library designed to simplify the handling of Facebook Messenger webhook responses."
-license-file = "LICENSE"
+license = "Apache-2.0"
 documentation = "https://github.com/j03-dev/russenger"
 homepage = "https://github.com/j03-dev/russenger"
 repository = "https://github.com/j03-dev/russenger"
@@ -27,6 +27,4 @@ dotenv = "^0.15.0"
 
 [dependencies.sqlx]
 version = "^0.7.1"
-features = ["runtime-tokio","postgres", "sqlite", "mysql"]
-
-
+features = ["runtime-tokio", "postgres", "sqlite", "mysql"]

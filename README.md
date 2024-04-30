@@ -107,7 +107,7 @@ create_action!(Option2, |res: Res, req: Req| async move {
 
     let generic_elements = vec![GenericElement::new(
         "Option 2",
-        "https://example.com/option2.jpg",
+        "https://example.com/option2.jpg", // use existe url
         "Option 2 description",
         vec![Button::Postback {
             title: "Choose Option 2",
@@ -146,6 +146,25 @@ create_action!(GetUsername, |res: Res, req: Req| async move {
 });
 
 russenger_app!(Main, GetUsername);
+```
+
+##### How to send file from static
+
+```rust
+create_action!(Main, |res: Res, req: Req| async move {
+    res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
+        .await;
+
+    // Send Image File from static file
+    // Add image file, on static dir
+    res.send(MediaModel::new(
+        &req.user,
+        "image",
+        &format!("{host}/image.png", host = req.host),
+    ))
+    .await;
+});
+russenger_app!(Main);
 ```
 
 #### Run

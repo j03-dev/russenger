@@ -126,6 +126,28 @@ create_action!(Option2, |res: Res, req: Req| async move {
 russenger_app!(Main, Option1, Option2);
 ```
 
+##### Who to get User Input
+
+```rust
+use russenger::prelude::*;
+
+create_action!(Main, |res: Res, req: Req| async move {
+    res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
+        .await;
+    res.send(TextModel::new(&req.user, "What is your name: "))
+        .await;
+    req.query.set_action(&req.user, GetUsername).await;
+});
+
+create_action!(GetUsername, |res: Res, req: Req| async move {
+    let username: String = req.data.get_value();
+    res.send(TextModel::new(&req.user, &format!("Hello {}", username)))
+        .await;
+});
+
+russenger_app!(Main, GetUsername);
+```
+
 #### Run
 
 ##### Migrate Database `run it once`
@@ -148,8 +170,8 @@ cargo run runserver
 
 In this example, we define three actions: `Main`, `Option1`, and `Option2`. Each action is associated with a function that handles the action. The `Main` action sends a text message and a quick reply with two options. The `Option1` and `Option2` actions handle the user's selection of the respective options.
 
-
 ### EndPoint
+
 - GET `/webhook`: Verify your chatbot with Facebook Messenger. Facebook will send a challenge, and your bot must respond correctly for verification.
 
 - POST `/webhook`: This is where Facebook Messenger sends messages from users. Handle incoming messages and respond accordingly here.

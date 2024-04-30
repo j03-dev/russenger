@@ -34,7 +34,7 @@ cargo generate --git https://github.com/j03-dev/russenger_template
 
 ### Project
 
-- [gemini-bot](https://github.com/j03-dev/gemini_bot)
+- [gemini-bot](https://github.com/j03-dev/gemini-bot)
 
 ### Example
 
@@ -133,7 +133,7 @@ russenger_app!(Main, Option1, Option2);
 if you use `sqlite` as Bb
 
 ```bash
-touch yourdatabase.db
+touch <dbname>
 ```
 
 ```bash

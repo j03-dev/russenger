@@ -43,7 +43,7 @@ Here's an example of how to use Russenger to handle different actions in a chatb
 #### Russenger `Cargo.toml`
 
 ```toml
-russenger = { git = "https://github.com/j03-dev/russenger", branch = "main" }
+russenger = "0.1.0"
 rocket = "0.5"
 ```
 

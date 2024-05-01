@@ -32,6 +32,19 @@ pub enum SendResult {
 pub struct Res;
 
 impl Res {
+    /// Sends a response to a user.
+    ///
+    /// # Arguments
+    ///
+    /// * `response_model`: A `ResponseModel` that represents the response to be sent.
+    ///
+    /// # Returns
+    ///
+    /// A `SendResult` that represents the result of the send operation.
+    ///
+    /// # Errors
+    ///
+    /// Returns `SendResult::Error` if the send operation fails.
     pub async fn send<T: ResponseModel>(&self, response_model: T) -> SendResult {
         let version = env::var("FACEBOOK_API_VERSION").unwrap_or("v15.0".into());
         let page_access_token =

@@ -1,23 +1,23 @@
-/// The `cli` module contains the command line interface for the application.
-///
-/// It includes the `command_handler` function that starts the server.
-///
-/// # Functions
-///
-/// * `command_handler`: This function starts the server. It first checks if the `ACTION_REGISTRY` contains the `Main` action. If not, it panics. Then it sets up CORS, reads the `PORT` and `HOST` environment variables, and starts the server with these settings.
-///
-/// # Examples
-///
-/// Running the server:
-///
-/// ```rust
-/// use russenger::cli::command_handler;
-///
-/// #[russenger::main]
-/// async fn main() {
-///     command_handler().await;
-/// }
-/// ```
+//! The `cli` module contains the command line interface for the application.
+//!
+//! It includes the `command_handler` function that starts the server.
+//!
+//! # Functions
+//!
+//! * `command_handler`: This function starts the server. It first checks if the `ACTION_REGISTRY` contains the `Main` action. If not, it panics. Then it sets up CORS, reads the `PORT` and `HOST` environment variables, and starts the server with these settings.
+//!
+//! # Examples
+//!
+//! Running the server:
+//!
+//! ```rust
+//! use russenger::cli::command_handler;
+//!
+//! #[russenger::main]
+//! async fn main() {
+//!     command_handler().await;
+//! }
+//! ```
 use dotenv::dotenv;
 use rocket::{catchers, fs::FileServer, routes};
 use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};

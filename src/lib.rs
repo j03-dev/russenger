@@ -68,7 +68,7 @@ macro_rules! create_action {
 ///
 /// ```rust
 /// use russenger::russenger_app;
-/// 
+///
 /// russenger_app!(action1, action2, ..., actionN);
 /// ```
 ///

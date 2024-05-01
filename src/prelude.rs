@@ -29,7 +29,7 @@ pub use crate::core::{
     response::{Res, SendResult},
 };
 pub use crate::response_models::{
-    button::Button,
+    button::{Button, ButtonModel},
     data::Data,
     generic::{GenericElement, GenericModel},
     get_started::GetStartedModel,

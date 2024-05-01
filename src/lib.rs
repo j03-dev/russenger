@@ -2,7 +2,7 @@ pub mod cli;
 mod core;
 pub mod prelude;
 mod query;
-mod response_models;
+pub mod response_models;
 #[cfg(test)]
 mod test;
 

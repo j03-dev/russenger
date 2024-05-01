@@ -35,11 +35,11 @@ struct Attachment<'s> {
 /// * `new(sender: &'m str, media_type: &'m str, url: &'m str) -> Self` - Creates a new `MediaModel` instance.
 ///
 /// # Examples
-/// 
+///
 /// Sending a video from static dir
 /// ```rust
 /// use russenger::prelude::*;
-/// 
+///
 /// create_action!(SendFileFromStaticDir, |res: Res, req: Req| async move {
 ///     let text = TextModel::new(&req.user, "Sending file... Please wait!");
 ///     res.send(text).await;

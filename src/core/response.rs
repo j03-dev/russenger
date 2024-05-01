@@ -8,6 +8,27 @@ pub enum SendResult {
     Error(reqwest::Error),
 }
 
+/// The `Res` struct represents a response that can be sent to a user.
+///
+/// It does not contain any fields.
+///
+/// # Examples
+///
+/// Sending a response to a user:
+///
+/// ```rust
+/// use russenger::response_models::text::TextModel;
+/// use russenger::core::response::Res;
+///
+/// let res = Res;
+/// let response_model = TextModel::new("sender_id", "Hello, user1!");
+///
+/// let send_result = res.send(response_model);
+/// ```
+///
+/// # Methods
+///
+/// * `send`: Sends a response to a user. It takes a `ResponseModel` as an argument and returns a `SendResult`.
 pub struct Res;
 
 impl Res {

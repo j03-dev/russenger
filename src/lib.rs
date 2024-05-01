@@ -66,6 +66,12 @@ macro_rules! create_action {
 ///
 /// # Syntax
 ///
+/// ```rust
+/// use russenger::russenger_app;
+/// 
+/// russenger_app!(action1, action2, ..., actionN);
+/// ```
+///
 /// * `action1, action2, ..., actionN`: The actions to be registered. These should be instances of structs that implement the `Action` trait.
 ///
 /// # Examples

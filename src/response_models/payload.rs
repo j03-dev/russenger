@@ -5,6 +5,42 @@ use rocket::serde::{Deserialize, Serialize};
 use super::data::Data;
 use crate::Action;
 
+/// `Payload` is a struct that represents the payload of a request in a Messenger conversation.
+///
+/// The payload contains the path of the action to be performed and optional data associated with the action.
+///
+/// # Fields
+///
+/// * `path: String` - The path of the action to be performed.
+/// * `data: Option<Data>` - The data associated with the action. This field is optional.
+///
+/// # Methods
+///
+/// * `new<A: Action>(action: A, data: Option<Data>) -> Self` - Creates a new `Payload` instance.
+///   The `action` parameter is the action to be performed, and the `data` parameter is the data associated with the action.
+/// * `get_data(&self) -> Data` - Returns the data associated with the action. If there is no data, it returns the default value of `Data`.
+///
+/// # Examples
+///
+/// Creating a `Payload` and getting its path and data:
+///
+/// ```rust
+/// use russenger::prelude::*;
+///
+/// let data = Data::new("HelloWorld", None);
+/// let payload = Payload::new(HelloWorld, Some(data));
+///
+/// create_action!(HelloWorld, |res: Res, req: Req| async move {
+///    let value: String = req.data.get_value();
+///    res.send(TextModel::new(&req.user, &value)).await;
+/// });
+/// ```
+///
+/// # Implements
+///
+/// * `FromStr`
+/// * `ToString`
+/// * `Default`
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Payload {
     path: String,
@@ -12,6 +48,29 @@ pub struct Payload {
 }
 
 impl Payload {
+    /// Creates a new `Payload` instance.
+    ///
+    /// # Parameters
+    ///
+    /// * `action: A` - The action to be performed.
+    /// * `data: Option<Data>` - The data associated with the action.
+    ///
+    /// # Returns
+    ///
+    /// A new `Payload` instance.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use russenger::prelude::*;
+    ///
+    /// let payload = Payload::new(SomeAction, None);
+    ///
+    /// create_action!(SomeAction, |res: Res, req: Req| async move {
+    ///    res.send(TextModel::new(&req.user, "SomeAction")).await;
+    /// });
+    ///
+    /// ```
     pub fn new<A: Action>(action: A, data: Option<Data>) -> Self {
         Self {
             path: action.path(),

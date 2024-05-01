@@ -1,6 +1,9 @@
-use rocket::serde::json::{json, Value};
+use rocket::serde::{
+    json::{json, Value},
+    Serialize,
+};
 
-use super::payload::Payload;
+use super::{payload::Payload, recipient::Recipient, ResponseModel};
 
 /// `Button` is an enum that represents different types of buttons that can be used in a Messenger conversation.
 ///
@@ -45,15 +48,15 @@ use super::payload::Payload;
 ///     title: "Call me",
 ///     payload: Payload::new(HelloWorld, Some(Data::new("<PhoneNumber>", None))),
 /// };
-/// 
+///
 /// use russenger::prelude::*;
-/// 
+///
 /// create_action!(HelloWorld, |res: Res, req: Req| async move {
 ///     let payload: String = req.data.get_value();
 ///     res.send(TextModel::new(&req.user, &payload)).await;
 /// });
 /// ```
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub enum Button<'b> {
     AccountUnlink,
     AccountLink { url: &'b str },
@@ -83,4 +86,98 @@ impl<'b> Button<'b> {
             }),
         }
     }
+}
+
+#[derive(Serialize)]
+struct ButtonPayload<'p> {
+    template_type: &'p str,
+    text: &'p str,
+    buttons: Vec<Button<'p>>,
+}
+
+#[derive(Serialize)]
+struct ButtonAttachement<'a> {
+    #[serde(rename = "type")]
+    r#type: &'a str,
+    payload: ButtonPayload<'a>,
+}
+/// The `ButtonModel` struct represents a button template message.
+///
+/// The button template sends a text message with up to three buttons attached. This template gives the message recipient different options to choose from, such as predefined answers to questions or actions to take.
+///
+/// # Fields
+///
+/// * `recipient`: The recipient of the message. This is a `Recipient` struct that contains the Facebook user ID of the recipient.
+/// * `message`: The message to be sent. This is a JSON value that contains the button template.
+///
+/// # Methods
+///
+/// * `new`: This method creates a new `ButtonModel`. It takes a sender ID, a text, and a vector of buttons as arguments.
+///
+/// # Examples
+///
+/// Creating a new `ButtonModel` and sending it using the `res.send()` method:
+///
+/// ```rust
+/// use russenger::prelude::*;
+///
+/// create_action!(Main, |res: Res, req: Req| async move {
+///     let buttons = vec![
+///         Button::WebUrl {title: "Click Me", url: "https://link.test.com"},
+///         // More Button ...
+///     ];
+///     res.send(ButtonModel::new(&req.user, "Option", buttons)).await;
+/// });
+/// ```
+///
+/// # References
+///
+/// * [Facebook Button Template Documentation](https://developers.facebook.com/docs/messenger-platform/send-messages/template/button)
+#[derive(Serialize)]
+pub struct ButtonModel<'b> {
+    recipient: Recipient<'b>,
+    message: Value,
+}
+
+impl<'b> ButtonModel<'b> {
+    /// Creates a new `ButtonModel`.
+    ///
+    /// # Arguments
+    ///
+    /// * `sender`: The Facebook user ID of the recipient.
+    /// * `text`: The text to describe the functionality of the buttons.
+    /// * `buttons`: The list of buttons to be sent.
+    ///
+    /// # Returns
+    ///
+    /// * `ButtonModel`: The created `ButtonModel`.
+    /// # Example
+    /// ```rust
+    /// use russenger::prelude::*;
+    ///  
+    /// let buttons = vec![
+    ///     Button::WebUrl {title: "Click Me", url: "https://link.test.com"},
+    ///     // More Button ...
+    /// ];
+    /// ButtonModel::new("sender_id", "Option", buttons);
+    /// ```
+    pub fn new(sender: &'b str, text: &'b str, buttons: Vec<Button>) -> Self {
+        Self {
+            recipient: Recipient { id: sender },
+            message: json!({
+                "attachment": ButtonAttachement {
+                    r#type: "template",
+                    payload: ButtonPayload {
+                        template_type: "button",
+                        text ,
+                        buttons
+                    }
+                }
+            }),
+        }
+    }
+}
+
+impl ResponseModel for ButtonModel<'_> {
+    const END_POINT: &'static str = "messages";
 }

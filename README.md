@@ -43,7 +43,7 @@ Here's an example of how to use Russenger to handle different actions in a chatb
 #### Russenger `Cargo.toml`
 
 ```toml
-russenger = "0.1.0"
+russenger = "0.1.1"
 rocket = "0.5"
 ```
 

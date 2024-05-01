@@ -26,6 +26,52 @@ impl ActionLock {
     }
 }
 
+/// The `Action` trait defines the behavior of an action.
+///
+/// An action is a unit of work that the application can perform. Each action is associated with a path, and when a request is received with that path, the action's `execute` method is called.
+///
+/// # Methods
+///
+/// * `execute`: This method is called when a request is received with the action's path. It takes a `Res` and a `Req` as arguments, which represent the response and request respectively.
+/// * `path`: This method returns the path associated with the action.
+///
+/// # Examples
+///
+/// Implementing the `Action` trait for a `Greet` action:
+///
+/// ```rust
+/// use russenger::prelude::*;
+///
+/// struct Greet;
+///
+/// #[rocket::async_trait]
+/// impl Action for Greet {
+///     async fn execute(&self, res: Res, req: Req) {
+///         let message: String = req.data.get_value();
+///     
+///         if message == "Hello" {
+///             res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+///         }
+///     }
+///
+///     fn path(&self) -> String {
+///         "Greet".to_string()
+///     }
+/// }
+/// ```
+/// ## Or
+/// ```rust
+/// use russenger::prelude::*;
+///
+/// create_action!(Greet, |res: Res, req: Req| async move {
+///     let message: String = req.data.get_value();
+///     
+///     if message == "Hello" {
+///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+///     }
+/// });
+///
+/// ```
 #[rocket::async_trait]
 pub trait Action: Send + Sync {
     async fn execute(&self, res: Res, req: Req);
@@ -36,6 +82,33 @@ pub trait Action: Send + Sync {
 type ActionRegistryType = Arc<Mutex<HashMap<String, Box<dyn Action>>>>;
 
 lazy_static::lazy_static! {
+    /// `ACTION_REGISTRY` is a thread-safe map that stores all the actions available in the application.
+    ///
+    /// Each action is associated with a path, and when a request is received with that path, the corresponding action's `execute` method is called.
+    ///
+    /// The `ACTION_REGISTRY` is initialized with an empty map when the application starts, and actions are added to it using the `create_action!` macro.
+    ///
+    /// # Examples
+    ///
+    /// Adding an action to the `ACTION_REGISTRY`:
+    /// ```rust
+    /// use russenger::{ACTION_REGISTRY, Action};
+    ///
+    /// use russenger::prelude::*;
+    ///
+    /// create_action!(Main, |res: Res, req: Req| async move {
+    ///     let message: String = req.data.get_value();
+    ///
+    ///     if message == "Hello" {
+    ///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+    ///     }
+    /// });
+    ///
+    /// #[russenger::main]
+    /// async fn main() {
+    ///     ACTION_REGISTRY.lock().await.insert(Main.path(), Box::new(Main));
+    /// }
+    /// ```
     pub static ref ACTION_REGISTRY: ActionRegistryType = Arc::new(Mutex::new(HashMap::new()));
     pub static ref ACTION_LOCK: ActionLock = ActionLock { locked_users: Arc::new(Mutex::new(HashSet::new()))};
 }

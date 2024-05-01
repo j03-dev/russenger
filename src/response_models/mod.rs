@@ -1,5 +1,48 @@
+//! The `response_models` module contains various response models that can be sent to a user.
+//!
+//! Each response model is represented by a struct that implements the `ResponseModel` trait.
+//!
+//! # Submodules
+//!
+//! * `button`: This module contains the `ButtonModel` struct.
+//! * `sender_action`: This module contains the `SenderActionModel` struct.
+//! * `generic`: This module contains the `GenericTemplateModel` struct.
+//! * `get_started`: This module contains the `GetStartedModel` struct.
+//! * `media`: This module contains the `MediaModel` struct.
+//! * `payload`: This module contains the `PayloadModel` struct.
+//! * `persistent_menu`: This module contains the `PersistentMenuModel` struct.
+//! * `quick_replies`: This module contains the `QuickRepliesModel` struct.
+//! * `recipient`: This module contains the `RecipientModel` struct.
+//! * `text`: This module contains the `TextModel` struct.
+//!
+//! # Traits
+//!
+//! * `ResponseModel`: This trait is implemented by all response models. It has a `get_endpoint` method that returns the endpoint to which the response should be sent.
+//!
+//! # Structs
+//!
+//! * `Page`: This struct represents a page of responses. It has a `next` method that moves to the next page and a `default` method that returns the first page.
+//!
+//! # Constants
+//!
+//! * `MAX_VALUE_AUTORIZED`: The maximum value that is authorized.
+//! * `MIN_PAGE`: The minimum page number.
+//! * `MAX_PAGE`: The maximum page number.
+//!
+//! # Examples
+//!
+//! Sending a `TextModel` response:
+//!
+//! ```rust
+//! use crate::response_models::text::TextModel;
+//! use crate::core::Res;
+//!
+//! let res = Res;
+//! let text_model = TextModel::new("user1", "Hello, user1!");
+//!
+//! let send_result = res.send(text_model).await;
+//! ```
 pub mod button;
-pub mod sender_action;
 pub mod generic;
 pub mod get_started;
 pub mod media;
@@ -7,6 +50,7 @@ pub mod payload;
 pub mod persistent_menu;
 pub mod quick_replies;
 pub mod recipient;
+pub mod sender_action;
 pub mod text;
 
 use rocket::serde::Serialize;

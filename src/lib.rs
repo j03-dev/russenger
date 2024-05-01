@@ -1,5 +1,5 @@
 pub mod cli;
-mod core;
+pub mod core;
 pub mod prelude;
 mod query;
 pub mod response_models;

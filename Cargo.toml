@@ -4,7 +4,7 @@ version = "0.1.2"
 edition = "2021"
 description = "A Rust library designed to simplify the handling of Facebook Messenger webhook responses."
 license = "Apache-2.0"
-documentation = "https://github.com/j03-dev/russenger"
+documentation = "https://docs.rs/russenger/latest/russenger/"
 homepage = "https://github.com/j03-dev/russenger"
 repository = "https://github.com/j03-dev/russenger"
 # Author information

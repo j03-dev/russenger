@@ -2,6 +2,4 @@
 /Cargo.lock
 .idea
 .vscode
-.env
 *.sqlite
-.fleet

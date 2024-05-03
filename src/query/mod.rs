@@ -41,12 +41,48 @@ macro_rules! execute_query {
     }};
 }
 
+/// The `Query` struct represents a database query.
+///
+/// This struct is used to interact with the database. It contains a `db` field, which is an instance of the `DB` enum that represents the database connection.
+///
+/// # Fields
+///
+/// * `db`: The database connection. This is an instance of the `DB` enum.
+///
+/// # Methods
+///
+/// * `new`: This method creates a new `Query`. It establishes a connection to the database and returns a `Query` with the established connection.
+/// * `migrate`: This method creates a new table `russenger_user` in the database. It returns a boolean indicating whether the operation was successful.
+/// * `create`: This method inserts a new user into the `russenger_user` table. It takes a user ID as an argument and returns a boolean indicating whether the operation was successful.
+/// * `set_action`: This method updates the action of a user in the `russenger_user` table. It takes a user ID and an action as arguments and returns a boolean indicating whether the operation was successful.
+///
+/// # Examples
+///
+/// Creating a new `Query` and using it to insert a new user into the database:
+///
+/// ```rust
+/// use russenger::query::Query;
+/// use russenger::dotenv;
+///
+/// #[russenger::main]
+/// async fn main() {
+///     let query = Query::new().await;
+///     let user_created = query.create("user1").await;
+/// }
+/// ```
 #[derive(Clone)]
 pub struct Query {
     pub db: DB,
 }
 
 impl Query {
+    /// Creates a new `Query`.
+    ///
+    /// This method establishes a connection to the database and returns a `Query` with the established connection.
+    ///
+    /// # Returns
+    ///
+    /// * `Query`: The created `Query`.
     pub async fn new() -> Self {
         match establish_connection().await {
             Ok(db) => Self { db },
@@ -54,6 +90,13 @@ impl Query {
         }
     }
 
+    /// Creates a new table `russenger_user` in the database.
+    ///
+    /// This method returns a boolean indicating whether the operation was successful.
+    ///
+    /// # Returns
+    ///
+    /// * `bool`: Whether the operation was successful.
     pub async fn migrate(&self) -> bool {
         let sql = "
             create table russenger_user (
@@ -70,6 +113,17 @@ impl Query {
         }
     }
 
+    /// Inserts a new user into the `russenger_user` table.
+    ///
+    /// This method takes a user ID as an argument and returns a boolean indicating whether the operation was successful.
+    ///
+    /// # Arguments
+    ///
+    /// * `user_id`: The user ID of the new user.
+    ///
+    /// # Returns
+    ///
+    /// * `bool`: Whether the operation was successful.
     pub async fn create(&self, user_id: &str) -> bool {
         let params = [user_id, "Main"];
         match &self.db {
@@ -88,7 +142,41 @@ impl Query {
             DB::Null => false,
         }
     }
-
+    /// Updates the action of a user in the `russenger_user` table.
+    ///
+    /// This method takes a user ID and an action as arguments and returns a boolean indicating whether the operation was successful.
+    ///
+    /// # Arguments
+    ///
+    /// * `user_id`: The user ID of the user whose action is to be updated.
+    /// * `action`: The new action for the user.
+    ///
+    /// # Returns
+    ///
+    /// * `bool`: Whether the operation was successful.
+    ///
+    /// # Examples
+    ///
+    /// Updating the action of a user:
+    ///
+    /// ```rust
+    /// use russenger::prelude::*;
+    ///
+    /// create_action!(Main, |res: Res, req: Req| async move {
+    ///    req.query.set_action(&req.user, NextAction).await;
+    /// });
+    ///
+    /// create_action!(NextAction, |res: Res, req: Req| async move {});
+    ///
+    /// russenger_app!(Main, Action);
+    ///
+    /// # Database Queries
+    ///
+    /// This method executes different SQL queries based on the type of the database:
+    ///
+    /// * For MySQL: `"update russenger_user set action=? where facebook_user_id=?"`
+    /// * For SQLite: `"update russenger_user set action=$1 where facebook_user_id=$2"`
+    /// * For Postgres: `"update russenger_user set action=$1 where facebook_user_id=$2"`
     pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {
         let params = [action.path(), user_id.to_string()];
         match &self.db {
@@ -108,6 +196,25 @@ impl Query {
         }
     }
 
+    /// Retrieves the action of a user from the `russenger_user` table.
+    ///
+    /// This method takes a user ID as an argument and returns the action of the user if it exists.
+    ///
+    /// # Arguments
+    ///
+    /// * `user_id`: The user ID of the user whose action is to be retrieved.
+    ///
+    /// # Returns
+    ///
+    /// * `Option<String>`: The action of the user if it exists, or `None` if it doesn't.
+    ///
+    /// # Database Queries
+    ///
+    /// This method executes different SQL queries based on the type of the database:
+    ///
+    /// * For MySQL: `"select action from russenger_user where facebook_user_id=?"`
+    /// * For SQLite: `"select action from russenger_user where facebook_user_id=$1"`
+    /// * For Postgres: `"select action from russenger_user where facebook_user_id=$1"`
     pub async fn get_action(&self, user_id: &str) -> Option<String> {
         match &self.db {
             DB::Mysql(pool) => {

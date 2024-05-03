@@ -1,5 +1,3 @@
-//! The `prelude` module re-exports the most commonly used types, traits, and functions.
-//!
 //! This allows users to include everything they need with a single `use` statement.
 //!
 //! # Re-exports

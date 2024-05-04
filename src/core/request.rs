@@ -11,6 +11,35 @@ use crate::response_models::data::Data;
 #[derive(Clone)]
 pub struct Req {
     pub user: String,
+
+    /// The `Query` struct represents a database query.
+    ///
+    /// This struct is used to interact with the database. It contains a `db` field, which is an instance of the `DB` enum that represents the database connection.
+    ///
+    /// # Fields
+    ///
+    /// * `db`: The database connection. This is an instance of the `DB` enum.
+    ///
+    /// # Methods
+    ///
+    /// * `new`: This method creates a new `Query`. It establishes a connection to the database and returns a `Query` with the established connection.
+    /// * `migrate`: This method creates a new table `russenger_user` in the database. It returns a boolean indicating whether the operation was successful.
+    /// * `create`: This method inserts a new user into the `russenger_user` table. It takes a user ID as an argument and returns a boolean indicating whether the operation was successful.
+    /// * `set_action`: This method updates the action of a user in the `russenger_user` table. It takes a user ID and an action as arguments and returns a boolean indicating whether the operation was successful.
+    ///
+    /// # Examples
+    ///
+    /// Creating a new `Query` and using it to insert a new user into the database:
+    ///
+    /// ```rust
+    /// use russenger::prelude::*;
+    ///
+    /// create_action!(Main, |res: Res, req: Req| async move {
+    ///     req.set_action(&req.user, NextAction).await; // goto NextAction
+    ///
+    ///});
+    /// create_action!(NextAction, |res: Res, req: Req| async move {});
+    /// ```
     pub query: Query,
     pub data: Data,
     pub host: String,

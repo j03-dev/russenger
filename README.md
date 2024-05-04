@@ -27,21 +27,6 @@ Russenger provides the following features:
 - **PersistenceMenuModel:** A model to handle persistent menus in Messenger.
 - **SenderActionModel:** A model to handle sender actions like typing indicators.
 
-
-## Installation
-
-### Install generate first if it's not yet installed
-
-```bash
-cargo install cargo-generate
-```
-
-### Create project with [template](https://github.com/j03-dev/russenger_template)
-
-```bash
-cargo generate --git https://github.com/j03-dev/russenger_template
-```
-
 ## How To Use
 
 ### Project
@@ -55,7 +40,7 @@ Here's an example of how to use Russenger to handle different actions in a chatb
 #### Russenger `Cargo.toml`
 
 ```toml
-russenger = "0.1.3"
+russenger = { git = "https://github.com/j03-dev/russenger", branch = "actix"}
 rocket = "0.5"
 ```
 

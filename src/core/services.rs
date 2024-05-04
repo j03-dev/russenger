@@ -1,31 +1,20 @@
 use std::str::FromStr;
 
-use rocket::serde::json::Json;
-use rocket::{catch, get, post, State};
+use actix_web::{get, post, web, HttpRequest, HttpResponse};
 
 use super::action::{ACTION_LOCK, ACTION_REGISTRY};
 use super::app_state::AppState;
 use super::incoming_data::InComingData;
 use super::request::Req;
-use super::request_handler::{WebQuery, WebRequest};
+use super::request_handler::WebQuery;
 use super::response::Res as res;
 
 use crate::query::Query;
 use crate::response_models::{data::Data, payload::Payload};
 
-#[catch(404)]
-pub fn page_not_found() -> &'static str {
-    "Page not found: 404"
-}
-
-#[catch(500)]
-pub fn server_panic() -> &'static str {
-    "Server panic: 500"
-}
-
 #[get("/webhook")]
-pub fn webhook_verify(webhook_query: WebQuery<'_>) -> &str {
-    webhook_query.hub_challenge
+pub async fn webhook_verify(webhook_query: web::Query<WebQuery>) -> HttpResponse {
+    webhook_query.get_hub_challenge()
 }
 
 pub enum Executable<'a> {
@@ -55,28 +44,28 @@ async fn run(executable: Executable<'_>) {
     }
 }
 
-#[post("/webhook", format = "json", data = "<data>")]
+#[post("/webhook")]
 pub async fn webhook_core(
-    data: Json<InComingData>,
-    app_state: &State<AppState>,
-    request: WebRequest,
+    data: web::Json<InComingData>,
+    app_state: web::Data<AppState>,
+    request: HttpRequest,
 ) -> &'static str {
     let query = app_state.query.clone();
     let user = data.get_sender();
-    let host = request.host;
+    let host = request.uri().host().unwrap();
     query.create(user).await;
     if ACTION_LOCK.lock(user).await {
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {
                 let payload = quick_reply.get_payload();
-                run(Executable::Payload(user, payload, &host, query)).await;
+                run(Executable::Payload(user, payload, host, query)).await;
             } else {
                 let text = message.get_text();
-                run(Executable::TextMessage(user, &text, &host, query)).await;
+                run(Executable::TextMessage(user, &text, host, query)).await;
             }
         } else if let Some(postback) = data.get_postback() {
             let payload = postback.get_payload();
-            run(Executable::Payload(user, payload, &host, query)).await;
+            run(Executable::Payload(user, payload, host, query)).await;
         }
     }
     ACTION_LOCK.unlock(user).await;

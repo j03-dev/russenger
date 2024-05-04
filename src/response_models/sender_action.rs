@@ -1,5 +1,5 @@
 use super::{recipient::Recipient, ResponseModel};
-use rocket::serde::Serialize;
+use serde::Serialize;
 
 /// `Actions` is an enum used to specify the type of sender action to send to the recipient.
 ///

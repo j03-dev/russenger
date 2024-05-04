@@ -27,8 +27,8 @@
 pub mod action;
 pub mod app_state;
 pub mod request;
+pub mod request_handler;
 pub mod response;
 pub mod services;
 
 mod incoming_data;
-mod request_handler;

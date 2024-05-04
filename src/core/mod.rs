@@ -31,4 +31,3 @@ pub mod response;
 pub mod services;
 
 mod incoming_data;
-mod request_handler;

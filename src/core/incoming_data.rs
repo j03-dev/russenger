@@ -1,4 +1,4 @@
-use rocket::serde::Deserialize;
+use serde::Deserialize;
 
 #[derive(Debug, Default, Deserialize)]
 pub struct Sender {

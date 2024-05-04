@@ -1,5 +1,6 @@
 use crate::query::Query;
 
+#[derive(Clone)]
 pub struct AppState {
     pub query: Query,
 }

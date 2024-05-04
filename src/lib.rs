@@ -1,3 +1,5 @@
+pub use async_trait::async_trait;
+pub use actix_web::main;
 pub mod cli;
 pub mod core;
 pub mod prelude;
@@ -9,7 +11,6 @@ mod test;
 pub use cli::command_handler;
 pub use core::action::{Action, ACTION_REGISTRY};
 pub use dotenv::dotenv;
-pub use rocket::{async_trait, main};
 
 /// The `create_action!` macro is used to create a new action.
 ///

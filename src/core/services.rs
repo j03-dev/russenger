@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use actix_web::{get, post, web, HttpRequest, HttpResponse};
+use actix_web::{dev, get, post, web, HttpResponse};
 
 use super::action::{ACTION_LOCK, ACTION_REGISTRY};
 use super::app_state::AppState;
@@ -48,11 +48,11 @@ async fn run(executable: Executable<'_>) {
 pub async fn webhook_core(
     data: web::Json<InComingData>,
     app_state: web::Data<AppState>,
-    request: HttpRequest,
+    conn: dev::ConnectionInfo,
 ) -> &'static str {
     let query = app_state.query.clone();
     let user = data.get_sender();
-    let host = request.headers().get("host").unwrap().to_str().unwrap();
+    let host = conn.host();
     if ACTION_LOCK.lock(user).await {
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {

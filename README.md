@@ -41,7 +41,7 @@ Here's an example of how to use Russenger to handle different actions in a chatb
 
 ```toml
 russenger = { git = "https://github.com/j03-dev/russenger", branch = "actix"}
-rocket = "0.5"
+actix-web = "4"
 ```
 
 #### Environnement `.env`

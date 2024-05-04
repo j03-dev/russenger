@@ -53,7 +53,7 @@ pub mod recipient;
 pub mod sender_action;
 pub mod text;
 
-use rocket::serde::Serialize;
+use serde::Serialize;
 
 pub trait ResponseModel: Serialize {
     const END_POINT: &'static str;
@@ -64,7 +64,7 @@ pub trait ResponseModel: Serialize {
 }
 
 pub mod data {
-    use rocket::serde::{Deserialize, Serialize};
+    use serde::{Deserialize, Serialize};
 
     const MAX_VALUE_AUTORIZED: usize = 500;
     const MIN_PAGE: usize = 0;

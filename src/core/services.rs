@@ -58,14 +58,14 @@ pub async fn webhook_core(
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {
                 let payload = quick_reply.get_payload();
-                run(Executable::Payload(user, payload, &host, query)).await;
+                run(Executable::Payload(user, payload, host, query)).await;
             } else {
                 let text = message.get_text();
-                run(Executable::TextMessage(user, &text, &host, query)).await;
+                run(Executable::TextMessage(user, &text, host, query)).await;
             }
         } else if let Some(postback) = data.get_postback() {
             let payload = postback.get_payload();
-            run(Executable::Payload(user, payload, &host, query)).await;
+            run(Executable::Payload(user, payload, host, query)).await;
         }
     }
     ACTION_LOCK.unlock(user).await;

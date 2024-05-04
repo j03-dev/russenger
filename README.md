@@ -15,6 +15,18 @@ Russenger provides the following features:
 - **Generic templates:** Send generic templates with images, titles, and buttons to users.
 - **Media attachments:** Send media attachments such as images, audio, and video to users.
 - **Webhook verification:** Verify incoming webhook requests from Facebook.
+- **Response Models:** Russenger provides various response models to handle different types of responses. These include:
+  - **Data struct:** A struct to store and manipulate data with a value and an optional page.
+  - **Req struct:** A struct to create and manipulate requests with a host field.
+  - **Deserialization:** Deserialize the value of the data into a specified type with the `get_value` method.
+  - **Page retrieval:** Retrieve the page of the data with the `get_page` method.
+
+## New Features
+- **ButtonModel:** A model to create and manipulate buttons in messages.
+- **GetstartModel:** A model to handle the "Get Started" button in Messenger.
+- **PersistenceMenuModel:** A model to handle persistent menus in Messenger.
+- **SenderActionModel:** A model to handle sender actions like typing indicators.
+
 
 ## Installation
 

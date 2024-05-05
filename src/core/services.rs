@@ -53,6 +53,7 @@ pub async fn webhook_core(
     let query = app_state.query.clone();
     let user = data.get_sender();
     let host = conn.host();
+    query.create(user).await;
     if ACTION_LOCK.lock(user).await {
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {

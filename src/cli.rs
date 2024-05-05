@@ -47,7 +47,7 @@ async fn run_server() {
             .app_data(web::Data::new(app_state.clone()))
             .service(webhook_verify)
             .service(webhook_core)
-            .service(fs::Files::new("/static", ".").show_files_listing())
+            .service(fs::Files::new("/static", "static").show_files_listing())
     })
     .bind((host.clone(), port))
     .expect("Failed to run this server: pls check the port if it's already used!")

@@ -1,7 +1,6 @@
-use rocket::serde::{
-    json::{json, Value},
-    Serialize,
-};
+use serde::Serialize;
+use serde_json::json;
+use serde_json::value::Value;
 
 use super::{payload::Payload, recipient::Recipient, ResponseModel};
 

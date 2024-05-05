@@ -1,7 +1,7 @@
-use rocket::serde::{json::Value, Serialize};
-
 use super::button::Button;
 use super::ResponseModel;
+use serde::Serialize;
+use serde_json::value::Value;
 
 #[derive(Serialize)]
 struct Menu<'m> {

@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-use rocket::tokio::sync::Mutex;
+use tokio::sync::Mutex;
 
 use super::{request::Req, response::Res};
 
@@ -26,53 +26,53 @@ impl ActionLock {
     }
 }
 
+#[async_trait::async_trait]
 /// The `Action` trait defines the behavior of an action.
 ///
 /// An action is a unit of work that the application can perform. Each action is associated with a path, and when a request is received with that path, the action's `execute` method is called.
 ///
 /// # Methods
-///
 /// * `execute`: This method is called when a request is received with the action's path. It takes a `Res` and a `Req` as arguments, which represent the response and request respectively.
-/// * `path`: This method returns the path associated with the action.
 ///
-/// # Examples
+/// ```
 ///
-/// Implementing the `Action` trait for a `Greet` action:
+/// });
+///     }
+///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+///     if message == "Hello" {
+///     
+///     let message: String = req.data.get_value();
+/// create_action!(Greet, |res: Res, req: Req| async move {
 ///
 /// ```rust
 /// use russenger::prelude::*;
+/// ## Or
+/// ```
+///     }
+/// }
+///     async fn execute(&self, res: Res, req: Req) {
+///         if message == "Hello" {
+///     }
+///
+///         "Greet".to_string()
+///     fn path(&self) -> String {
+///             res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+///         }
+/// #[rocket::async_trait]
+///     
+///         let message: String = req.data.get_value();
+/// impl Action for Greet {
+///
+/// # Examples
+/// Implementing the `Action` trait for a `Greet` action:
 ///
 /// struct Greet;
 ///
-/// #[rocket::async_trait]
-/// impl Action for Greet {
-///     async fn execute(&self, res: Res, req: Req) {
-///         let message: String = req.data.get_value();
-///     
-///         if message == "Hello" {
-///             res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
-///         }
-///     }
 ///
-///     fn path(&self) -> String {
-///         "Greet".to_string()
-///     }
-/// }
-/// ```
-/// ## Or
-/// ```rust
 /// use russenger::prelude::*;
+/// ```rust
+/// * `path`: This method returns the path associated with the action.
 ///
-/// create_action!(Greet, |res: Res, req: Req| async move {
-///     let message: String = req.data.get_value();
-///     
-///     if message == "Hello" {
-///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
-///     }
-/// });
-///
-/// ```
-#[rocket::async_trait]
 pub trait Action: Send + Sync {
     async fn execute(&self, res: Res, req: Req);
 

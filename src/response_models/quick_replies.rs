@@ -1,4 +1,4 @@
-use rocket::serde::Serialize;
+use serde::Serialize;
 
 use super::ResponseModel;
 use super::{payload::Payload, recipient::Recipient};

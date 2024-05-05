@@ -1,75 +1,31 @@
-use std::env;
+use actix_web::HttpResponse;
+use serde::Deserialize;
 
-use rocket::{
-    http::Status,
-    request::{FromRequest, Outcome},
-    Request,
-};
-
-#[derive(Debug)]
-pub enum HandleRequestError<'a> {
-    ArgsNotEnough,
-    HostNotFound,
-    VerificationFailed(&'a str),
+#[derive(Debug, Deserialize)]
+pub struct WebQuery {
+    #[serde(rename = "hub.mode")]
+    hub_mode: Option<String>,
+    #[serde(rename = "hub.challenge")]
+    hub_challenge: Option<String>,
+    #[serde(rename = "hub.verify_token")]
+    hub_verify_token: Option<String>,
 }
 
-pub struct WebQuery<'w> {
-    pub hub_challenge: &'w str,
-}
-
-#[rocket::async_trait]
-impl<'a> FromRequest<'a> for WebQuery<'a> {
-    type Error = HandleRequestError<'a>;
-
-    async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
-        let query = request
-            .uri()
-            .query()
-            .expect("failed to get query from request");
-
-        let mut hub_mode = None;
-        let mut hub_challenge = None;
-        let mut token = None;
-
-        for (key, value) in query.segments() {
-            match key {
-                "hub.mode" => hub_mode = Some(value),
-                "hub.challenge" => hub_challenge = Some(value),
-                "hub.verify_token" => token = Some(value),
-                _ => (),
-            }
-        }
-
-        match (hub_mode, hub_challenge, token) {
-            (Some("subscribe"), Some(hub_challenge), Some(token)) => {
-                if env::var("VERIFY_TOKEN").ok() == Some(token.to_string()) {
-                    Outcome::Success(Self { hub_challenge })
+impl WebQuery {
+    pub fn get_hub_challenge(&self) -> HttpResponse {
+        match (
+            self.hub_mode.clone(),
+            self.hub_challenge.clone(),
+            self.hub_verify_token.clone(),
+        ) {
+            (Some(hub_mode), Some(hub_challenge), Some(token)) => {
+                if hub_mode.eq("subscribe") && std::env::var("VERIFY_TOKEN").unwrap().eq(&token) {
+                    HttpResponse::Ok().body(hub_challenge)
                 } else {
-                    Outcome::Error((
-                        Status::Unauthorized,
-                        HandleRequestError::VerificationFailed("Token mismatch"),
-                    ))
+                    HttpResponse::Unauthorized().body("Token mismatch")
                 }
             }
-            _ => Outcome::Error((Status::Unauthorized, HandleRequestError::ArgsNotEnough)),
-        }
-    }
-}
-
-pub struct WebRequest {
-    pub host: String,
-}
-
-#[rocket::async_trait]
-impl<'a> FromRequest<'a> for WebRequest {
-    type Error = HandleRequestError<'a>;
-
-    async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
-        match request.host() {
-            Some(host) => Outcome::Success(Self {
-                host: format!("https://{host}"),
-            }),
-            None => Outcome::Error((Status::BadRequest, HandleRequestError::HostNotFound)),
+            _ => HttpResponse::Unauthorized().body("Arguments not enough"),
         }
     }
 }

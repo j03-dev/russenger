@@ -27,4 +27,4 @@ dotenv = "^0.15.0"
 
 [dependencies.sqlx]
 version = "^0.7.1"
-feaures = ["runtime-tokio", "postgres", "sqlite", "mysql"]
+features = ["runtime-tokio", "postgres", "sqlite", "mysql"]

@@ -37,29 +37,6 @@ impl ActionLock {
 ///
 /// # Examples
 ///
-/// Implementing the `Action` trait for a `Greet` action:
-///
-/// ```rust
-/// use russenger::prelude::*;
-///
-/// struct Greet;
-///
-/// #[rocket::async_trait]
-/// impl Action for Greet {
-///     async fn execute(&self, res: Res, req: Req) {
-///         let message: String = req.data.get_value();
-///     
-///         if message == "Hello" {
-///             res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
-///         }
-///     }
-///
-///     fn path(&self) -> String {
-///         "Greet".to_string()
-///     }
-/// }
-/// ```
-/// ## Or
 /// ```rust
 /// use russenger::prelude::*;
 ///

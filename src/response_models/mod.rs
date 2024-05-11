@@ -34,13 +34,14 @@
 //! Sending a `TextModel` response:
 //!
 //! ```rust
-//! use crate::response_models::text::TextModel;
-//! use crate::core::Res;
+//! use russenger::prelude::*;
 //!
-//! let res = Res;
-//! let text_model = TextModel::new("user1", "Hello, user1!");
+//! create_action!(Main, |res: Res, req: Req| async move {
+//!     let text_model = TextModel::new(&req.user, "Hello, user1!");
+//!     res.send(text_model).await;
+//! });
 //!
-//! let send_result = res.send(text_model).await;
+//!
 //! ```
 pub mod button;
 pub mod generic;

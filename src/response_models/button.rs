@@ -10,10 +10,10 @@ use super::{payload::Payload, recipient::Recipient, ResponseModel};
 /// # Variants
 ///
 /// * `AccountUnlink` - Represents an account unlink button.
-/// * `AccountLink { url: &'b str }` - Represents an account link button. The `url` field is the URL to be opened when the button is clicked.
-/// * `WebUrl { title: &'b str, url: &'b str }` - Represents a web URL button. The `title` field is the title of the button, and the `url` field is the URL to be opened when the button is clicked.
-/// * `Postback { title: &'b str, payload: Payload }` - Represents a postback button. The `title` field is the title of the button, and the `payload` field is the payload to be sent back to the server when the button is clicked.
-/// * `PhoneNumber { title: &'b str, payload: Payload }` - Represents a phone number button. The `title` field is the title of the button, and the `payload` field is the phone number to be dialed when the button is clicked.
+/// * `AccountLink { url: Stirng }` - Represents an account link button. The `url` field is the URL to be opened when the button is clicked.
+/// * `WebUrl { title: Stirng, url: Stirng }` - Represents a web URL button. The `title` field is the title of the button, and the `url` field is the URL to be opened when the button is clicked.
+/// * `Postback { title: Stirng, payload: Payload }` - Represents a postback button. The `title` field is the title of the button, and the `payload` field is the payload to be sent back to the server when the button is clicked.
+/// * `PhoneNumber { title: Stirng, payload: Payload }` - Represents a phone number button. The `title` field is the title of the button, and the `payload` field is the phone number to be dialed when the button is clicked.
 ///
 /// # Examples
 ///
@@ -28,24 +28,24 @@ use super::{payload::Payload, recipient::Recipient, ResponseModel};
 ///
 /// // Creating an AccountLink button
 /// let account_link_button = Button::AccountLink {
-///     url: "https://www.facebook.com/your_account_page",
+///     url: "https://www.facebook.com/your_account_page".to_owned(),
 /// };
 ///
 /// // Creating a WebUrl button
 /// let web_url_button = Button::WebUrl {
-///     title: "Visit Website",
-///     url: "https://example.com",
+///     title: "Visit Website".to_owned(),
+///     url: "https://example.com".to_owned(),
 /// };
 ///
 /// // Creating a Postback button
 /// let postback_button = Button::Postback {
-///     title: "Click me",
+///     title: "Click me".to_owned(),
 ///     payload: Payload::new(HelloWorld, Some(Data::new("HelloWorld", None))),
 /// };
 ///
 /// // Creating a PhoneNumber button
 /// let phone_number_button = Button::PhoneNumber {
-///     title: "Call me",
+///     title: "Call me".to_owned(),
 ///     payload: Payload::new(HelloWorld, Some(Data::new("<PhoneNumber>", None))),
 /// };
 ///
@@ -57,15 +57,15 @@ use super::{payload::Payload, recipient::Recipient, ResponseModel};
 /// });
 /// ```
 #[derive(Clone, Debug, Serialize)]
-pub enum Button<'b> {
+pub enum Button {
     AccountUnlink,
-    AccountLink { url: &'b str },
-    WebUrl { title: &'b str, url: &'b str },
-    Postback { title: &'b str, payload: Payload },
-    PhoneNumber { title: &'b str, payload: Payload },
+    AccountLink { url: String },
+    WebUrl { title: String, url: String },
+    Postback { title: String, payload: Payload },
+    PhoneNumber { title: String, payload: Payload },
 }
 
-impl<'b> Button<'b> {
+impl Button {
     pub fn to_value(&self) -> Value {
         match self.clone() {
             Self::AccountLink { url } => {
@@ -92,7 +92,7 @@ impl<'b> Button<'b> {
 struct ButtonPayload<'p> {
     template_type: &'p str,
     text: &'p str,
-    buttons: Vec<Button<'p>>,
+    buttons: Vec<Value>,
 }
 
 #[derive(Serialize)]
@@ -123,7 +123,7 @@ struct ButtonAttachement<'a> {
 ///
 /// create_action!(Main, |res: Res, req: Req| async move {
 ///     let buttons = vec![
-///         Button::WebUrl {title: "Click Me", url: "https://link.test.com"},
+///         Button::WebUrl {title: "Click Me".to_owned(), url: "https://link.test.com".to_owned()},
 ///         // More Button ...
 ///     ];
 ///     res.send(ButtonModel::new(&req.user, "Option", buttons)).await;
@@ -156,12 +156,13 @@ impl<'b> ButtonModel<'b> {
     /// use russenger::prelude::*;
     ///  
     /// let buttons = vec![
-    ///     Button::WebUrl {title: "Click Me", url: "https://link.test.com"},
+    ///     Button::WebUrl {title: "Click Me".to_owned(), url: "https://link.test.com".to_owned()},
     ///     // More Button ...
     /// ];
     /// ButtonModel::new("sender_id", "Option", buttons);
     /// ```
     pub fn new(sender: &'b str, text: &'b str, buttons: Vec<Button>) -> Self {
+        let buttons = buttons.iter().map(|button| button.to_value()).collect();
         Self {
             recipient: Recipient { id: sender },
             message: json!({

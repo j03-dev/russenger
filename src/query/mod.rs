@@ -55,21 +55,6 @@ macro_rules! execute_query {
 /// * `migrate`: This method creates a new table `russenger_user` in the database. It returns a boolean indicating whether the operation was successful.
 /// * `create`: This method inserts a new user into the `russenger_user` table. It takes a user ID as an argument and returns a boolean indicating whether the operation was successful.
 /// * `set_action`: This method updates the action of a user in the `russenger_user` table. It takes a user ID and an action as arguments and returns a boolean indicating whether the operation was successful.
-///
-/// # Examples
-///
-/// Creating a new `Query` and using it to insert a new user into the database:
-///
-/// ```rust
-/// use russenger::query::Query;
-/// use russenger::dotenv;
-///
-/// #[russenger::main]
-/// async fn main() {
-///     let query = Query::new().await;
-///     let user_created = query.create("user1").await;
-/// }
-/// ```
 #[derive(Clone)]
 pub struct Query {
     pub db: DB,
@@ -168,7 +153,8 @@ impl Query {
     ///
     /// create_action!(NextAction, |res: Res, req: Req| async move {});
     ///
-    /// russenger_app!(Main, Action);
+    /// russenger_app!(Main, NextAction);
+    /// ```
     ///
     /// # Database Queries
     ///

@@ -43,7 +43,7 @@ use super::{
 ///     "https://example.com/image.jpg",
 ///     "Subtitle",
 ///     vec![Button::Postback {
-///         title: "Hello World",
+///         title: "Hello World".to_owned(),
 ///         payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
 ///     }],
 /// );
@@ -91,7 +91,7 @@ impl GenericElement {
     ///     "https://example.com/image.jpg",
     ///     "Subtitle",
     ///     vec![Button::Postback {
-    ///         title: "Hello World",
+    ///         title: "Hello World".to_owned(),
     ///         payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
     ///     }],
     /// );
@@ -171,7 +171,7 @@ struct GenericMessage {
 ///             "https://example.com/image.jpg",
 ///             "Subtitle",
 ///             vec![Button::Postback {
-///                 title: "Hello World",
+///                 title: "Hello World".to_owned(),
 ///                 payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
 ///             }],
 ///         ),
@@ -222,7 +222,7 @@ impl<'g> GenericModel<'g> {
     ///         "https://example.com/image.jpg",
     ///         "Subtitle",
     ///         vec![Button::Postback {
-    ///             title: "Hello World",
+    ///             title: "Hello World".to_owned(),
     ///             payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
     ///         }],
     ///     ),
@@ -294,7 +294,7 @@ impl<'g> GenericModel<'g> {
     ///             "https://example.com/image.jpg",
     ///             "Subtitle",
     ///             vec![Button::Postback {
-    ///                 title: "Hello World",
+    ///                 title: "Hello World".to_owned(),
     ///                 payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
     ///             }],
     ///         ),

@@ -19,15 +19,6 @@ pub use rocket::{async_trait, main};
 ///
 /// The `path` method returns the name of the action as a string.
 ///
-/// # Syntax
-///
-/// ```
-/// create_action!(name, handler);
-/// ```
-///
-/// * `name`: The name of the action. This will be used as the name of the struct and will be returned by the `path` method.
-/// * `handler`: An expression that defines how to handle the user input. This will be used in the `execute` method.
-///
 /// # Examples
 ///
 /// Creating a new action that sends a greeting message when the user input is "Hello":
@@ -67,9 +58,18 @@ macro_rules! create_action {
 /// # Syntax
 ///
 /// ```rust
-/// use russenger::russenger_app;
+/// use russenger::prelude::*;
+/// 
+/// create_action!(Action1, |res: Res, req: Req| async move {
+/// });
+/// 
+/// create_action!(Action2, |res: Res, req: Req| async move {
+/// });
+/// 
+/// create_action!(ActionN, |res: Res, req: Req| async move {
+/// });
 ///
-/// russenger_app!(action1, action2, ..., actionN);
+/// russenger_app!(Action1, Action2, ActionN);
 /// ```
 ///
 /// * `action1, action2, ..., actionN`: The actions to be registered. These should be instances of structs that implement the `Action` trait.

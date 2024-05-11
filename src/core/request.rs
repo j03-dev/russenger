@@ -35,7 +35,7 @@ pub struct Req {
     /// use russenger::prelude::*;
     ///
     /// create_action!(Main, |res: Res, req: Req| async move {
-    ///     req.set_action(&req.user, NextAction).await; // goto NextAction
+    ///     req.query.set_action(&req.user, NextAction).await; // goto NextAction
     ///
     ///});
     /// create_action!(NextAction, |res: Res, req: Req| async move {});
@@ -82,10 +82,11 @@ pub struct Req {
     /// use russenger::prelude::*;
     ///
     /// create_action!(Main, |res: Res, req: Req| async move {
-    ///    let media = MediaModel::new(&req.user, "image", &format!("{host}/image.jpg", host = req.host));
+    ///    let image_url = &format!("{host}/image.jpg", host = req.host);
+    ///    let media = MediaModel::new(&req.user, "image", image_url);
     ///    res.send(media).await;
-    /// ));
-    /// ````
+    /// });
+    /// ```
     pub host: String,
 }
 

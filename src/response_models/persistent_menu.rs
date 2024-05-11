@@ -35,7 +35,7 @@ struct Menu<'m> {
 ///     res.send(GetStartedModel::new(Payload::default())).await;
 ///     let buttons = vec![
 ///         Button::Postback {
-///             title: "Option 1",
+///             title: "Option 1".to_owned(),
 ///             payload: Payload::new(Option1, None),
 ///         },
 ///         // More buttons
@@ -79,7 +79,7 @@ impl<'p> PersistentMenuModel<'p> {
     ///
     /// let buttons = vec![
     ///     Button::Postback {
-    ///         title: "Option 1",
+    ///         title: "Option 1".to_owned(),
     ///         payload: Payload::new(Option1, None),
     ///     },
     ///     // More buttons

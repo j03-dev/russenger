@@ -1,5 +1,5 @@
 [package]
-name = "choosecolor"
+name = "hello"
 version = "0.1.0"
 edition = "2021"
 workspace = "../"
@@ -11,4 +11,4 @@ publish = false
 path = "../.."
 
 [dependencies]
-actix-web = "4"
+actix-web = "^4"

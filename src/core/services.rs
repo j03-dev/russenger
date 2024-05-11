@@ -2,19 +2,23 @@ use std::str::FromStr;
 
 use actix_web::{dev, get, post, web, HttpResponse};
 
-use super::action::{ACTION_LOCK, ACTION_REGISTRY};
-use super::app_state::AppState;
-use super::incoming_data::InComingData;
-use super::request::Req;
-use super::request_handler::WebQuery;
-use super::response::Res as res;
+use super::{
+    action::{ACTION_LOCK, ACTION_REGISTRY},
+    app_state::AppState,
+    incoming_data::InComingData,
+    request::Req,
+    request_handler::WebQuery,
+    response::Res as res,
+};
 
-use crate::query::Query;
-use crate::response_models::{data::Data, payload::Payload};
+use crate::{
+    query::Query,
+    response_models::{data::Data, payload::Payload},
+};
 
 #[get("/webhook")]
-pub async fn webhook_verify(webhook_query: web::Query<WebQuery>) -> HttpResponse {
-    webhook_query.get_hub_challenge()
+pub async fn webhook_verify(web_query: web::Query<WebQuery>) -> HttpResponse {
+    web_query.get_hub_challenge()
 }
 
 pub enum Executable<'a> {

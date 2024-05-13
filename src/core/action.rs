@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-use rocket::tokio::sync::Mutex;
+use tokio::sync::Mutex;
 
 use super::{request::Req, response::Res};
 
@@ -26,16 +26,15 @@ impl ActionLock {
     }
 }
 
+#[async_trait::async_trait]
 /// The `Action` trait defines the behavior of an action.
 ///
 /// An action is a unit of work that the application can perform. Each action is associated with a path, and when a request is received with that path, the action's `execute` method is called.
 ///
 /// # Methods
-///
 /// * `execute`: This method is called when a request is received with the action's path. It takes a `Res` and a `Req` as arguments, which represent the response and request respectively.
-/// * `path`: This method returns the path associated with the action.
 ///
-/// # Examples
+/// ```
 ///
 /// ```rust
 /// use russenger::prelude::*;
@@ -43,13 +42,19 @@ impl ActionLock {
 /// create_action!(Greet, |res: Res, req: Req| async move {
 ///     let message: String = req.data.get_value();
 ///     
-///     if message == "Hello" {
-///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
-///     }
-/// });
+///         let message: String = req.data.get_value();
+/// impl Action for Greet {
 ///
-/// ```
-#[rocket::async_trait]
+/// # Examples
+/// Implementing the `Action` trait for a `Greet` action:
+///
+/// struct Greet;
+///
+///
+/// use russenger::prelude::*;
+/// ```rust
+/// * `path`: This method returns the path associated with the action.
+///
 pub trait Action: Send + Sync {
     async fn execute(&self, res: Res, req: Req);
 

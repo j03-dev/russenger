@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use rocket::serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 use super::data::Data;
 use crate::Action;

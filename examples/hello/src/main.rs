@@ -9,7 +9,7 @@ create_action!(Start, |res: Res, req: Req| async move {
     res.send(PersistentMenuModel::new(
         &req.user,
         vec![Button::Postback {
-            title: "hello world".to_owned(),
+            title: "hello world",
             payload: Payload::new(HelloWorld, None),
         }],
     ))

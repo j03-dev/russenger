@@ -11,4 +11,4 @@ publish = false
 path = "../.."
 
 [dependencies]
-rocket = "0.5"
+actix-web = "4"

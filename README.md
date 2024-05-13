@@ -16,16 +16,16 @@ Russenger provides the following features:
 - **Media attachments:** Send media attachments such as images, audio, and video to users.
 - **Webhook verification:** Verify incoming webhook requests from Facebook.
 - **Response Models:** Russenger provides various response models to handle different types of responses. These include:
-  - **Data struct:** A struct to store and manipulate data with a value and an optional page.
-  - **Req struct:** A struct to create and manipulate requests with a host field.
-  - **Deserialization:** Deserialize the value of the data into a specified type with the `get_value` method.
-  - **Page retrieval:** Retrieve the page of the data with the `get_page` method.
+- **Data struct:** A struct to store and manipulate data with a value and an optional page.
+- **Deserialization:** Deserialize the value of the data into a specified type with the `get_value` method.
+- **Page retrieval:** Retrieve the page of the data with the `get_page` method.
+- **Button:** A model to create and manipulate buttons in messages.
+- **Getstart:** A model to handle the "Get Started" button in Messenger.
+- **PersistenceMenu:** A model to handle persistent menus in Messenger.
+- **Action:** A model to handle sender actions like typing indicators.
 
 ## New Features
-- **ButtonModel:** A model to create and manipulate buttons in messages.
-- **GetstartModel:** A model to handle the "Get Started" button in Messenger.
-- **PersistenceMenuModel:** A model to handle persistent menus in Messenger.
-- **SenderActionModel:** A model to handle sender actions like typing indicators.
+- **Actix-web Integration**: Russenger now leverages Actix-web for improved speed and performance in handling Messenger webhook responses.
 
 ## How To Use
 
@@ -40,7 +40,7 @@ Here's an example of how to use Russenger to handle different actions in a chatb
 #### Russenger `Cargo.toml`
 
 ```toml
-russenger = { git = "https://github.com/j03-dev/russenger", branch = "actix"}
+russenger = "0.1.4"
 actix-web = "4"
 ```
 

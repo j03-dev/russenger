@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-use rocket::tokio::sync::Mutex;
+use tokio::sync::Mutex;
 
 use super::{request::Req, response::Res};
 
@@ -47,9 +47,8 @@ impl ActionLock {
 ///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
 ///     }
 /// });
-///
 /// ```
-#[rocket::async_trait]
+#[async_trait::async_trait]
 pub trait Action: Send + Sync {
     async fn execute(&self, res: Res, req: Req);
 

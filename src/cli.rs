@@ -18,16 +18,14 @@
 //!     command_handler().await;
 //! }
 //! ```
+use actix_files as fs;
+use actix_web::{web, App, HttpServer};
 use dotenv::dotenv;
-use rocket::{catchers, fs::FileServer, routes};
-use rocket_cors::{AllowedHeaders, AllowedMethods, AllowedOrigins, CorsOptions};
-
-use std::str::FromStr;
 
 use crate::core::{
     action::ACTION_REGISTRY,
     app_state::AppState,
-    services::{page_not_found, server_panic, webhook_core, webhook_verify}, // core services
+    services::{webhook_core, webhook_verify}, // core services
 };
 use crate::query::Query;
 
@@ -37,42 +35,25 @@ async fn run_server() {
     if !ACTION_REGISTRY.lock().await.contains_key("Main") {
         panic!("'russenger_app!' should containt `Main` action");
     }
-    let allowed_origins = AllowedOrigins::some_regex(&["graph.facebook.com"]);
-
-    let allowed_methods: AllowedMethods = ["Get", "Post"]
-        .iter()
-        .map(|s| FromStr::from_str(s).unwrap())
-        .collect();
-
-    let cors = CorsOptions {
-        allowed_origins,
-        allowed_methods,
-        allowed_headers: AllowedHeaders::all(),
-        allow_credentials: true,
-        ..Default::default()
-    }
-    .to_cors()
-    .unwrap();
-
-    let port: i32 = env::var("PORT")
+    let app_state = AppState::init().await;
+    let host = env::var("HOST").unwrap_or("0.0.0.0".into());
+    let port = env::var("PORT")
         .unwrap_or("2453".into())
         .parse()
-        .expect("Should Containt number");
-    let addr = env::var("HOST").unwrap_or("0.0.0.0".into());
-
-    let figment = rocket::Config::figment()
-        .merge(("port", port))
-        .merge(("address", addr));
-
-    rocket::custom(figment)
-        .attach(cors)
-        .manage(AppState::init().await)
-        .mount("/", routes![webhook_verify, webhook_core])
-        .mount("/static", FileServer::from("static"))
-        .register("/", catchers![page_not_found, server_panic])
-        .launch()
-        .await
-        .expect("Failed to run Rocket server");
+        .unwrap_or(2453);
+    println!("server start on {host}:{port}");
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(app_state.clone()))
+            .service(webhook_verify)
+            .service(webhook_core)
+            .service(fs::Files::new("/static", "static").show_files_listing())
+    })
+    .bind((host.clone(), port))
+    .expect("Failed to run this server: pls check the port if it's already used!")
+    .run()
+    .await
+    .expect("sever is crashed");
 }
 
 async fn migrate() {

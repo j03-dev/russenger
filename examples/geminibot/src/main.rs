@@ -59,7 +59,7 @@ create_action!(Main, |res: Res, req: Req| async move {
     res.send(PersistentMenuModel::new(
         &req.user,
         vec![Button::Postback {
-            title: "AskGemini".to_owned(),
+            title: "AskGemini",
             payload: Payload::new(HelloWorld, None),
         }],
     ))

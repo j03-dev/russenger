@@ -18,6 +18,21 @@ pub use dotenv::dotenv;
 ///
 /// The `path` method returns the name of the action as a string.
 ///
+/// # Deprecated
+///
+/// This macro is deprecated. Please use the `#[action]` proc macro instead.
+/// 
+/// ```rust
+/// use russenger::prelude::*;
+///
+/// #[action]
+/// async fn Main(res: Res, req: Req) {
+///     let message: String = req.data.get_value();
+///     if message == "Hello" {
+///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+///     }
+/// }
+/// ```
 /// # Examples
 ///
 /// Creating a new action that sends a greeting message when the user input is "Hello":
@@ -58,15 +73,18 @@ macro_rules! create_action {
 ///
 /// ```rust
 /// use russenger::prelude::*;
-/// 
-/// create_action!(Action1, |res: Res, req: Req| async move {
-/// });
-/// 
-/// create_action!(Action2, |res: Res, req: Req| async move {
-/// });
-/// 
-/// create_action!(ActionN, |res: Res, req: Req| async move {
-/// });
+///
+/// #[action]
+/// async fn Action1(res: Res, req: Req) {
+/// }
+///
+/// #[action]
+/// async fn Action2(res: Res, req: Req) {
+/// }
+///
+/// #[action]
+/// async fn ActionN(res: Res, req: Req) {
+/// }
 ///
 /// russenger_app!(Action1, Action2, ActionN);
 /// ```
@@ -80,16 +98,18 @@ macro_rules! create_action {
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// create_action!(Main, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn Main(res: Res, req: Req) {
 ///     res.send(TextModel::new(&req.user, "welcome to our bot!")).await;
 ///     res.send(TextModel::new(&req.user, "What is your name: ")).await;
 ///     req.query.set_action(&req.user, Greet).await;
-/// });
+/// }
 ///
-/// create_action!(Greet, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn Greet(res: Res, req: Req) {
 ///     let name: String = req.data.get_value();
 ///     res.send(TextModel::new(&req.user, &format!("Hello : {name}"))).await;
-/// });
+/// }
 ///
 /// russenger_app!(Main, Greet);
 /// ```

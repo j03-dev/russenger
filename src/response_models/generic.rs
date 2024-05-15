@@ -2,15 +2,10 @@ use core::panic;
 use serde::Serialize;
 use serde_json::value::Value;
 
-use crate::{core::response::Res as res, Action};
-
 use super::{
     button::Button,
-    data::{Data, Page, MAX_PAGE},
-    payload::Payload,
-    quick_replies::{QuickReply, QuickReplyModel},
+    data::{Page, MAX_PAGE},
     recipient::Recipient,
-    text::TextModel,
     ResponseModel,
 };
 
@@ -47,10 +42,12 @@ use super::{
 ///     }],
 /// );
 ///
-/// create_action!(HelloWorld, |res: Res, req: Req| async move {
+///
+/// #[action]
+/// async fn HelloWorld(res: Res, req: Req) {
 ///     let hello_world: String = req.data.get_value();
-///    res.send(TextModel::new(&req.user, &hello_world)).await
-/// });
+///     res.send(TextModel::new(&req.user, &hello_world)).await;
+/// }
 /// ```
 #[derive(Debug, Clone, Serialize)]
 pub struct GenericElement {
@@ -95,10 +92,11 @@ impl GenericElement {
     ///     }],
     /// );
     ///
-    /// create_action!(HelloWorld, |res: Res, req: Req| async move {
+    /// #[action]
+    /// async fn HelloWorld(res: Res, req: Req) {
     ///     let hello_world: String = req.data.get_value();
-    ///    res.send(TextModel::new(&req.user, &hello_world)).await
-    /// });
+    ///     res.send(TextModel::new(&req.user, &hello_world)).await;
+    /// }
     /// ```
     ///
     /// This example shows how to create a new `GenericElement`.
@@ -163,7 +161,8 @@ struct GenericMessage {
 ///
 /// use russenger::prelude::*; // if you use this import other imports are not needed;
 ///
-/// create_action!(Main, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn Main(res: Res, req: Req) {
 ///     let elements = vec![
 ///         GenericElement::new(
 ///             "Title",
@@ -179,12 +178,13 @@ struct GenericMessage {
 ///
 ///     let message = GenericModel::new(&req.user, elements, None);
 ///     res.send(message).await;
-/// });
+/// }
 ///
-/// create_action!(HelloWorld, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn HelloWorld(res: Res, req: Req) {
 ///     let hello_world: String = req.data.get_value();
-///    res.send(TextModel::new(&req.user, &hello_world)).await
-/// });
+///    res.send(TextModel::new(&req.user, &hello_world)).await;
+/// }
 /// ```
 ///
 /// [Facebook Documentation](https://developers.facebook.com/docs/messenger-platform/send-messages/template/generic)
@@ -230,10 +230,11 @@ impl<'g> GenericModel<'g> {
     ///
     /// let message = GenericModel::new("sender_id", elements, None);
     ///
-    /// create_action!(HelloWorld, |res: Res, req: Req| async move {
+    /// #[action]
+    /// async fn HelloWorld(res: Res, req: Req) {
     ///     let hello_world: String = req.data.get_value();
-    ///    res.send(TextModel::new(&req.user, &hello_world)).await
-    /// });
+    ///    res.send(TextModel::new(&req.user, &hello_world)).await;
+    /// }
     /// ```
     ///
     /// This example shows how to create a new `GenericModel` and send it.
@@ -256,83 +257,6 @@ impl<'g> GenericModel<'g> {
                 },
             },
         }
-    }
-}
-
-impl<'g> GenericModel<'g> {
-    fn get_sender(&self) -> &'g str {
-        self.recipient.id
-    }
-
-    fn is_element_empty(&self) -> bool {
-        self.message.attachment.payload.elements.is_empty()
-    }
-
-    /// `send_next` is a method of the `GenericModel` struct that sends the next set of `GenericElement`s.
-    ///
-    /// Facebook Messenger limits the number of `GenericElement`s that can be sent in a single message to 10.
-    /// If there are more than 10 `GenericElement`s, they need to be sent in separate messages.
-    /// The `send_next` method is used to send these additional `GenericElement`s.
-    ///
-    /// # Parameters
-    ///
-    /// * `action: Action` - The action to be performed after sending the next set of `GenericElement`s.
-    /// * `data: Data` - The data to be sent along with the next set of `GenericElement`s.
-    ///
-    /// # Examples
-    ///
-    /// Sending the next set of `GenericElement`s:
-    ///
-    /// ```rust
-    /// use russenger::prelude::*; // if you use this import other imports are not needed;
-    ///
-    /// create_action!(Main, |res: Res, req: Req| async move {
-    ///     let elements = vec![
-    ///         GenericElement::new(
-    ///             "Title",
-    ///             "https://example.com/image.jpg",
-    ///             "Subtitle",
-    ///             vec![Button::Postback {
-    ///                 title: "Hello World".to_owned(),
-    ///                 payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
-    ///             }],
-    ///         ),
-    ///         // More elements ....
-    ///     ];
-    ///
-    ///     let message = GenericModel::new(&req.user, elements, req.data.get_page()); // get page, and send elements
-    ///     res.send(message.clone()).await;
-    ///     message.send_next(Main, req.data).await;  // Loop the `Main` action, Send next_element, next the page
-    /// });
-    ///
-    /// create_action!(HelloWorld, |res: Res, req: Req| async move {
-    ///     let hello_world: String = req.data.get_value();
-    ///    res.send(TextModel::new(&req.user, &hello_world)).await
-    /// });
-    /// ```
-    ///
-    /// This example shows how to use the `send_next` method to send the next set of `GenericElement`s after the initial message has been sent.
-    pub async fn send_next<A: Action>(&self, action: A, data: Data) {
-        if !self.is_element_empty() {
-            let mut page = data.get_page().unwrap_or_default();
-            page.next();
-            let quick_reply: QuickReplyModel<'_> = QuickReplyModel::new(
-                self.get_sender(),
-                "Navigation",
-                vec![QuickReply::new(
-                    "Next",
-                    "",
-                    Payload::new(
-                        action,
-                        Some(Data::new(data.get_value::<String>(), Some(page))),
-                    ),
-                )],
-            );
-            res.send(quick_reply).await;
-        } else {
-            let text: TextModel<'_> = TextModel::new(self.get_sender(), "No more elements");
-            res.send(text).await;
-        };
     }
 }
 

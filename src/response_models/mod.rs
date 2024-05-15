@@ -36,10 +36,11 @@
 //! ```rust
 //! use russenger::prelude::*;
 //!
-//! create_action!(Main, |res: Res, req: Req| async move {
+//! #[action]
+//! async fn Main(res: Res, req: Req) {
 //!     let text_model = TextModel::new(&req.user, "Hello, user1!");
 //!     res.send(text_model).await;
-//! });
+//! }
 //!
 //!
 //! ```

@@ -5,7 +5,6 @@
 //! * `Req`: A struct that represents a request from a user.
 //! * `Res`, `SendResult`: A struct and a type alias that represent a response that can be sent to a user.
 //! * `Button`, `Data`, `GenericElement`, `GenericModel`, `GetStartedModel`, `MediaModel`, `Payload`, `PersistentMenuModel`, `QuickReply`, `QuickReplyModel`, `SenderActionModel`, `TextModel`, `ResponseModel`: Various response models that can be sent to a user.
-//! * `create_action`, `russenger_app`: Macros for creating actions and the main application.
 //!
 //! # Examples
 //!
@@ -14,12 +13,13 @@
 //! ```rust
 //! use russenger::prelude::*;
 //!
-//! create_action!(Main, |res: Res, req: Req| async move {
+//! #[action]
+//! async fn Main (res: Res, req: Req) {
 //!     let message: String = req.data.get_value();
 //!     if message == "Hi" {
 //!         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
 //!     }
-//! });
+//! }
 //!
 //! russenger_app!(Main);
 pub use crate::core::{
@@ -40,3 +40,4 @@ pub use crate::response_models::{
     ResponseModel,
 };
 pub use crate::{create_action, russenger_app};
+pub use russenger_macro::action;

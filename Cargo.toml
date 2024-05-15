@@ -1,6 +1,6 @@
 [package]
 name = "russenger"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 description = "A Rust library designed to simplify the handling of Facebook Messenger webhook responses."
 license = "Apache-2.0"
@@ -15,6 +15,12 @@ name = "russenger"
 path = "src/lib.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace]
+members = ["russenger_macro"]
+
+[dependencies.russenger_macro]
+path = "russenger_macro"
 
 [dependencies]
 reqwest = { version = "^0.11.18", features = ["json"] }

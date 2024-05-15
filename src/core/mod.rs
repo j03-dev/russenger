@@ -19,9 +19,10 @@
 //! ```rust
 //! use russenger::prelude::*;
 //!
-//! create_action!(Greet, |res: Res, req: Req| async move {
+//! #[action]
+//! async fn Greet(res: Res, req: Req) {
 //!     res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
-//! });
+//! }
 //! ```
 
 pub mod action;

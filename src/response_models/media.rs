@@ -40,12 +40,13 @@ struct Attachment<'s> {
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// create_action!(SendFileFromStaticDir, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn SendFileFromStaticDir(res: Res, req: Req) {
 ///     let text = TextModel::new(&req.user, "Sending file... Please wait!");
 ///     res.send(text).await;
 ///     let url = format!("{host}/video.mp4", host = req.host);
-///     res.send(MediaModel::new(&req.user, "video", &url)).await
-/// });
+///     res.send(MediaModel::new(&req.user, "video", &url)).await;
+/// }
 /// ```
 ///
 /// Sending a media file:

@@ -34,11 +34,13 @@ pub struct Req {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// create_action!(Main, |res: Res, req: Req| async move {
+    /// #[action]
+    /// async fn Main(res: Res, req: Req) {
     ///     req.query.set_action(&req.user, NextAction).await; // goto NextAction
-    ///
-    ///});
-    /// create_action!(NextAction, |res: Res, req: Req| async move {});
+    /// }
+    /// 
+    /// #[action]
+    /// async fn NextAction(res: Res, req: Req) {}
     /// ```
     pub query: Query,
 
@@ -81,11 +83,12 @@ pub struct Req {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// create_action!(Main, |res: Res, req: Req| async move {
+    /// #[action]
+    /// async fn Main(res: Res, req: Req) {
     ///    let image_url = &format!("{host}/image.jpg", host = req.host);
     ///    let media = MediaModel::new(&req.user, "image", image_url);
     ///    res.send(media).await;
-    /// });
+    /// }
     /// ```
     pub host: String,
 }

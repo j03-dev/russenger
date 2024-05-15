@@ -15,17 +15,42 @@ Russenger provides the following features:
 - **Generic templates:** Send generic templates with images, titles, and buttons to users.
 - **Media attachments:** Send media attachments such as images, audio, and video to users.
 - **Webhook verification:** Verify incoming webhook requests from Facebook.
-- **Response Models:** Russenger provides various response models to handle different types of responses. These include:
-- **Data struct:** A struct to store and manipulate data with a value and an optional page.
-- **Deserialization:** Deserialize the value of the data into a specified type with the `get_value` method.
-- **Page retrieval:** Retrieve the page of the data with the `get_page` method.
 - **Button:** A model to create and manipulate buttons in messages.
 - **Getstart:** A model to handle the "Get Started" button in Messenger.
 - **PersistenceMenu:** A model to handle persistent menus in Messenger.
 - **Action:** A model to handle sender actions like typing indicators.
-
-## New Features
 - **Actix-web Integration**: Russenger now leverages Actix-web for improved speed and performance in handling Messenger webhook responses.
+
+### New Features
+
+#### Old Method with `create_action!`
+
+```rust
+use russenger::prelude::*;
+
+create_action!(Main, |res: Res, req: Req| async move {
+    let message: String = req.data.get_value();
+    if message == "Hello" {
+        res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+    }
+});
+```
+
+#### New Method with `#[action]`
+
+```rust
+use russenger::prelude::*;
+
+#[action]
+async fn Main(res: Res, req: Req) {
+    let message: String = req.data.get_value();
+    if message == "Hello" {
+        res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+    }
+}
+```
+
+In both examples, we define an action `Main` that sends a welcome message if the user input is "Hello". The new method using `#[action]` is more concise and easier to read.
 
 ## How To Use
 
@@ -40,7 +65,7 @@ Here's an example of how to use Russenger to handle different actions in a chatb
 #### Russenger `Cargo.toml`
 
 ```toml
-russenger = "0.1.4"
+russenger = "0.1.5"
 actix-web = "4"
 ```
 
@@ -72,7 +97,8 @@ DATABASE=sqlite:<db_name>
 ```rust
 use russenger::prelude::*;
 
-create_action!(Main, |res: Res, req: Req| async move {
+#[action]
+async fn Main (res: Res, req: Req) {
     res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
         .await;
 
@@ -89,15 +115,17 @@ create_action!(Main, |res: Res, req: Req| async move {
         replies,
     ))
     .await;
-});
+}
 
-create_action!(Option1, |res: Res, req: Req| async move {
+#[action]
+async fn Option1 (res: Res, req: Req) {
     let value: String = req.data.get_value();
     let message = format!("You selected Option 1 with payload: {}", value);
     res.send(TextModel::new(&req.user, &message)).await;
-});
+}
 
-create_action!(Option2, |res: Res, req: Req| async move {
+#[action]
+async fn Option2 (res: Res, req: Req) {
     let value: String = req.data.get_value();
     let message = format!("You selected Option 2 with payload: {}", value);
     res.send(TextModel::new(&req.user, &message)).await;
@@ -107,7 +135,7 @@ create_action!(Option2, |res: Res, req: Req| async move {
         "https://example.com/option2.jpg", // use existe url
         "Option 2 description",
         vec![Button::Postback {
-            title: "Choose Option 2",
+            title: "Choose Option 2".to_string(),
             payload: Payload::new(Main, None),
         }],
     )];
@@ -118,7 +146,7 @@ create_action!(Option2, |res: Res, req: Req| async move {
         req.data.get_page(),
     ))
     .await;
-});
+}
 
 russenger_app!(Main, Option1, Option2);
 ```
@@ -128,19 +156,21 @@ russenger_app!(Main, Option1, Option2);
 ```rust
 use russenger::prelude::*;
 
-create_action!(Main, |res: Res, req: Req| async move {
+#[action]
+async fn Main (res: Res, req: Req){
     res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
         .await;
     res.send(TextModel::new(&req.user, "What is your name: "))
         .await;
     req.query.set_action(&req.user, GetUsername).await;
-});
+}
 
-create_action!(GetUsername, |res: Res, req: Req| async move {
+#[action]
+async fn GetUsername (res: Res, req: Req){
     let username: String = req.data.get_value();
     res.send(TextModel::new(&req.user, &format!("Hello {}", username)))
         .await;
-});
+}
 
 russenger_app!(Main, GetUsername);
 ```
@@ -148,7 +178,10 @@ russenger_app!(Main, GetUsername);
 ##### How to send file from static
 
 ```rust
-create_action!(Main, |res: Res, req: Req| async move {
+use russenger::prelude::*;
+
+#[action]
+async fn Main (res: Res, req: Req){
     res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
         .await;
 
@@ -160,7 +193,7 @@ create_action!(Main, |res: Res, req: Req| async move {
         &format!("{host}/image.png", host = req.host),
     ))
     .await;
-});
+}
 russenger_app!(Main);
 ```
 

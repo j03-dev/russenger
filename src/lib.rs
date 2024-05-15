@@ -58,13 +58,13 @@ macro_rules! create_action {
 ///
 /// ```rust
 /// use russenger::prelude::*;
-/// 
+///
 /// create_action!(Action1, |res: Res, req: Req| async move {
 /// });
-/// 
+///
 /// create_action!(Action2, |res: Res, req: Req| async move {
 /// });
-/// 
+///
 /// create_action!(ActionN, |res: Res, req: Req| async move {
 /// });
 ///

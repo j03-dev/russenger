@@ -47,7 +47,6 @@ pub use dotenv::dotenv;
 ///     }
 /// });
 /// ```
-/// ```
 #[macro_export]
 macro_rules! create_action {
     ($name:ident, $handler:expr) => {

@@ -9,6 +9,7 @@ pub mod response_models;
 pub use cli::command_handler;
 pub use core::action::{Action, ACTION_REGISTRY};
 pub use dotenv::dotenv;
+pub use russenger_macro::action;
 
 /// The `create_action!` macro is used to create a new action.
 ///
@@ -21,7 +22,7 @@ pub use dotenv::dotenv;
 /// # Deprecated
 ///
 /// This macro is deprecated. Please use the `#[action]` proc macro instead.
-/// 
+///
 /// ```rust
 /// use russenger::prelude::*;
 ///

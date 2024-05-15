@@ -22,6 +22,7 @@
 //! }
 //!
 //! russenger_app!(Main);
+pub use crate::action;
 pub use crate::core::{
     request::Req,
     response::{Res, SendResult},
@@ -40,4 +41,3 @@ pub use crate::response_models::{
     ResponseModel,
 };
 pub use crate::{create_action, russenger_app};
-pub use russenger_macro::action;

@@ -11,14 +11,6 @@ pub use core::action::{Action, ACTION_REGISTRY};
 pub use dotenv::dotenv;
 pub use russenger_macro::action;
 
-/// The `create_action!` macro is used to create a new action.
-///
-/// An action is a struct that implements the `Action` trait, which has two methods: `execute` and `path`.
-///
-/// The `execute` method is where you define how to handle the user input. It receives two parameters: `res` and `req`. `res` is a `Res` struct that you can use to send responses to the user, and `req` is a `Req` struct that contains the user input.
-///
-/// The `path` method returns the name of the action as a string.
-///
 /// # Deprecated
 ///
 /// This macro is deprecated. Please use the `#[action]` proc macro instead.
@@ -39,6 +31,7 @@ pub use russenger_macro::action;
 /// Creating a new action that sends a greeting message when the user input is "Hello":
 ///
 /// ```rust
+/// use russenger::create_action;
 /// use russenger::prelude::*;
 ///
 /// create_action!(Main, |res: Res, req: Req| async move {
@@ -49,6 +42,10 @@ pub use russenger_macro::action;
 /// });
 /// ```
 #[macro_export]
+#[deprecated(
+    since = "0.1.5",
+    note = "Please use the `#[action]` proc macro instead."
+)]
 macro_rules! create_action {
     ($name:ident, $handler:expr) => {
         pub struct $name;

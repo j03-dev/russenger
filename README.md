@@ -157,7 +157,7 @@ russenger_app!(Main, Option1, Option2);
 use russenger::prelude::*;
 
 #[action]
-async fn Main (res: Res, req: Req){
+async fn Main (res: Res, req: Req) {
     res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
         .await;
     res.send(TextModel::new(&req.user, "What is your name: "))
@@ -181,7 +181,7 @@ russenger_app!(Main, GetUsername);
 use russenger::prelude::*;
 
 #[action]
-async fn Main (res: Res, req: Req){
+async fn Main (res: Res, req: Req) {
     res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
         .await;
 

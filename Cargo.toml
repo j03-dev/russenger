@@ -16,9 +16,6 @@ path = "src/lib.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[workspace]
-members = ["russenger_macro"]
-
 [dependencies.russenger_macro]
 path = "russenger_macro"
 
@@ -30,7 +27,6 @@ serde_json = "^1.0.107"
 lazy_static = "^1.4.0"
 dotenv = "^0.15.0"
 tokio = "^1.36.0"
-url = "^2.4.1"
 actix-web = "^4"
 actix-files = "^0.6.5"
 

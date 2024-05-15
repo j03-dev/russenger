@@ -54,7 +54,8 @@ async fn ask_gemini(text: String) -> Result<Response, reqwest::Error> {
     }
 }
 
-create_action!(Main, |res: Res, req: Req| async move {
+#[action]
+async fn Main(res: Res, req: Req) {
     res.send(GetStartedModel::new(Payload::default())).await;
     res.send(PersistentMenuModel::new(
         &req.user,
@@ -64,15 +65,17 @@ create_action!(Main, |res: Res, req: Req| async move {
         }],
     ))
     .await;
-});
+}
 
-create_action!(HelloWorld, |res: Res, req: Req| async move {
+#[action]
+async fn HelloWorld(res: Res, req: Req) {
     let text = "Hello, I'm Gemini";
     res.send(TextModel::new(&req.user, text)).await;
     req.query.set_action(&req.user, AskGemini).await;
-});
+}
 
-create_action!(AskGemini, |res: Res, req: Req| async move {
+#[action]
+async fn AskGemini(res: Res, req: Req) {
     let text: String = req.data.get_value();
     match ask_gemini(text).await {
         Ok(response) => {
@@ -84,6 +87,6 @@ create_action!(AskGemini, |res: Res, req: Req| async move {
             res.send(TextModel::new(&req.user, &err.to_string())).await;
         }
     };
-});
+}
 
 russenger_app!(Main, HelloWorld, AskGemini);

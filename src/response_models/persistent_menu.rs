@@ -30,7 +30,9 @@ struct Menu<'m> {
 ///
 /// ```rust
 /// use russenger::prelude::*;
-/// create_action!(Main, |res: Res, req: Req| async move {
+/// 
+/// #[action]
+/// async fn Main(res: Res, req: Req) {
 ///     // Need Getstart Frist Before Send PersistenceMenu
 ///     res.send(GetStartedModel::new(Payload::default())).await;
 ///     let buttons = vec![
@@ -43,12 +45,13 @@ struct Menu<'m> {
 ///
 ///     let menu = PersistentMenuModel::new(&req.user, buttons);
 ///     res.send(menu).await;
-/// });
+/// }
 ///
 ///
-/// create_action!(Option1, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn Option1(res: Res, req: Req) {
 ///     res.send(TextModel::new(&req.user, "Option_1")).await;
-/// });
+/// }
 /// ```
 ///
 /// [Facebook Documentation](https://developers.facebook.com/docs/messenger-platform/send-messages/persistent-menu)
@@ -87,10 +90,10 @@ impl<'p> PersistentMenuModel<'p> {
     ///
     /// let menu = PersistentMenuModel::new("sender_id", buttons);
     ///
-    /// create_action!(Option1, |res: Res, req: Req| async move {
+    /// #[action]
+    /// async fn Option1(res: Res, req: Req) {
     ///     res.send(TextModel::new(&req.user, "Option_1")).await;
-    /// });
-    ///
+    /// }
     /// ```
     ///
     /// This example shows how to create a new `PersistentMenuModel`.

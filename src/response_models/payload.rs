@@ -29,11 +29,12 @@ use crate::Action;
 ///
 /// let data = Data::new("HelloWorld", None);
 /// let payload = Payload::new(HelloWorld, Some(data));
-///
-/// create_action!(HelloWorld, |res: Res, req: Req| async move {
+/// 
+/// #[action]
+/// async fn HelloWorld(res: Res, req: Req) {
 ///    let value: String = req.data.get_value();
 ///    res.send(TextModel::new(&req.user, &value)).await;
-/// });
+/// }
 /// ```
 ///
 /// # Implements
@@ -43,8 +44,8 @@ use crate::Action;
 /// * `Default`
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Payload {
-    path: String,
-    data: Option<Data>,
+    pub path: String,
+    pub data: Option<Data>,
 }
 
 impl Payload {
@@ -66,9 +67,10 @@ impl Payload {
     ///
     /// let payload = Payload::new(SomeAction, None);
     ///
-    /// create_action!(SomeAction, |res: Res, req: Req| async move {
+    /// #[action]
+    /// async fn SomeAction(res: Res, req: Req) {
     ///    res.send(TextModel::new(&req.user, "SomeAction")).await;
-    /// });
+    /// }
     ///
     /// ```
     pub fn new<A: Action>(action: A, data: Option<Data>) -> Self {

@@ -1,13 +1,15 @@
 use russenger::prelude::*;
 
-create_action!(Main, |res: Res, req: Req| async move {
+#[action]
+async fn Main(res: Res, req: Req) {
     res.send(TextModel::new(&req.user, "Hello!")).await;
     res.send(TextModel::new(&req.user, "What is your name: "))
         .await;
     req.query.set_action(&req.user, GetUserInput).await;
-});
+}
 
-create_action!(GetUserInput, |res: Res, req: Req| async move {
+#[action]
+async fn GetUserInput(res: Res, req: Req) {
     let username: String = req.data.get_value();
     res.send(TextModel::new(&req.user, &format!("hello {username}")))
         .await;
@@ -21,12 +23,12 @@ create_action!(GetUserInput, |res: Res, req: Req| async move {
     ];
     let quickreplymodel = QuickReplyModel::new(&req.user, "choose one color", quickreplies);
     res.send(quickreplymodel).await;
-});
+}
 
-create_action!(NextAction, |res: Res, req: Req| async move {
+#[action]
+async fn NextAction(res: Res, req: Req) {
     let color: String = req.data.get_value();
     res.send(TextModel::new(&req.user, &color)).await;
     Main.execute(res, req).await; // goto Main action
-});
-
+}
 russenger_app!(Main, GetUserInput, NextAction);

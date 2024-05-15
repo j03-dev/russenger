@@ -50,10 +50,11 @@ use super::{payload::Payload, recipient::Recipient, ResponseModel};
 ///
 /// use russenger::prelude::*;
 ///
-/// create_action!(HelloWorld, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn HelloWorld(res: Res, req: Req) {
 ///     let payload: String = req.data.get_value();
 ///     res.send(TextModel::new(&req.user, &payload)).await;
-/// });
+/// }
 /// ```
 #[derive(Clone, Debug, Serialize)]
 pub enum Button {
@@ -120,13 +121,14 @@ struct ButtonAttachement<'a> {
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// create_action!(Main, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn Main(res: Res, req: Req) {
 ///     let buttons = vec![
 ///         Button::WebUrl {title: "Click Me".to_owned(), url: "https://link.test.com".to_owned()},
 ///         // More Button ...
 ///     ];
 ///     res.send(ButtonModel::new(&req.user, "Option", buttons)).await;
-/// });
+/// }
 /// ```
 ///
 /// # References

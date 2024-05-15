@@ -147,11 +147,13 @@ impl Query {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// create_action!(Main, |res: Res, req: Req| async move {
+    /// #[action]
+    /// async fn Main(res: Res, req: Req) {
     ///    req.query.set_action(&req.user, NextAction).await;
-    /// });
+    /// }
     ///
-    /// create_action!(NextAction, |res: Res, req: Req| async move {});
+    /// #[action]
+    /// async fn NextAction(res: Res, req: Req) {}
     ///
     /// russenger_app!(Main, NextAction);
     /// ```

@@ -21,9 +21,10 @@ use super::{payload::Payload, ResponseModel};
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// create_action!(Main, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn Main(res: Res, req: Req) {
 ///     res.send(GetStartedModel::new(Payload::default())).await;
-/// });
+/// }
 /// ```
 ///
 /// # Returns

@@ -56,10 +56,11 @@ pub enum Actions {
 /// ``` rust
 /// use russenger::prelude::*;
 ///
-/// create_action!(Main, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn Main(res: Res, req: Req) {
 ///     let action = SenderActionModel::new(&req.user, MarkSeen);
 ///     res.send(action).await;
-/// });
+/// };
 /// ```
 ///
 /// Sending a `mark_seen` action:

@@ -26,9 +26,10 @@ struct Text<'t> {
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// create_action!(Main, |res: Res, req: Req| async move {
-///     res.send(TextModel::new(&req.user, "Hello World!")).await
-/// });
+/// #[action]
+/// async fn Main(res: Res, req: Req) {
+///     res.send(TextModel::new(&req.user, "Hello World!")).await;
+/// }
 /// ```
 ///
 /// ```rust

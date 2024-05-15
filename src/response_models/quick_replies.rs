@@ -29,10 +29,11 @@ use super::{payload::Payload, recipient::Recipient};
 /// let payload = Payload::new(HelloWorld, Some(data));
 /// let quick_reply = QuickReply::new("Button Title", "https://example.com/image.png", payload);
 ///
-/// create_action!(HelloWorld, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn HelloWorld(res: Res, req: Req) {
 ///     let hello_world: String = req.data.get_value();
 ///     res.send(TextModel::new(&req.user, &hello_world)).await;
-/// });
+/// }
 /// ```
 #[derive(Serialize, Debug)]
 pub struct QuickReply {
@@ -62,9 +63,10 @@ impl QuickReply {
     /// let payload = Payload::new(SomeAction, None);
     /// let quick_reply = QuickReply::new("Button Title", "https://example.com/image.png", payload);
     ///
-    /// create_action!(SomeAction, |res: Res, req: Req| async move {
+    /// #[action]
+    /// async fn SomeAction(res: Res, req: Req) {
     ///     res.send(TextModel::new(&req.user, "SomeAction")).await;
-    /// });
+    /// }
     /// ```
     pub fn new(title: &str, image_url: &str, payload: Payload) -> Self {
         Self {
@@ -101,12 +103,13 @@ struct QuickMessage {
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// create_action!(SomeAction, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn SomeAction(res: Res, req: Req) {
 ///     let payload = Payload::new(SomeAction, None);
 ///     let quick_reply = QuickReply::new("Button Title", "https://example.com/image.png", payload);
 ///     let quick_reply_model = QuickReplyModel::new(&req.user, "Message Text", vec![quick_reply]);
 ///     res.send(quick_reply_model).await;
-/// });
+/// }
 /// ```
 
 #[derive(Debug, Serialize)]
@@ -137,10 +140,11 @@ impl<'q> QuickReplyModel<'q> {
     /// let payload = Payload::new(SomeAction, None);
     /// let quick_reply = QuickReply::new("Button Title", "https://example.com/image.png", payload);
     /// let quick_reply_model = QuickReplyModel::new("send_id", "Message Text", vec![quick_reply]);
-    /// 
-    /// create_action!(SomeAction, |res: Res, req: Req| async move {
+    ///
+    /// #[action]
+    /// async fn SomeAction(res: Res, req: Req) {
     ///     res.send(TextModel::new(&req.user, "SomeAction")).await;
-    /// });
+    /// }
     /// ```
     pub fn new(sender: &'q str, message: &str, quick_replies: Vec<QuickReply>) -> Self {
         Self {

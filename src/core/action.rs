@@ -4,6 +4,9 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 
 use super::{request::Req, response::Res};
+use crate::response_models::data::Data;
+use crate::response_models::payload::Payload;
+use crate::response_models::quick_replies::{QuickReply, QuickReplyModel};
 
 pub struct ActionLock {
     pub locked_users: Arc<Mutex<HashSet<String>>>,
@@ -40,19 +43,38 @@ impl ActionLock {
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// create_action!(Greet, |res: Res, req: Req| async move {
+/// #[action]
+/// async fn Greet(res: Res, req: Req) {
 ///     let message: String = req.data.get_value();
 ///     
 ///     if message == "Hello" {
 ///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
 ///     }
-/// });
+/// }
 /// ```
 #[async_trait::async_trait]
 pub trait Action: Send + Sync {
     async fn execute(&self, res: Res, req: Req);
 
     fn path(&self) -> String;
+
+    async fn next(&self, res: Res, req: Req) {
+        let mut page = req.data.get_page().unwrap_or_default();
+        page.next();
+        let quick_reply: QuickReplyModel<'_> = QuickReplyModel::new(
+            &req.user,
+            "Navigation",
+            vec![QuickReply::new(
+                "Next",
+                "",
+                Payload {
+                    path: self.path(),
+                    data: Some(Data::new(req.data.get_value::<String>(), Some(page))),
+                },
+            )],
+        );
+        res.send(quick_reply).await;
+    }
 }
 
 type ActionRegistryType = Arc<Mutex<HashMap<String, Box<dyn Action>>>>;
@@ -72,13 +94,14 @@ lazy_static::lazy_static! {
     ///
     /// use russenger::prelude::*;
     ///
-    /// create_action!(Main, |res: Res, req: Req| async move {
+    /// #[action]
+    /// async fn Main(res: Res, req: Req) {
     ///     let message: String = req.data.get_value();
     ///
     ///     if message == "Hello" {
     ///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
     ///     }
-    /// });
+    /// }
     ///
     /// #[russenger::main]
     /// async fn main() {

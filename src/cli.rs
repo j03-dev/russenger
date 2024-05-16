@@ -11,11 +11,11 @@
 //! Running the server:
 //!
 //! ```rust
-//! use russenger::cli::command_handler;
+//! use russenger::cli::launch;
 //!
 //! #[russenger::main]
 //! async fn main() {
-//!     command_handler().await;
+//!     launch().await;
 //! }
 //! ```
 use actix_files as fs;

@@ -21,23 +21,7 @@
 //!
 //! ## Examples
 //!
-//! Creating a new action that sends a greeting message when the user input is "Hello":
-//!
-//! ```rust
-//! use russenger::create_action;
-//! use russenger::prelude::*;
-//!
-//! create_action!(Main, |res: Res, req: Req| async move {
-//!     let message: String = req.data.get_value();
-//!     if message == "Hello" {
-//!         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
-//!     }
-//! });
-//! 
-//! russenger_app(Main);
-//! ```
-//!
-//! Creating an action using the new `#[action]` proc macro:
+//! Creating a new action that sends a greeting message when the user input is "Hello": using the new `#[action]` proc macro:
 //!
 //! ```rust
 //! use russenger::prelude::*;
@@ -49,8 +33,8 @@
 //!         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
 //!     }
 //! }
-//! 
-//! russenger_app(Main);
+//!
+//! russenger_app!(Main);
 //! ```
 pub use actix_web::main;
 pub use async_trait::async_trait;

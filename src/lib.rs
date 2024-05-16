@@ -32,6 +32,8 @@
 //!         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
 //!     }
 //! });
+//! 
+//! russenger_app(Main);
 //! ```
 //!
 //! Creating an action using the new `#[action]` proc macro:
@@ -46,6 +48,8 @@
 //!         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
 //!     }
 //! }
+//! 
+//! russenger_app(Main);
 //! ```
 pub use actix_web::main;
 pub use async_trait::async_trait;

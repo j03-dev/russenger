@@ -1,17 +1,21 @@
 //! This module provides utilities for handling queries.
 //! The `Query` struct represents a database query. It includes a `DB` enum that represents the database connection.
 //!
-//! ## Query::new Method
+//! ## new Method
 //!
-//! The `Query::new` method establishes a connection to the database and returns a new `Query` with the established connection.
+//! The `new` method establishes a connection to the database and returns a new `Query` with the established connection.
 //!
-//! ## Query::migrate Method
+//! ## migrate Method
 //!
-//! The `Query::migrate` method creates a new table `russenger_user` in the database. It returns a boolean indicating whether the operation was successful.
+//! The `migrate` method creates a new table `russenger_user` in the database. It returns a boolean indicating whether the operation was successful.
 //!
-//! ## Query::create Method
+//! ## create Method
 //!
-//! The `Query::create` method inserts a new user into the `russenger_user` table. It takes a user ID as an argument and returns a boolean indicating whether the operation was successful.
+//! The `create` method inserts a new user into the `russenger_user` table. It takes a user ID as an argument and returns a boolean indicating whether the operation was successful.
+//! 
+//! ## set_action Method
+//!
+//! The `set_action` method updates the action of a user in the `russenger_user` table. It takes a user ID and an action as arguments and returns a boolean indicating whether the operation was successful.
 //!
 //! ## Examples
 //!

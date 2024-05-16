@@ -10,9 +10,10 @@
 //! - `query`: This module provides utilities for handling queries.
 //! - `response_models`: This module contains models for different types of responses.
 //!
-//! ## Macro
+//! ## Macros
 //!
 //! - `action`: This proc macro is used to define an action.
+//! - `russenger_app`: This macro is used to create the main application.
 //!
 //! ## Deprecated
 //!

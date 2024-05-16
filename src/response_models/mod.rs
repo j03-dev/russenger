@@ -41,8 +41,6 @@
 //!     let text_model = TextModel::new(&req.user, "Hello, user1!");
 //!     res.send(text_model).await;
 //! }
-//!
-//!
 //! ```
 pub mod button;
 pub mod generic;

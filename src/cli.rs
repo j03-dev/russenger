@@ -79,7 +79,7 @@ fn parser() -> Option<String> {
     }
 }
 
-pub async fn command_handler() {
+pub async fn launch() {
     dotenv().ok();
     match parser() {
         Some(option) => match option.as_str() {

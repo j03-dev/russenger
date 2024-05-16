@@ -6,7 +6,7 @@ pub mod prelude;
 pub mod query;
 pub mod response_models;
 
-pub use cli::command_handler;
+pub use cli::launch;
 pub use core::action::{Action, ACTION_REGISTRY};
 pub use dotenv::dotenv;
 pub use russenger_macro::action;
@@ -114,12 +114,12 @@ macro_rules! create_action {
 #[macro_export]
 macro_rules! russenger_app {
     ($($action:expr),* $(,)?) => {
-        use russenger::{command_handler, Action, ACTION_REGISTRY};
+        use russenger::{launch, Action, ACTION_REGISTRY};
 
         #[russenger::main]
         async fn main() {
             $(ACTION_REGISTRY.lock().await.insert($action.path(), Box::new($action));)*
-            command_handler().await;
+            launch().await;
         }
     };
 }

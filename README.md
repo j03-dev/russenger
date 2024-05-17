@@ -52,6 +52,16 @@ async fn Main(res: Res, req: Req) {
 
 In both examples, we define an action `Main` that sends a welcome message if the user input is "Hello". The new method using `#[action]` is more concise and easier to read.
 
+## How to Create new Project
+- ### **1**: Install Cargo Generate
+```bash
+cargo install cargo-generate
+```
+- ### **2**: Generate new project
+```bash
+cargo generate --git https://github.com/j03-dev/russenger_template
+```
+
 ## How To Use
 
 ### Project

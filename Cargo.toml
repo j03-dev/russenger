@@ -20,6 +20,7 @@ path = "src/lib.rs"
 members = ["russenger_macro"]
 
 [dependencies.russenger_macro]
+version = "0.1.0"
 path = "russenger_macro"
 
 [dependencies]

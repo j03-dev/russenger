@@ -64,10 +64,6 @@ cargo generate --git https://github.com/j03-dev/russenger_template
 
 ## How To Use
 
-### Project
-
-- [gemini-bot](https://github.com/j03-dev/gemini-bot)
-
 ### Example
 
 Here's an example of how to use Russenger to handle different actions in a chatbot:

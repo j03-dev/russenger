@@ -46,7 +46,7 @@ impl ActionLock {
 /// #[action]
 /// async fn Greet(res: Res, req: Req) {
 ///     let message: String = req.data.get_value();
-///     
+///
 ///     if message == "Hello" {
 ///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
 ///     }
@@ -67,10 +67,10 @@ pub trait Action: Send + Sync {
             vec![QuickReply::new(
                 "Next",
                 "",
-                Payload {
-                    path: self.path(),
-                    data: Some(Data::new(req.data.get_value::<String>(), Some(page))),
-                },
+                Payload::new_with_path(
+                    self.path(),
+                    Some(Data::new(req.data.get_value::<String>(), Some(page))),
+                ),
             )],
         );
         res.send(quick_reply).await;

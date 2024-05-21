@@ -29,7 +29,7 @@ use crate::Action;
 ///
 /// let data = Data::new("HelloWorld", None);
 /// let payload = Payload::new(HelloWorld, Some(data));
-/// 
+///
 /// #[action]
 /// async fn HelloWorld(res: Res, req: Req) {
 ///    let value: String = req.data.get_value();
@@ -44,8 +44,8 @@ use crate::Action;
 /// * `Default`
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Payload {
-    pub path: String,
-    pub data: Option<Data>,
+    path: String,
+    data: Option<Data>,
 }
 
 impl Payload {
@@ -78,6 +78,10 @@ impl Payload {
             path: action.path(),
             data,
         }
+    }
+
+    pub fn new_with_path(path: String, data: Option<Data>) -> Self {
+        Self { path, data }
     }
 
     pub fn get_path(&self) -> String {

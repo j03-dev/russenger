@@ -29,6 +29,77 @@ impl ActionLock {
     }
 }
 
+/// The `IsExist` trait defines the behavior of checking if an action exists.
+///
+/// # Methods
+///
+/// * `is_exist`: This method is called to check if an action exists.
+///
+/// # Examples
+///
+/// ```rust
+/// use russenger::prelude::*;
+///
+/// #[action]
+/// async fn HelloWorld(res: Res, req: Req) {
+///    res.send(TextModel::new(&req.user, "Hello, world!")).await;
+/// }
+///
+/// #[russenger::main]
+/// async fn main() {
+///     let path = Path::from("HelloWorld");
+///     let is_exist = path.is_exist().await;
+///     assert_eq!(is_exist, true);
+/// }
+/// ```
+#[async_trait::async_trait]
+pub trait IsExist {
+    async fn is_exist(&self) -> bool;
+}
+
+/// The `Path` type represents the path of an action.
+///
+/// The path is a unique identifier for an action. It is used to route requests to the appropriate action.
+///
+/// # Examples
+///
+/// ```rust
+/// use russenger::prelude::*;
+///
+/// let path = Path::from("HelloWorld");
+/// ```
+pub type Path = String;
+
+#[async_trait::async_trait]
+impl IsExist for Path {
+    /// Checks if an action exists.
+    ///
+    /// # Returns
+    ///
+    /// A boolean value indicating whether the action exists.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use russenger::prelude::*;
+    ///
+    /// #[action]
+    /// async fn HelloWorld(res: Res, req: Req) {
+    ///   res.send(TextModel::new(&req.user, "Hello, world!")).await;
+    /// }
+    ///
+    /// #[russenger::main]
+    /// async fn main() {
+    ///     let path = Path::from("HelloWorld");
+    ///     let is_exist = path.is_exist().await;
+    ///     assert_ne!(is_exist, true);
+    /// }
+    /// ```
+    async fn is_exist(&self) -> bool {
+        ACTION_REGISTRY.lock().await.contains_key(self)
+    }
+}
+
 /// The `Action` trait defines the behavior of an action.
 ///
 /// An action is a unit of work that the application can perform. Each action is associated with a path, and when a request is received with that path, the action's `execute` method is called.
@@ -56,28 +127,23 @@ impl ActionLock {
 pub trait Action: Send + Sync {
     async fn execute(&self, res: Res, req: Req);
 
-    fn path(&self) -> String;
+    fn path(&self) -> Path;
 
     async fn next(&self, res: Res, req: Req) {
         let mut page = req.data.get_page().unwrap_or_default();
-        page.next();
+        page.next(); // increment the page number
+        let data = Data::new(req.data.get_value::<String>(), Some(page));
+        let payload = Payload::from_path(self.path(), Some(data)).await;
         let quick_reply: QuickReplyModel<'_> = QuickReplyModel::new(
             &req.user,
             "Navigation",
-            vec![QuickReply::new(
-                "Next",
-                "",
-                Payload::new_with_path(
-                    self.path(),
-                    Some(Data::new(req.data.get_value::<String>(), Some(page))),
-                ),
-            )],
+            vec![QuickReply::new("Next", "", payload)],
         );
         res.send(quick_reply).await;
     }
 }
 
-type ActionRegistryType = Arc<Mutex<HashMap<String, Box<dyn Action>>>>;
+type ActionRegistryType = Arc<Mutex<HashMap<Path, Box<dyn Action>>>>;
 
 lazy_static::lazy_static! {
     /// `ACTION_REGISTRY` is a thread-safe map that stores all the actions available in the application.

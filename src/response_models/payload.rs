@@ -3,6 +3,7 @@ use std::str::FromStr;
 use serde::{Deserialize, Serialize};
 
 use super::data::Data;
+use crate::core::action::{IsExist, Path};
 use crate::Action;
 
 /// `Payload` is a struct that represents the payload of a request in a Messenger conversation.
@@ -44,7 +45,7 @@ use crate::Action;
 /// * `Default`
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Payload {
-    path: String,
+    path: Path,
     data: Option<Data>,
 }
 
@@ -80,11 +81,14 @@ impl Payload {
         }
     }
 
-    pub fn new_with_path(path: String, data: Option<Data>) -> Self {
+    pub async fn from_path(path: Path, data: Option<Data>) -> Self {
+        if path.is_exist().await {
+            panic!("The Action `{path}` is not Exist!");
+        }
         Self { path, data }
     }
 
-    pub fn get_path(&self) -> String {
+    pub fn get_path(&self) -> Path {
         self.path.clone()
     }
 
@@ -110,7 +114,7 @@ impl ToString for Payload {
 impl Default for Payload {
     fn default() -> Self {
         Payload {
-            path: "Main".to_owned(),
+            path: Path::from("Main"),
             data: None,
         }
     }

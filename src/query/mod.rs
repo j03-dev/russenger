@@ -1,4 +1,4 @@
-//! This module provides utilities for handling queries.
+//! The `query` module provides utilities for handling queries.
 //! The `Query` struct represents a database query. It includes a `DB` enum that represents the database connection.
 //!
 //! ## new Method
@@ -12,7 +12,7 @@
 //! ## create Method
 //!
 //! The `create` method inserts a new user into the `russenger_user` table. It takes a user ID as an argument and returns a boolean indicating whether the operation was successful.
-//! 
+//!
 //! ## set_action Method
 //!
 //! The `set_action` method updates the action of a user in the `russenger_user` table. It takes a user ID and an action as arguments and returns a boolean indicating whether the operation was successful.
@@ -21,20 +21,20 @@
 //!
 //! ```rust
 //! use russenger::prelude::*;
-//! 
-//! #[action] 
+//!
+//! #[action]
 //! async fn Main(res: Res, req: Req) {
 //!     res.send(TextModel::new(&req.user, "What is your name: ")).await;
 //!     req.query.set_action(&req.user, GetUserInput).await;
 //! }
 //!
-//! #[action] 
+//! #[action]
 //! async fn GetUserInput(res: Res, req: Req) {
 //!     let username: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await;
 //!     Main.execute(res, req).await; // go back to Main Action
 //! }
-//! 
+//!
 //! russenger_app!(Main, GetUserInput);
 //! ```
 use core::panic;

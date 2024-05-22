@@ -1,3 +1,6 @@
+//! The `request_handler` module contains the request handler for the webhook endpoint.
+//!
+//! The `WebQuery` struct is used to handle the query parameters of the webhook endpoint.
 use actix_web::HttpResponse;
 use serde::Deserialize;
 

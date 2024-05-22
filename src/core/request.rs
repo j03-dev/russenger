@@ -51,6 +51,21 @@ use crate::response_models::data::Data;
 /// * `host`: A `String` that represents the host from which the request was made.
 #[derive(Clone)]
 pub struct Req {
+    /// The user who made the request.
+    ///
+    /// This field is a `String` that represents the user who made the request.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use russenger::prelude::*;
+    ///
+    /// #[action]
+    /// async fn HelloWorld(res: Res, req: Req) {
+    ///     let user: String = req.user;
+    ///     res.send(TextModel::new(&user, "Hello, world!")).await;
+    /// }
+    /// ```
     pub user: String,
 
     /// The `Query` struct represents a database query.

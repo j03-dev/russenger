@@ -1,3 +1,14 @@
+//! The `services` contains the actix-web handlers for the webhook endpoints.
+//!
+//! # Functions
+//!
+//! * `webhook_verify`: This function verifies the webhook.
+//! * `webhook_core`: This function handles the webhook core.
+//!
+//! Endpoints:
+//!
+//! * `GET /webhook`: This endpoint verifies the webhook.
+//! * `POST /webhook`: This endpoint handles the webhook core.
 use std::str::FromStr;
 
 use actix_web::{dev, get, post, web, HttpResponse};

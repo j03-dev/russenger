@@ -71,7 +71,7 @@ Here's an example of how to use Russenger to handle different actions in a chatb
 #### Russenger `Cargo.toml`
 
 ```toml
-russenger = "0.1.5"
+russenger = "0.1.6"
 actix-web = "4"
 ```
 

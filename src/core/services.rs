@@ -32,7 +32,7 @@ pub async fn webhook_verify(web_query: web::Query<WebQuery>) -> HttpResponse {
     web_query.get_hub_challenge()
 }
 
-pub enum Executable<'a> {
+enum Executable<'a> {
     Payload(&'a str, &'a str, &'a str, Query),
     TextMessage(&'a str, &'a str, &'a str, Query),
 }

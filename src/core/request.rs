@@ -1,3 +1,44 @@
+//! The `request` module contains the `Req` struct, which represents a request from a user.
+//!
+//! The `Req` struct contains the following fields:
+//! * `user`: A `String` that represents the user who made the request.
+//! * `query`: A `Query` that represents the query made by the user.
+//! * `data`: A `Data` that represents the data associated with the request.
+//! * `host`: A `String` that represents the host from which the request was made.
+//!
+//! # Examples
+//!
+//! Use the `Req` to get the user and data from a request:
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//!
+//! #[action]
+//! async fn HelloWorld(res: Res, req: Req) {
+//!     let user: String = req.user;
+//!     let message: String  = req.data.get_value();
+//!     res.send(TextModel::new(&user, "Hello, world!")).await;
+//! }
+//!```
+//! Use the `Req` to get the user and query from a request:
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//!
+//! #[action]
+//! async fn Main(res: Res, req: Req) {
+//!     res.send(TextModel::new(&req.user, "What is your name")).await;
+//!     req.query.set_action(&req.user, Name).await;
+//! }
+//!
+//! #[action]
+//! async fn Name(res: Res, req: Req) {
+//!   let name: String = req.data.get_value();
+//!   res.send(TextModel::new(&req.user, &format!("Hello, {}!", name))).await;
+//! }
+//!
+//! russenger_app!(Main, Name);
+//! ```
 use crate::query::Query;
 use crate::response_models::data::Data;
 
@@ -38,7 +79,7 @@ pub struct Req {
     /// async fn Main(res: Res, req: Req) {
     ///     req.query.set_action(&req.user, NextAction).await; // goto NextAction
     /// }
-    /// 
+    ///
     /// #[action]
     /// async fn NextAction(res: Res, req: Req) {}
     /// ```

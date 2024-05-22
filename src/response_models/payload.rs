@@ -80,14 +80,43 @@ impl Payload {
         }
     }
 
+    /// Creates a new `Payload` instance with a specified path and optional data.
+    ///
+    /// # Parameters
+    ///
+    /// * `path: String` - The path associated with the payload.
+    /// * `data: Option<Data>` - Optional data to be included in the payload.
+    ///
+    /// # Returns
+    ///
+    /// A new `Payload` instance with the specified path and data.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use russenger::prelude::*;
+    /// 
+    /// let data = Some(Data::new("key", None));
+    /// let payload = Payload::new_with_path("Main".to_string(), data);
+    /// ```
     pub fn new_with_path(path: String, data: Option<Data>) -> Self {
         Self { path, data }
     }
 
+    /// Returns the path associated with the payload.
+    ///
+    /// # Returns
+    ///
+    /// The path associated with the payload.
     pub fn get_path(&self) -> String {
         self.path.clone()
     }
 
+    /// Returns the data associated with the payload.
+    ///
+    /// # Returns
+    ///
+    /// The data associated with the payload.
     pub fn get_data(&self) -> Data {
         self.data.clone().unwrap_or_default()
     }
@@ -101,9 +130,12 @@ impl FromStr for Payload {
     }
 }
 
-impl ToString for Payload {
-    fn to_string(&self) -> String {
-        serde_json::to_string(self).unwrap_or_default()
+impl std::fmt::Display for Payload {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match serde_json::to_string(self) {
+            Ok(json_string) => write!(f, "{}", json_string),
+            Err(_) => write!(f, "") // Outputs an empty string if there is an error in serialization
+        }
     }
 }
 

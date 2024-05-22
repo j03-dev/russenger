@@ -1,7 +1,8 @@
-//! The `app_state` module contains the `AppState`
+//! The `app_state` module provides the `AppState` struct.
 //!
-//! The `AppState` struct is use to store the state of the application.
-//! query:  `Query` is use to query the database
+//! The `AppState` struct is utilized by Actix's `AppState` to maintain the application's state.
+//! It contains the following fields:
+//! - `query`: A `Query` instance used to interact with the database.
 use crate::query::Query;
 
 /// # App State

@@ -4,8 +4,8 @@ use super::recipient::Recipient;
 use super::ResponseModel;
 
 #[derive(Serialize)]
-struct Text<'t> {
-    text: &'t str,
+struct Text {
+    text: String,
 }
 
 /// `TextModel` is used to send text messages to the recipient.
@@ -42,7 +42,7 @@ struct Text<'t> {
 pub struct TextModel<'s> {
     recipient: Recipient<'s>,
     messaging_type: &'s str,
-    message: Text<'s>,
+    message: Text,
 }
 
 impl<'s> TextModel<'s> {
@@ -67,11 +67,13 @@ impl<'s> TextModel<'s> {
     /// ```
     ///
     /// [Facebook Documentation](https://developers.facebook.com/docs/messenger-platform/send-messages#sending_text)
-    pub fn new(sender: &'s str, text: &'s str) -> Self {
+    pub fn new(sender: &'s str, text: &str) -> Self {
         Self {
             recipient: Recipient { id: sender },
             messaging_type: "RESPONSE",
-            message: Text { text },
+            message: Text {
+                text: text.to_owned(),
+            },
         }
     }
 }

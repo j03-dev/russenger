@@ -1,3 +1,30 @@
+//! This module contains the `Button` enum and the `ButtonModel` struct.
+//!
+//! # Examples
+//!
+//! Creating a new button:
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//!
+//! #[action]
+//! async fn Main(res: Res, req: Req) {
+//!     let payload = Payload::new(HelloWorld, Some(Data::new("HelloWorld", None)));
+//!     let buttons = vec![
+//!         Button::Postback { title: "Click me".to_owned(), payload: payload },
+//!         // Add more buttons here
+//!     ];
+//!     let button_model = ButtonModel::new("sender_id", "Hello, user1!", buttons);
+//!     res.send(button_model).await;
+//! }
+//! #[action]
+//! async fn HelloWorld(res: Res, req: Req) {
+//!     let value: String = req.data.get_value();
+//!     res.send(TextModel::new(&req.user, &value)).await;
+//! }
+//!
+//! russenger_app!(Main, HelloWorld);
+//! ```
 use serde::Serialize;
 use serde_json::json;
 use serde_json::value::Value;
@@ -155,7 +182,7 @@ impl<'b> ButtonModel<'b> {
     /// # Example
     /// ```rust
     /// use russenger::prelude::*;
-    ///  
+    ///
     /// let buttons = vec![
     ///     Button::WebUrl {title: "Click Me".to_owned(), url: "https://link.test.com".to_owned()},
     ///     // More Button ...

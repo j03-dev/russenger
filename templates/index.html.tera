@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russenger - Simplify Messenger Webhooks with Rust</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #563f30; /* Background color inspired by the icon */
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 3em;
+            margin: 0.5em 0;
+        }
+        p {
+            font-size: 1.2em;
+            margin: 0.5em 0 1.5em;
+        }
+        a {
+            text-decoration: none;
+            color: #ffffff;
+            background-color: transparent; /* Button color inspired by the icon */
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            border: 2px solid white;
+        }
+        a:hover {
+            background-color: white; /* Hover color inspired by the icon */
+            color: #563f30;
+        }
+        .logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Russenger!</h1>
+        <p>Russenger is a Rust library designed to simplify the handling of Facebook Messenger webhook responses.</p>
+        <a href="https://github.com/j03-dev/russenger" target="_blank">Check it out on GitHub</a>
+    </div>
+</body>
+</html>

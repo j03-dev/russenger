@@ -86,3 +86,13 @@ pub async fn webhook_core(
     ACTION_LOCK.unlock(user).await;
     "Ok"
 }
+
+#[get("/")]
+async fn index(data: web::Data<AppState>) -> Result<HttpResponse, actix_web::Error> {
+    let template = &data.templates;
+    let ctx = tera::Context::new();
+    let body = template
+        .render("index.html.tera", &ctx)
+        .map_err(|_| actix_web::error::ErrorInternalServerError("Template error"))?;
+    Ok(HttpResponse::Ok().content_type("text/html").body(body))
+}

@@ -14,12 +14,15 @@ use crate::query::Query;
 /// * `query`: A `Query` that represents the query made by the user.
 #[derive(Clone)]
 pub struct AppState {
+    pub templates: tera::Tera,
     pub query: Query,
 }
 
 impl AppState {
     pub async fn init() -> Self {
         let query: Query = Query::new().await;
-        Self { query }
+        let template_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*");
+        let templates = tera::Tera::new(template_dir).unwrap();
+        Self { query, templates }
     }
 }

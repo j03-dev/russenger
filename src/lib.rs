@@ -38,10 +38,13 @@
 //! ```
 pub use actix_web::main;
 pub use async_trait::async_trait;
+
 pub mod cli;
 pub mod core;
+pub mod entity;
 pub mod prelude;
 pub mod query;
+// pub mod repository;
 pub mod response_models;
 
 pub use cli::launch;

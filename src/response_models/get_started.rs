@@ -1,3 +1,37 @@
+//! This module provides a `GetStartedModel` struct that represents the GET STARTED button in a Messenger conversation.
+//!
+//! ## GetStartedModel Struct
+//!
+//! The `GetStartedModel` struct represents the GET STARTED button in a Messenger conversation. This button is shown when the user talks to the bot for the first time.
+//!
+//! ### Fields
+//!
+//! * `get_started: String` - The payload of the GET STARTED button.
+//!
+//! ### Methods
+//!
+//! * `new(payload: Payload) -> Self` - Creates a new `GetStartedModel` instance.
+//!
+//! ## Examples
+//!
+//! Creating a `GetStartedModel` and sending it:
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//!
+//! #[action]
+//! async fn Main(res: Res, req: Req) {
+//!     res.send(GetStartedModel::new(Payload::default())).await;
+//! }
+//! ```
+//!
+//! ## Returns
+//!
+//! A POST request to the Facebook API to send a media file using the Facebook URL.
+//!
+//! ## Reference
+//!
+//! [Facebook Messenger Platform - Get Started Button](https://developers.facebook.com/docs/messenger-platform/reference/messenger-profile-api/get-started-button)
 use serde::Serialize;
 
 use super::{payload::Payload, ResponseModel};

@@ -1,3 +1,55 @@
+//! This module provides `Actions` enum and `SenderActionModel` struct that represent sender actions in a Messenger conversation.
+//!
+//! ## Actions Enum
+//!
+//! The `Actions` enum is used to specify the type of sender action to send to the recipient. Sender actions include `MarkSeen`, `TypingOn`, and `TypingOff`. These actions allow you to control the status of the conversation, such as marking a message as seen or showing a typing indicator.
+//!
+//! ### Variants
+//!
+//! * `MarkSeen` - Marks the last message as seen. This will show a "seen" receipt to the user.
+//! * `TypingOn` - Turns the typing indicators on. This will show a "typing..." indicator to the user.
+//! * `TypingOff` - Turns the typing indicators off. This will hide the "typing..." indicator from the user.
+//!
+//! ## SenderActionModel Struct
+//!
+//! The `SenderActionModel` struct is used to send sender actions to the recipient. Sender actions include `mark_seen`, `typing_on`, and `typing_off`. These actions allow you to control the status of the conversation, such as marking a message as seen or showing a typing indicator.
+//!
+//! ### Fields
+//!
+//! * `messaging_type: String` - The type of messaging. For sender actions, this is always "RESPONSE".
+//! * `recipient: Recipient` - The recipient of the sender action.
+//! * `sender_action: String` - The sender action to send.
+//!
+//! ## Examples
+//!
+//! Using `Actions` and `SenderActionModel`:
+//!
+//! ```rust
+//! use russenger::response_models::sender_action::{Actions, SenderActionModel};
+//!
+//! let action = SenderActionModel::new("sender_id", Actions::MarkSeen);
+//! let action = SenderActionModel::new("sender_id", Actions::TypingOn);
+//! let action = SenderActionModel::new("sender_id", Actions::TypingOff);
+//! ```
+//! 
+//! Usse case:
+//! 
+//! ```rust
+//! use russenger::prelude::*;
+//! 
+//! #[action]
+//! async fn Main(res: Res, req: Req) {
+//!     res.send(SenderActionModel::new(&req.user, MarkSeen));
+//!     res.send(TextModel::new(&req.user, "Hello, world!"));
+//! }
+//! 
+//! russenger_app!(Main);
+//! ``` 
+//! 
+//!
+//! ## Reference
+//!
+//! [Facebook Messenger Platform - Sender Actions](https://developers.facebook.com/docs/messenger-platform/send-messages/sender-actions)
 use super::{recipient::Recipient, ResponseModel};
 use serde::Serialize;
 

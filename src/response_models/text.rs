@@ -1,3 +1,47 @@
+//! This module provides `Message` and `MessageModel` structs that represent a message in a Messenger conversation.
+//!
+//! ## Message Struct
+//!
+//! The `Message` struct represents a message in a Messenger conversation. This struct is used to send a message to the recipient.
+//!
+//! ### Fields
+//!
+//! * `text: String` - The text of the message.
+//!
+//! ## MessageModel Struct
+//!
+//! The `MessageModel` struct is used to send a message to the recipient. This struct contains the recipient, the type of messaging, and the message itself.
+//!
+//! ### Fields
+//!
+//! * `recipient: Recipient` - The recipient of the message.
+//! * `messaging_type: String` - The type of messaging. For messages, this is always "RESPONSE".
+//! * `message: Message` - The message to send.
+//!
+//! ### Methods
+//!
+//! * `new(sender: &'s str, text: &'s str) -> Self` - Creates a new `MessageModel` instance.
+//!
+//! ## Examples
+//!
+//! Sending a message:
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//!
+//! #[action]
+//! async fn Main(res: Res, req: Req) {
+//!     res.send(TextModel::new(&req.user, "Hello World!")).await;
+//! }
+//! ```
+//!
+//! ## Returns
+//!
+//! A POST request to the Facebook API to send a message.
+//!
+//! ## Reference
+//!
+//! [Facebook Messenger Platform - Send Messages](https://developers.facebook.com/docs/messenger-platform/send-messages)
 use serde::Serialize;
 
 use super::recipient::Recipient;

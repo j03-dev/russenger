@@ -1,3 +1,49 @@
+//! This module provides a `MediaModel` struct that represents a media message in a Messenger conversation.
+//!
+//! ## MediaModel Struct
+//!
+//! The `MediaModel` struct represents a media message in a Messenger conversation. This message can be an image or a video.
+//!
+//! ### Fields
+//!
+//! * `messaging_type: String` - The type of messaging. For media messages, this is always "RESPONSE".
+//! * `recipient: Recipient` - The recipient of the media message.
+//! * `message: Attachment` - The attachment that contains the type of the media file and the Facebook URL of the media file.
+//!
+//! ### Methods
+//!
+//! * `new(sender: &'m str, media_type: &'m str, url: &'m str) -> Self` - Creates a new `MediaModel` instance.
+//!
+//! ## Examples
+//!
+//! Sending a video from static dir:
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//!
+//! #[action]
+//! async fn SendFileFromStaticDir(res: Res, req: Req) {
+//!     let text = TextModel::new(&req.user, "Sending file... Please wait!");
+//!     res.send(text).await;
+//!     let url = format!("{host}/static/video.mp4", host = req.host);
+//!     res.send(MediaModel::new(&req.user, "video", &url)).await;
+//! }
+//! ```
+//!
+//! Sending a media file:
+//!
+//! ```rust
+//! use russenger::response_models::media::MediaModel;
+//! let message = MediaModel::new("sender_id", "image", "https://cdn.pixabay.com/photo/2017/06/28/10/53/board-2450236_960_720.jpg");
+//! ```
+//!
+//! ## Returns
+//!
+//! A POST request to the Facebook API to send a media file using the Facebook URL.
+//!
+//! ## Reference
+//!
+//! [Facebook Messenger Platform - Send API Reference](https://developers.facebook.com/docs/messenger-platform/reference/send-api)
 use serde::Serialize;
 
 use super::recipient::Recipient;
@@ -44,7 +90,7 @@ struct Attachment<'s> {
 /// async fn SendFileFromStaticDir(res: Res, req: Req) {
 ///     let text = TextModel::new(&req.user, "Sending file... Please wait!");
 ///     res.send(text).await;
-///     let url = format!("{host}/video.mp4", host = req.host);
+///     let url = format!("{host}/static/video.mp4", host = req.host);
 ///     res.send(MediaModel::new(&req.user, "video", &url)).await;
 /// }
 /// ```

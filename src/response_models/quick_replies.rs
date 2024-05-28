@@ -1,3 +1,67 @@
+//! This module provides `QuickReply` and `QuickReplyModel` structs that represent a quick reply button and a message with quick reply buttons in a Messenger conversation.
+//!
+//! ## QuickReply Struct
+//!
+//! The `QuickReply` struct represents a quick reply button in a Messenger conversation. Quick replies provide a way to present a set of up to 13 buttons in-conversation that contain a title and optional image, and appear prominently above the composer.
+//!
+//! ### Fields
+//!
+//! * `content_type: String` - The type of content. In this case, it's always "text".
+//! * `title: String` - The title of the quick reply button.
+//! * `payload: String` - The payload of the quick reply button.
+//! * `image_url: String` - The URL of the image to be displayed on the quick reply button.
+//!
+//! ### Methods
+//!
+//! * `new(title: &str, image_url: &str, payload: Payload) -> Self` - Creates a new `QuickReply` instance.
+//!
+//! ## QuickReplyModel Struct
+//!
+//! The `QuickReplyModel` struct represents a message with quick reply buttons in a Messenger conversation.
+//!
+//! ### Fields
+//!
+//! * `messaging_type: String` - The type of messaging. For quick reply messages, this is always "RESPONSE".
+//! * `recipient: Recipient` - The recipient of the quick reply message.
+//! * `message: QuickMessage` - The message that contains the text and the quick reply buttons.
+//!
+//! ### Methods
+//!
+//! * `new(sender: &'q str, text: &'q str, quick_replies: Vec<QuickReply>) -> Self` - Creates a new `QuickReplyModel` instance.
+//!
+//! ## Examples
+//!
+//! Creating a `QuickReply` and a `QuickReplyModel`:
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//! 
+//! #[action]
+//! async fn Main(res: Res, req: Req) {
+//!     let data = Data::new("HelloWorld", None);
+//!     let payload = Payload::new(HelloWorld, Some(data));
+//!     let quick_replies = vec![QuickReply::new("Button Title", "https://example.com/image.png", payload)];
+//!     let quick_reply = QuickReplyModel::new(&req.user, "Choose an option:", quick_replies);
+//!     res.send(quick_reply).await;
+//! }
+//!
+//!
+//! #[action]
+//! async fn HelloWorld(res: Res, req: Req) {
+//!     let hello_world: String = req.data.get_value();
+//!     res.send(TextModel::new(&req.user, &hello_world)).await;
+//! }
+//! 
+//! russenger_app!(Main, HelloWorld);
+//! ```
+//!
+//! ## Returns
+//!
+//! A POST request to the Facebook API to send a quick reply button or a message with quick reply buttons.
+//!
+//! ## Reference
+//!
+//! [Facebook Messenger Platform - Quick Replies](https://developers.facebook.com/docs/messenger-platform/send-messages/quick-replies)
 use serde::Serialize;
 
 use super::ResponseModel;

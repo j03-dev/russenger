@@ -7,8 +7,9 @@ license = "Apache-2.0"
 documentation = "https://docs.rs/russenger/latest/russenger/"
 homepage = "https://github.com/j03-dev/russenger"
 repository = "https://github.com/j03-dev/russenger"
-# Author information
 authors = ["FITAHIANA Nomeniavo Joe <24nomeniavo@gmail.com>"]
+keywords = ["action", "button", "user", "send", "facebook", "bot", "messenger", "rust", "facebookresponse"]
+categories = ["web-programming", "api-bindings"]
 
 [lib]
 name = "russenger"

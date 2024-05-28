@@ -32,12 +32,11 @@ use crate::query::Query;
 use std::env;
 
 fn print_info(host: &str, port: u16) {
-    let url = format!("{host}:{port}");
-    println!("You can access the server at {url}");
+    let url = format!("http://{}:{}", host, port);
     println!("Endpoints:");
-    println!("  GET: {url}/");
-    println!("  GET: {url}/webhook");
-    println!("  POST: {url}/webhook");
+    println!("  GET: {}/ - Root endpoint", url);
+    println!("  GET: {}/webhook - Webhook verification endpoint", url);
+    println!("  POST: {}/webhook - Webhook core endpoint", url);
 }
 
 async fn run_server() {

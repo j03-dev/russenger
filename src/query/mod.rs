@@ -95,6 +95,7 @@ impl Query {
         .await
         .is_ok()
     }
+
     pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {
         if let Ok(Some(user)) = User::find_by_id(user_id).one(&self.conn).await {
             ActiveModel {

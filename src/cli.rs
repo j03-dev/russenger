@@ -31,6 +31,15 @@ use crate::query::Query;
 
 use std::env;
 
+fn print_info(host: &str, port: u16) {
+    let url = format!("{host}:{port}");
+    println!("You can access the server at {url}");
+    println!("Endpoints:");
+    println!("  GET: {url}/");
+    println!("  GET: {url}/webhook");
+    println!("  POST: {url}/webhook");
+}
+
 async fn run_server() {
     if !ACTION_REGISTRY.lock().await.contains_key("Main") {
         panic!("'russenger_app!' should contain `Main` action");
@@ -41,7 +50,7 @@ async fn run_server() {
         .unwrap_or("2453".into())
         .parse()
         .unwrap_or(2453);
-    println!("server start on {host}:{port}");
+    print_info(&host, port);
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))

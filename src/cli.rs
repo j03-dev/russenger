@@ -25,15 +25,23 @@ use dotenv::dotenv;
 use crate::core::{
     action::ACTION_REGISTRY,
     app_state::AppState,
-    services::{webhook_core, webhook_verify}, // core services
+    services::{index, webhook_core, webhook_verify}, // core services
 };
 use crate::query::Query;
 
 use std::env;
 
+fn print_info(host: &str, port: u16) {
+    let url = format!("http://{}:{}", host, port);
+    println!("Endpoints:");
+    println!("  GET: {}/ - Root endpoint", url);
+    println!("  GET: {}/webhook - Webhook verification endpoint", url);
+    println!("  POST: {}/webhook - Webhook core endpoint", url);
+}
+
 async fn run_server() {
     if !ACTION_REGISTRY.lock().await.contains_key("Main") {
-        panic!("'russenger_app!' should containt `Main` action");
+        panic!("'russenger_app!' should contain `Main` action");
     }
     let app_state = AppState::init().await;
     let host = env::var("HOST").unwrap_or("0.0.0.0".into());
@@ -41,10 +49,11 @@ async fn run_server() {
         .unwrap_or("2453".into())
         .parse()
         .unwrap_or(2453);
-    println!("server start on {host}:{port}");
+    print_info(&host, port);
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))
+            .service(index)
             .service(webhook_verify)
             .service(webhook_core)
             .service(fs::Files::new("/static", "static").show_files_listing())

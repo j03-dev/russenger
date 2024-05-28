@@ -1,3 +1,14 @@
+//! The `services` contains the actix-web handlers for the webhook endpoints.
+//!
+//! # Functions
+//!
+//! * `webhook_verify`: This function verifies the webhook.
+//! * `webhook_core`: This function handles the webhook core.
+//!
+//! Endpoints:
+//!
+//! * `GET /webhook`: This endpoint verifies the webhook.
+//! * `POST /webhook`: This endpoint handles the webhook core.
 use std::str::FromStr;
 
 use actix_web::{dev, get, post, web, HttpResponse};
@@ -16,12 +27,22 @@ use crate::{
     response_models::{data::Data, payload::Payload},
 };
 
+#[get("/")]
+async fn index(data: web::Data<AppState>) -> Result<HttpResponse, actix_web::Error> {
+    let template = &data.templates;
+    let ctx = tera::Context::new();
+    let body = template
+        .render("index.html.tera", &ctx)
+        .map_err(|_| actix_web::error::ErrorInternalServerError("Template error"))?;
+    Ok(HttpResponse::Ok().content_type("text/html").body(body))
+}
+
 #[get("/webhook")]
 pub async fn webhook_verify(web_query: web::Query<WebQuery>) -> HttpResponse {
     web_query.get_hub_challenge()
 }
 
-pub enum Executable<'a> {
+enum Executable<'a> {
     Payload(&'a str, &'a str, &'a str, Query),
     TextMessage(&'a str, &'a str, &'a str, Query),
 }

@@ -1,3 +1,49 @@
+//! The `generic` module contains structs and methods for creating and sending generic template messages in Facebook Messenger.
+//!
+//! A generic template message is a type of structured message that can contain multiple `GenericElement`s.
+//! Each `GenericElement` can contain a title, subtitle, image, and multiple buttons.
+//!
+//! This module provides the following structs:
+//!
+//! * `GenericElement`: Represents a single element in a generic template.
+//! * `GenericModel`: Represents a generic template message.
+//!
+//! It also provides methods for creating and sending generic template messages.
+//!
+//! # Examples
+//!
+//! Creating and sending a generic template message:
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//!
+//! #[action]
+//! async fn Main(res: Res, req: Req) {
+//!     let elements = vec![
+//!         GenericElement::new(
+//!             "Title",
+//!             "https://example.com/image.jpg",
+//!             "Subtitle",
+//!             vec![Button::Postback {
+//!                 title: "Hello World".to_owned(),
+//!                 payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
+//!             }],
+//!         ),
+//!         // More elements ....
+//!     ];
+//!
+//!     let generic = GenericModel::new(&req.user, elements, None);
+//!     res.send(generic).await;
+//! }
+//!
+//! #[action]
+//! async fn HelloWorld(res: Res, req: Req) {
+//!     let hello_world: String = req.data.get_value();
+//!     res.send(TextModel::new(&req.user, &hello_world)).await;
+//! }
+//! ```
+//!
+//! For more information on generic template messages, refer to the [Facebook Documentation](https://developers.facebook.com/docs/messenger-platform/send-messages/template/generic).
 use core::panic;
 use serde::Serialize;
 use serde_json::value::Value;

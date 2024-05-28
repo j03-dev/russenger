@@ -1,3 +1,54 @@
+//! This module provides a `PersistentMenuModel` struct that represents a persistent menu in a Messenger conversation.
+//!
+//! ## PersistentMenuModel Struct
+//!
+//! The `PersistentMenuModel` struct represents a persistent menu in a Messenger conversation. The persistent menu is an always-on user interface element inside Messenger conversations. It's an easy way to help people discover and access the core functionality of your Messenger bot at any point in the conversation.
+//!
+//! ### Fields
+//!
+//! * `psid: String` - The ID of the recipient.
+//! * `persistent_menu: Vec<Menu>` - The items in the persistent menu.
+//!
+//! ### Methods
+//!
+//! * `new(sender: &'p str, buttons: Vec<Button>) -> Self` - Creates a new `PersistentMenuModel` instance.
+//!
+//! ## Examples
+//!
+//! Creating a `PersistentMenuModel` and sending it:
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//!
+//! #[action]
+//! async fn Main(res: Res, req: Req) {
+//!     // Need Getstart First Before Send PersistenceMenu
+//!     res.send(GetStartedModel::new(Payload::default())).await;
+//!     let buttons = vec![
+//!         Button::Postback {
+//!             title: "Option 1".to_owned(),
+//!             payload: Payload::new(Option1, None),
+//!         },
+//!         // More buttons
+//!     ];
+//!
+//!     let menu = PersistentMenuModel::new(&req.user, buttons);
+//!     res.send(menu).await;
+//! }
+//!
+//! #[action]
+//! async fn Option1(res: Res, req: Req) {
+//!     res.send(TextModel::new(&req.user, "Option_1")).await;
+//! }
+//! ```
+//!
+//! ## Returns
+//!
+//! A POST request to the Facebook API to send a persistent menu.
+//!
+//! ## Reference
+//!
+//! [Facebook Messenger Platform - Persistent Menu](https://developers.facebook.com/docs/messenger-platform/send-messages/persistent-menu)
 use super::button::Button;
 use super::ResponseModel;
 use serde::Serialize;

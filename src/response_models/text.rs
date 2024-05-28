@@ -1,11 +1,55 @@
+//! This module provides `Message` and `MessageModel` structs that represent a message in a Messenger conversation.
+//!
+//! ## Message Struct
+//!
+//! The `Message` struct represents a message in a Messenger conversation. This struct is used to send a message to the recipient.
+//!
+//! ### Fields
+//!
+//! * `text: String` - The text of the message.
+//!
+//! ## MessageModel Struct
+//!
+//! The `MessageModel` struct is used to send a message to the recipient. This struct contains the recipient, the type of messaging, and the message itself.
+//!
+//! ### Fields
+//!
+//! * `recipient: Recipient` - The recipient of the message.
+//! * `messaging_type: String` - The type of messaging. For messages, this is always "RESPONSE".
+//! * `message: Message` - The message to send.
+//!
+//! ### Methods
+//!
+//! * `new(sender: &'s str, text: &'s str) -> Self` - Creates a new `MessageModel` instance.
+//!
+//! ## Examples
+//!
+//! Sending a message:
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//!
+//! #[action]
+//! async fn Main(res: Res, req: Req) {
+//!     res.send(TextModel::new(&req.user, "Hello World!")).await;
+//! }
+//! ```
+//!
+//! ## Returns
+//!
+//! A POST request to the Facebook API to send a message.
+//!
+//! ## Reference
+//!
+//! [Facebook Messenger Platform - Send Messages](https://developers.facebook.com/docs/messenger-platform/send-messages)
 use serde::Serialize;
 
 use super::recipient::Recipient;
 use super::ResponseModel;
 
 #[derive(Serialize)]
-struct Text<'t> {
-    text: &'t str,
+struct Text {
+    text: String,
 }
 
 /// `TextModel` is used to send text messages to the recipient.
@@ -42,7 +86,7 @@ struct Text<'t> {
 pub struct TextModel<'s> {
     recipient: Recipient<'s>,
     messaging_type: &'s str,
-    message: Text<'s>,
+    message: Text,
 }
 
 impl<'s> TextModel<'s> {
@@ -67,11 +111,13 @@ impl<'s> TextModel<'s> {
     /// ```
     ///
     /// [Facebook Documentation](https://developers.facebook.com/docs/messenger-platform/send-messages#sending_text)
-    pub fn new(sender: &'s str, text: &'s str) -> Self {
+    pub fn new(sender: &'s str, text: &str) -> Self {
         Self {
             recipient: Recipient { id: sender },
             messaging_type: "RESPONSE",
-            message: Text { text },
+            message: Text {
+                text: text.to_owned(),
+            },
         }
     }
 }

@@ -1,6 +1,6 @@
 [package]
 name = "russenger"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 description = "A Rust library designed to simplify the handling of Facebook Messenger webhook responses."
 license = "Apache-2.0"
@@ -20,7 +20,7 @@ path = "src/lib.rs"
 version = "0.1.0"
 
 [dependencies]
-reqwest = { version = "^0.11.18", features = ["json"] }
+reqwest = { version = "0.12.4", features = ["json"] }
 serde = { version = "^1.0", features = ["derive"] }
 async-trait = "^0.1.77"
 serde_json = "^1.0.107"
@@ -29,6 +29,7 @@ dotenv = "^0.15.0"
 tokio = "^1.36.0"
 actix-web = "^4"
 actix-files = "^0.6.5"
+tera = "^1.19.1"
 
 [dependencies.sqlx]
 version = "^0.7.1"

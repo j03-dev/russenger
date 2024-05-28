@@ -1,3 +1,17 @@
+//! The `request_handler` module contains the request handler for the webhook endpoint.
+//!
+//! The `WebQuery` struct is used to handle the query parameters of the webhook endpoint.
+//! It specifically deals with the parameters sent by Facebook during the webhook verification process.
+//! This includes `hub.mode`, `hub.challenge`, and `hub.verify_token`.
+//!
+//! # Example
+//!
+//! A typical query from Facebook for webhook verification might look like:
+//! `GET /webhook?hub.verify_token=<your_verify_token>&hub.challenge=CHALLENGE_ACCEPTED&hub.mode=subscribe`
+//!
+//! The `WebQuery` struct extracts these parameters and validates them against the environment's
+//! verification token. If the mode is `subscribe` and the tokens match, it responds with the
+//! `hub.challenge` to confirm the subscription; otherwise, it responds with an error.
 use actix_web::HttpResponse;
 use serde::Deserialize;
 
@@ -25,7 +39,7 @@ impl WebQuery {
                     HttpResponse::Unauthorized().body("Token mismatch")
                 }
             }
-            _ => HttpResponse::Unauthorized().body("Arguments not enough"),
+            _ => HttpResponse::Unauthorized().body("Insufficient arguments provided"),
         }
     }
 }

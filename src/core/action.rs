@@ -1,3 +1,22 @@
+//! The `action` module contains the `Action` trait and the `ActionLock` struct.
+//!
+//! The `Action` trait is used to define the actions that can be performed by the application.
+//!
+//! The `ActionLock` struct is used to prevent multiple actions from being executed at the same time.
+//!
+//! # Examples
+//!
+//! Implementing the `Action` trait:
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//!
+//! #[action]
+//! async fn HelloWorld(res: Res, req: Req) {
+//!     let hello_world: String = req.data.get_value();
+//!     res.send(TextModel::new(&req.user, &hello_world)).await;
+//! }
+//! ```
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
@@ -8,11 +27,21 @@ use crate::response_models::data::Data;
 use crate::response_models::payload::Payload;
 use crate::response_models::quick_replies::{QuickReply, QuickReplyModel};
 
+/// The `ActionLock` struct is used to prevent multiple actions from being executed at the same time.
+///
+/// # Fields
+///
+/// * `locked_users`: A `HashSet` of `String`s that contains the users that are currently locked.
 pub struct ActionLock {
     pub locked_users: Arc<Mutex<HashSet<String>>>,
 }
 
 impl ActionLock {
+    /// Locks the user.
+    ///
+    /// # Parameters
+    ///
+    /// * `user: &str` - The user to lock.
     pub async fn lock(&self, user: &str) -> bool {
         let mut locked_user = self.locked_users.lock().await;
         if !locked_user.contains(user) {
@@ -23,6 +52,11 @@ impl ActionLock {
         }
     }
 
+    /// Unlocks the user.
+    ///
+    /// # Parameters
+    ///
+    /// * `user: &str` - The user to unlock.
     pub async fn unlock(&self, user: &str) {
         let mut locked_users = self.locked_users.lock().await;
         locked_users.remove(user);
@@ -109,5 +143,9 @@ lazy_static::lazy_static! {
     /// }
     /// ```
     pub static ref ACTION_REGISTRY: ActionRegistryType = Arc::new(Mutex::new(HashMap::new()));
+
+    /// `ACTION_LOCK` is a thread-safe lock that prevents multiple actions from being executed at the same time.
+    ///
+    /// The `ACTION_LOCK` is initialized with an empty set when the application starts, and users are added to it when an action is executed.
     pub static ref ACTION_LOCK: ActionLock = ActionLock { locked_users: Arc::new(Mutex::new(HashSet::new()))};
 }

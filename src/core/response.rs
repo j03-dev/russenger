@@ -1,3 +1,19 @@
+//! The `response` module contains the `Res` struct that represents a response that can be sent to a user.
+//!
+//! The `Res` struct does not contain any fields.
+//!
+//! # Examples
+//!
+//! Send a response to a user on Action
+//!
+//! ```rust
+//! use russenger::prelude::*;
+//!
+//! #[action]
+//! async fn Main(res: Res, req: Req) {
+//!     res.send(TextModel::new(&req.user, "Hello World")).await;
+//! }
+//! ```
 use std::env;
 
 use crate::response_models::ResponseModel;

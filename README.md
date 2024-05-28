@@ -19,9 +19,10 @@ Russenger provides the following features:
 - **Getstart:** A model to handle the "Get Started" button in Messenger.
 - **PersistenceMenu:** A model to handle persistent menus in Messenger.
 - **Action:** A model to handle sender actions like typing indicators.
-- **Actix-web Integration**: Russenger now leverages Actix-web for improved speed and performance in handling Messenger webhook responses.
+- **Actix-web Integration**: Russenger continues to leverage Actix-web for improved speed and performance in handling Messenger webhook responses.
 
 ### New Features
+- **SeaORM Integration**: Russenger now leverages SeaORM for improved database operations.
 
 #### Old Method with `create_action!`
 

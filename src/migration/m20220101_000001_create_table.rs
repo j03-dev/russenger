@@ -12,7 +12,7 @@ impl MigrationTrait for Migration {
                     .table(RussengerUser::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(RussengerUser::SenderId)
+                        ColumnDef::new(RussengerUser::Facebook_User_Id)
                             .string()
                             .not_null()
                             .primary_key(),
@@ -33,6 +33,7 @@ impl MigrationTrait for Migration {
 #[derive(DeriveIden)]
 enum RussengerUser {
     Table,
-    SenderId,
+    #[allow(non_camel_case_types)]
+    Facebook_User_Id,
     Action,
 }

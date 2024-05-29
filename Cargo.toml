@@ -8,17 +8,7 @@ documentation = "https://docs.rs/russenger/latest/russenger/"
 homepage = "https://github.com/j03-dev/russenger"
 repository = "https://github.com/j03-dev/russenger"
 authors = ["FITAHIANA Nomeniavo Joe <24nomeniavo@gmail.com>"]
-keywords = [
-  "action",
-  "button",
-  "user",
-  "send",
-  "facebook",
-  "bot",
-  "messenger",
-  "rust",
-  "facebookresponse",
-]
+keywords = ["facebook", "bot", "messenger", "rust"]
 categories = ["web-programming", "api-bindings"]
 
 [lib]

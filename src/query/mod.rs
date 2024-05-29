@@ -40,13 +40,9 @@
 use core::panic;
 use std::env::var;
 
-use crate::Action;
-
 use crate::entity::{ActiveModel, Entity as User};
-
-use migration::sea_orm::*;
-use migration::sea_orm::{Database, DatabaseConnection};
-use migration::{Migrator, MigratorTrait};
+use crate::migration::{sea_orm::*, Migrator, MigratorTrait};
+use crate::Action;
 
 async fn establish_connection() -> Result<DatabaseConnection, String> {
     let database_url = var("DATABASE").expect("Database name not found in .env file");
@@ -112,7 +108,7 @@ impl Query {
     /// Returns `true` if the record is successfully created, `false` otherwise.
     pub async fn create(&self, user_id: &str) -> bool {
         ActiveModel {
-            senderid: Set(user_id.to_owned()),
+            facebook_user_id: Set(user_id.to_owned()),
             action: Set("Main".to_owned()),
         }
         .save(&self.conn)
@@ -147,13 +143,13 @@ impl Query {
     ///     let username: String = req.data.get_value();
     ///     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await;
     /// }
-    /// 
+    ///
     /// russenger_app!(Main, GetUserInput);
     /// ```
     pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {
         if let Ok(Some(user)) = User::find_by_id(user_id).one(&self.conn).await {
             ActiveModel {
-                senderid: Set(user.senderid),
+                facebook_user_id: Set(user.facebook_user_id),
                 action: Set(action.path()),
             }
             .update(&self.conn)

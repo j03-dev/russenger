@@ -1,5 +1,5 @@
-use migration::sea_orm;
-use migration::sea_orm::entity::prelude::*;
+use crate::migration::sea_orm;
+use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Deserialize, Serialize)]
@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    pub senderid: String,
+    pub facebook_user_id: String,
     pub action: String,
 }
 

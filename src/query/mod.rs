@@ -140,13 +140,18 @@ impl Query {
     /// russenger_app!(Main, GetUserInput);
     /// ```
     pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {
-        let user = RussengerUser::get(kwargs!(facebook_user_id = user_id), &self.conn).await;
-        RussengerUser {
-            action: action.path(),
-            ..user
+        if let Some(user) =
+            RussengerUser::get(kwargs!(facebook_user_id = user_id), &self.conn).await
+        {
+            RussengerUser {
+                action: action.path(),
+                ..user
+            }
+            .update(&self.conn)
+            .await
+        } else {
+            false
         }
-        .update(&self.conn)
-        .await
     }
 
     /// Retrieves the action for a user.
@@ -159,7 +164,12 @@ impl Query {
     ///
     /// Returns the action as an `Option<String>`. Returns `None` if the user is not found.
     pub async fn get_action(&self, user_id: &str) -> Option<String> {
-        let user = RussengerUser::get(kwargs!(facebook_user_id = user_id), &self.conn).await;
-        Some(user.action)
+        if let Some(user) =
+            RussengerUser::get(kwargs!(facebook_user_id = user_id), &self.conn).await
+        {
+            Some(user.action)
+        } else {
+            None
+        }
     }
 }

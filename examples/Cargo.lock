@@ -1834,14 +1834,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c8640c5d730cb13ebd907d8d04b52f55ac9a2eec55b440c8892f40d56c76c1d"
 
 [[package]]
-name = "migration"
-version = "0.1.0"
-dependencies = [
- "async-std",
- "sea-orm-migration",
-]
-
-[[package]]
 name = "mime"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2547,12 +2539,13 @@ version = "0.1.6"
 dependencies = [
  "actix-files",
  "actix-web",
+ "async-std",
  "async-trait",
  "dotenv",
  "lazy_static",
- "migration",
  "reqwest",
  "russenger_macro",
+ "sea-orm-migration",
  "serde",
  "serde_json",
  "tera",
@@ -2867,6 +2860,14 @@ name = "semver"
 version = "1.0.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "92d43fe69e652f3df9bdc2b85b2854a0825b86e4fb76bc44d945137d053639ca"
+
+[[package]]
+name = "sendfile"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "russenger",
+]
 
 [[package]]
 name = "serde"

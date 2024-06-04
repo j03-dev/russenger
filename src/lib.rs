@@ -41,8 +41,6 @@ pub use async_trait::async_trait;
 
 pub mod cli;
 pub mod core;
-pub mod entity;
-mod migration;
 pub mod prelude;
 pub mod query;
 pub mod response_models;

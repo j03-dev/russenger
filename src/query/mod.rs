@@ -45,6 +45,7 @@ use crate::Action;
 pub struct RussengerUser {
     #[model(primary_key = true, null = false)]
     pub facebook_user_id: String,
+    #[model(default = "Main")]
     pub action: String,
 }
 
@@ -102,11 +103,7 @@ impl Query {
     ///
     /// Returns `true` if the record is successfully created, `false` otherwise.
     pub async fn create(&self, user_id: &str) -> bool {
-        RussengerUser::create(
-            kwargs!(facebook_user_id = user_id, action = "Main"),
-            &self.conn,
-        )
-        .await
+        RussengerUser::create(kwargs!(facebook_user_id = user_id), &self.conn).await
     }
 
     /// Sets the action for a user.

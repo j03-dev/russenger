@@ -50,58 +50,6 @@ pub use core::action::{Action, ACTION_REGISTRY};
 pub use dotenv::dotenv;
 pub use russenger_macro::action;
 
-/// # Deprecated
-///
-/// This macro is deprecated. Please use the `#[action]` proc macro instead.
-///
-/// ```rust
-/// use russenger::prelude::*;
-///
-/// #[action]
-/// async fn Main(res: Res, req: Req) {
-///     let message: String = req.data.get_value();
-///     if message == "Hello" {
-///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
-///     }
-/// }
-/// ```
-/// # Examples
-///
-/// Creating a new action that sends a greeting message when the user input is "Hello":
-///
-/// ```rust
-/// use russenger::create_action;
-/// use russenger::prelude::*;
-///
-/// create_action!(Main, |res: Res, req: Req| async move {
-///     let message: String = req.data.get_value();
-///     if message == "Hello" {
-///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
-///     }
-/// });
-/// ```
-#[macro_export]
-#[deprecated(
-    since = "0.1.5",
-    note = "Please use the `#[action]` proc macro instead."
-)]
-macro_rules! create_action {
-    ($name:ident, $handler:expr) => {
-        pub struct $name;
-
-        #[russenger::async_trait]
-        impl russenger::Action for $name {
-            async fn execute(&self, res: russenger::prelude::Res, req: russenger::prelude::Req) {
-                ($handler)(res, req).await;
-            }
-
-            fn path(&self) -> String {
-                stringify!($name).to_string()
-            }
-        }
-    };
-}
-
 /// The `russenger_app!` macro is used to create the main application.
 ///
 /// It registers all the provided actions in the `ACTION_REGISTRY` and then starts the command handler.

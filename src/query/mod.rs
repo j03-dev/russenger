@@ -166,6 +166,7 @@ impl Query {
         {
             Some(user.action)
         } else {
+            println!("Action is not found");
             None
         }
     }

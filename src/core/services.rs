@@ -78,6 +78,7 @@ pub async fn webhook_core(
     let query = app_state.query.clone();
     let user = data.get_sender();
     let host = conn.host();
+    println!("data {:#?}", data);
     query.create(user).await;
     if ACTION_LOCK.lock(user).await {
         if let Some(message) = data.get_message() {

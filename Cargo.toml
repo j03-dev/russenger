@@ -35,4 +35,4 @@ tera = "^1.19.1"
 [dependencies.rusql-alchemy]
 version = "0.1.0"
 git = "https://github.com/j03-dev/rusql-alchemy"
-branch = "main"
+branch = "turso"

@@ -9,7 +9,6 @@ publish = false
 
 [dependencies.russenger]
 path = "../.."
-features = ["sqlite"]
 
 [dependencies]
 actix-web = "^4"

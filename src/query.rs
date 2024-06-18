@@ -20,6 +20,7 @@
 //! ## Examples
 //!
 //! ```rust
+//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! #[action]
@@ -35,19 +36,18 @@
 //!     Main.execute(res, req).await; // go back to Main Action
 //! }
 //!
-//! russenger_app!(Main, GetUserInput);
+//! #[russenger::main]
+//! async fn main() {
+//!     let conn = Database::new().await.conn;
+//!     migrate!([RussengerUser], &conn);
+//!     russenger::actions![Main, GetUserInput];
+//!     russenger::launch().await;
+//! }
 //! ```
-use rusql_alchemy::prelude::*;
-
 use crate::Action;
+use crate::models::RussengerUser;
 
-#[derive(Deserialize, Model, Default)]
-pub struct RussengerUser {
-    #[model(primary_key = true, null = false)]
-    pub facebook_user_id: String,
-    #[model(default = "Main")]
-    pub action: String,
-}
+use rusql_alchemy::prelude::*;
 
 /// The `Query` struct represents a database query.
 ///
@@ -120,6 +120,7 @@ impl Query {
     /// # Examples
     ///
     /// ```rust
+    /// use russenger::models::RussengerUser;
     /// use russenger::prelude::*;
     ///
     /// #[action]
@@ -133,8 +134,14 @@ impl Query {
     ///     let username: String = req.data.get_value();
     ///     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await;
     /// }
-    ///
-    /// russenger_app!(Main, GetUserInput);
+    /// 
+    /// #[russenger::main]
+    /// async fn main() { 
+    ///     let conn = Database::new().await.conn;
+    ///     migrate!([RussengerUser], &conn);
+    ///     russenger::actions![Main, GetUserInput];
+    ///     russenger::launch().await;
+    /// }
     /// ```
     pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {
         if let Some(user) =

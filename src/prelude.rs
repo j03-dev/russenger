@@ -11,6 +11,7 @@
 //! Using the `prelude` module to include everything needed for a basic application:
 //!
 //! ```rust
+//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! #[action]
@@ -21,12 +22,21 @@
 //!     }
 //! }
 //!
-//! russenger_app!(Main);
+//! #[russenger::main]
+//! async fn main() {
+//!     let conn = Database::new().await.conn;
+//!     migrate!([RussengerUser], &conn);
+//!
+//!     russenger::actions![Main];
+//!     russenger::launch().await;
+//! }
+//! ```
 pub use crate::action;
 pub use crate::core::{
     request::Req,
     response::{Res, SendResult},
 };
+pub use crate::launch;
 pub use crate::response_models::{
     button::{Button, ButtonModel},
     data::Data,
@@ -40,4 +50,5 @@ pub use crate::response_models::{
     text::TextModel,
     ResponseModel,
 };
-pub use crate::russenger_app;
+
+pub use rusql_alchemy::prelude::{config::db::Database, *};

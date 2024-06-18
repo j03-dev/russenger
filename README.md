@@ -72,7 +72,7 @@ Here's an example of how to use Russenger to handle different actions in a chatb
 #### Russenger `Cargo.toml`
 
 ```toml
-russenger = "0.1.6"
+russenger = "0.2.0"
 actix-web = "4"
 ```
 
@@ -102,6 +102,7 @@ DATABASE=sqlite:<db_name>
 #### Code `src/main.rs`
 
 ```rust
+use russenger::models::RussengerUser;
 use russenger::prelude::*;
 
 #[action]
@@ -155,12 +156,20 @@ async fn Option2 (res: Res, req: Req) {
     .await;
 }
 
-russenger_app!(Main, Option1, Option2);
+#[russenger::main]
+async fn main() {
+    let conn = Database::new().await.conn;
+    migrate!([RussengerUser, &conn);
+    
+    russenger::action![Main, Option1, Option2];
+    russenger.launch().await;
+}
 ```
 
 ##### Who to get User Input
 
 ```rust
+use russenger::models::RussengerUser;
 use russenger::prelude::*;
 
 #[action]
@@ -179,12 +188,20 @@ async fn GetUsername (res: Res, req: Req){
         .await;
 }
 
-russenger_app!(Main, GetUsername);
+#[russenger::main]
+async fn main() {
+    let conn = Database::new().await.conn;
+    migrate!([RussengerUser, &conn);
+    
+    russenger::action![Main, GetUsername];
+    russenger.launch().await;
+}
 ```
 
 ##### How to send file from static
 
 ```rust
+use russenger::models::RussengerUser;
 use russenger::prelude::*;
 
 #[action]
@@ -197,11 +214,19 @@ async fn Main (res: Res, req: Req) {
     res.send(MediaModel::new(
         &req.user,
         "image",
-        &format!("{host}/image.png", host = req.host),
+        &format!("{host}/static/image.png", host = req.host),
     ))
     .await;
 }
-russenger_app!(Main);
+
+#[russenger::main]
+async fn main() {
+    let conn = Database::new().await.conn;
+    migrate!([RussengerUser, &conn);
+    
+    russenger::action![Main];
+    russenger.launch().await;
+}
 ```
 
 #### Run

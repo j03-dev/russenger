@@ -34,6 +34,7 @@
 //! Creating a `QuickReply` and a `QuickReplyModel`:
 //!
 //! ```rust
+//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //! 
 //! #[action]
@@ -52,7 +53,13 @@
 //!     res.send(TextModel::new(&req.user, &hello_world)).await;
 //! }
 //! 
-//! russenger_app!(Main, HelloWorld);
+//! #[russenger::main]
+//! async fn main() {
+//!     let conn = Database::new().await.conn;
+//!     migrate!([RussengerUser], &conn);
+//!     russenger::actions![Main, HelloWorld];
+//!     russenger::launch().await;
+//! }
 //! ```
 //!
 //! ## Returns

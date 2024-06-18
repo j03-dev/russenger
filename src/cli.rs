@@ -27,7 +27,6 @@ use crate::core::{
     app_state::AppState,
     services::{index, webhook_core, webhook_verify}, // core services
 };
-use crate::query::Query;
 
 use std::env;
 
@@ -41,7 +40,7 @@ fn print_info(host: &str, port: u16) {
 
 async fn run_server() {
     if !ACTION_REGISTRY.lock().await.contains_key("Main") {
-        panic!("'russenger_app!' should contain `Main` action");
+        panic!("'actions!' should contain `Main` action");
     }
     let app_state = AppState::init().await;
     let host = env::var("HOST").unwrap_or("0.0.0.0".into());
@@ -65,18 +64,8 @@ async fn run_server() {
     .expect("sever is crashed");
 }
 
-async fn migrate() {
-    let query = Query::new().await;
-    println!("Connection successful!");
-    let migration_result = match query.migrate().await {
-        true => "Migration successful!",
-        false => "Migration failed",
-    };
-    println!("{migration_result}");
-}
-
 fn print_usage() {
-    println!("Usage: cargo run --release [runserver|migrate]");
+    println!("Usage: cargo run --release [runserver]");
 }
 
 fn parser() -> Option<String> {
@@ -93,7 +82,6 @@ pub async fn launch() {
     match parser() {
         Some(option) => match option.as_str() {
             "runserver" => run_server().await,
-            "migrate" => migrate().await,
             _ => print_usage(),
         },
         None => print_usage(),

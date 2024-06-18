@@ -20,6 +20,7 @@
 //! ## Examples
 //!
 //! ```rust
+//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! #[action]
@@ -35,21 +36,18 @@
 //!     Main.execute(res, req).await; // go back to Main Action
 //! }
 //!
-//! russenger_app!(Main, GetUserInput);
+//! #[russenger::main]
+//! async fn main() {
+//!     let conn = Database::new().await.conn;
+//!     migrate!([RussengerUser], &conn);
+//!     russenger::actions![Main, GetUserInput];
+//!     russenger::launch().await;
+//! }
 //! ```
-use core::panic;
-use std::env::var;
-
-use crate::entity::{ActiveModel, Entity as User};
-use crate::migration::{sea_orm::*, Migrator, MigratorTrait};
 use crate::Action;
+use crate::models::RussengerUser;
 
-async fn establish_connection() -> Result<DatabaseConnection, String> {
-    let database_url = var("DATABASE").expect("Database name not found in .env file");
-    Database::connect(&database_url)
-        .await
-        .map_err(|err| err.to_string())
-}
+use rusql_alchemy::prelude::*;
 
 /// The `Query` struct represents a database query.
 ///
@@ -67,7 +65,7 @@ async fn establish_connection() -> Result<DatabaseConnection, String> {
 /// * `set_action`: This method updates the action of a user in the `russenger_user` table. It takes a user ID and an action as arguments and returns a boolean indicating whether the operation was successful.
 #[derive(Clone)]
 pub struct Query {
-    pub conn: DatabaseConnection,
+    pub conn: Connection,
 }
 
 /// Represents a query object used for database operations.
@@ -82,10 +80,8 @@ impl Query {
     ///
     /// Panics if the connection cannot be established.
     pub async fn new() -> Self {
-        match establish_connection().await {
-            Ok(conn) => Self { conn },
-            Err(err) => panic!("Can't establish the connection {err:?}"),
-        }
+        let conn = config::db::Database::new().await.conn;
+        Self { conn }
     }
 
     /// Runs database migrations.
@@ -94,7 +90,7 @@ impl Query {
     ///
     /// Returns `true` if the migrations are successful, `false` otherwise.
     pub async fn migrate(&self) -> bool {
-        Migrator::up(&self.conn, None).await.is_ok()
+        migrate!([RussengerUser], &self.conn)
     }
 
     /// Creates a new record in the database.
@@ -107,13 +103,7 @@ impl Query {
     ///
     /// Returns `true` if the record is successfully created, `false` otherwise.
     pub async fn create(&self, user_id: &str) -> bool {
-        ActiveModel {
-            facebook_user_id: Set(user_id.to_owned()),
-            action: Set("Main".to_owned()),
-        }
-        .save(&self.conn)
-        .await
-        .is_ok()
+        RussengerUser::create(kwargs!(facebook_user_id = user_id), &self.conn).await
     }
 
     /// Sets the action for a user.
@@ -130,6 +120,7 @@ impl Query {
     /// # Examples
     ///
     /// ```rust
+    /// use russenger::models::RussengerUser;
     /// use russenger::prelude::*;
     ///
     /// #[action]
@@ -143,18 +134,25 @@ impl Query {
     ///     let username: String = req.data.get_value();
     ///     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await;
     /// }
-    ///
-    /// russenger_app!(Main, GetUserInput);
+    /// 
+    /// #[russenger::main]
+    /// async fn main() { 
+    ///     let conn = Database::new().await.conn;
+    ///     migrate!([RussengerUser], &conn);
+    ///     russenger::actions![Main, GetUserInput];
+    ///     russenger::launch().await;
+    /// }
     /// ```
     pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {
-        if let Ok(Some(user)) = User::find_by_id(user_id).one(&self.conn).await {
-            ActiveModel {
-                facebook_user_id: Set(user.facebook_user_id),
-                action: Set(action.path()),
+        if let Some(user) =
+            RussengerUser::get(kwargs!(facebook_user_id = user_id), &self.conn).await
+        {
+            RussengerUser {
+                action: action.path(),
+                ..user
             }
             .update(&self.conn)
             .await
-            .is_ok()
         } else {
             false
         }
@@ -170,8 +168,10 @@ impl Query {
     ///
     /// Returns the action as an `Option<String>`. Returns `None` if the user is not found.
     pub async fn get_action(&self, user_id: &str) -> Option<String> {
-        if let Ok(Some(user)) = User::find_by_id(user_id).one(&self.conn).await {
-            Some(user.action.to_owned())
+        if let Some(user) =
+            RussengerUser::get(kwargs!(facebook_user_id = user_id), &self.conn).await
+        {
+            Some(user.action)
         } else {
             None
         }

@@ -1,4 +1,5 @@
 use russenger::dotenv;
+use russenger::models::RussengerUser;
 use russenger::prelude::*;
 use serde::Deserialize;
 use serde::Serialize;
@@ -60,7 +61,7 @@ async fn Main(res: Res, req: Req) {
     res.send(PersistentMenuModel::new(
         &req.user,
         vec![Button::Postback {
-            title: "AskGemini",
+            title: "AskGemini".into(),
             payload: Payload::new(HelloWorld, None),
         }],
     ))
@@ -89,4 +90,11 @@ async fn AskGemini(res: Res, req: Req) {
     };
 }
 
-russenger_app!(Main, HelloWorld, AskGemini);
+#[russenger::main]
+async fn main() {
+    let conn = Database::new().await.conn;
+    migrate!([RussengerUser], &conn);
+    russenger::actions![Main, HelloWorld, AskGemini];
+    russenger::launch().await;
+}
+

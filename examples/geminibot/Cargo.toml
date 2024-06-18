@@ -12,5 +12,6 @@ path = "../.."
 
 [dependencies]
 actix-web = "^4"
+rusql-alchemy = "0.1.0"
 reqwest = { version = "0.12.4", features = ["json"] }
 serde = { version = "1.0.198", features = ["derive"] }

@@ -1,5 +1,5 @@
 use const_data::DATA;
-use russenger::prelude::*;
+use russenger::{models::RussengerUser, prelude::*};
 
 mod const_data;
 
@@ -28,4 +28,10 @@ async fn Main(res: Res, req: Req) {
     Main.next(res, req).await; // Send next 10 element
 }
 
-russenger_app!(Main);
+#[russenger::main]
+async fn main() {
+    let conn = Database::new().await.conn;
+    migrate!([RussengerUser], &conn);
+    russenger::actions![Main];
+    russenger::launch().await;
+}

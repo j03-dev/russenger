@@ -8,6 +8,6 @@ edition = "2021"
 [dependencies.russenger]
 path = "../.."
 
-
 [dependencies]
 actix-web = "^4"
+rusql-alchemy = "0.1.0"

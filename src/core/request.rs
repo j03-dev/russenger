@@ -11,6 +11,7 @@
 //! Use the `Req` to get the user and data from a request:
 //!
 //! ```rust
+//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! #[action]
@@ -23,6 +24,7 @@
 //! Use the `Req` to get the user and query from a request:
 //!
 //! ```rust
+//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! #[action]
@@ -37,7 +39,13 @@
 //!   res.send(TextModel::new(&req.user, &format!("Hello, {}!", name))).await;
 //! }
 //!
-//! russenger_app!(Main, Name);
+//! #[russenger::main]
+//! async fn main() {
+//!     let conn = Database::new().await.conn;
+//!     migrate!([RussengerUser], &conn);
+//!     russenger::actions![Main, Name];
+//!     russenger::launch().await;
+//! }
 //! ```
 use crate::query::Query;
 use crate::response_models::data::Data;

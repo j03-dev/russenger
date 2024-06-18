@@ -1,4 +1,5 @@
 use russenger::prelude::*;
+use russenger::models::RussengerUser;
 
 #[action]
 async fn Main(res: Res, _req: Req) {
@@ -28,4 +29,10 @@ async fn HelloWorld(res: Res, req: Req) {
     res.send(TextModel::new(&req.user, "Hello World")).await; // End
 }
 
-russenger_app!(Main, Start, HelloWorld);
+#[russenger::main]
+async fn main() {
+    let conn = Database::new().await.conn;
+    migrate!([RussengerUser], &conn);
+    russenger::actions![Main, HelloWorld, Start];
+    russenger::launch().await;
+}

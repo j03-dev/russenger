@@ -35,6 +35,7 @@
 //! Usse case:
 //! 
 //! ```rust
+//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //! 
 //! #[action]
@@ -43,7 +44,13 @@
 //!     res.send(TextModel::new(&req.user, "Hello, world!"));
 //! }
 //! 
-//! russenger_app!(Main);
+//! #[russenger::main]
+//! async fn main() {
+//!     let conn = Database::new().await.conn;
+//!     migrate!([RussengerUser], &conn);
+//!     russenger::actions![Main];
+//!     russenger::launch().await;
+//! } 
 //! ``` 
 //! 
 //!

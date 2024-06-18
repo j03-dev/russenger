@@ -12,7 +12,5 @@ path = "../.."
 [dependencies]
 actix-web = "^4"
 sqlx = "^0.7"
+rusql-alchemy = { version = "0.1.0", default-features = false , features = ["postgres"]}
 
-[dependencies.rusql-alchemy]
-git = "https://github.com/j03-dev/rusql-alchemy"
-branch = "main"

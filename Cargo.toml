@@ -33,7 +33,7 @@ actix-files = "^0.6.5"
 tera = "^1.19.1"
 sqlx = "^0.7"
 
+
 [dependencies.rusql-alchemy]
 version = "0.1.0"
-git = "https://github.com/j03-dev/rusql-alchemy"
-branch = "main"
+default-features = false

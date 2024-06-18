@@ -3,12 +3,12 @@ use russenger::models::RussengerUser;
 
 #[derive(FromRow, Clone, Model)]
 pub struct Register {
-    #[model(primary_key=true, auto=true, null=false)]
-   pub id: Integer,
-    #[model(foreign_key="RussengerUser.facebook_user_id", null=false, unique=true)]
-   pub user: String,
-    #[model(size=30, unique=true, null=false)]
-   pub username: String 
+    #[model(primary_key = true)]
+    pub id: Serial,
+    #[model(foreign_key = "RussengerUser.facebook_user_id", unique = true, null = false)]
+    pub user_id: String,
+    #[model(size = 30, unique = true, null = false)]
+    pub username: String,
 }
 
 #[action]
@@ -29,12 +29,12 @@ async fn Main(res: Res, req: Req) {
 #[action]
 async fn SignUp(res: Res, req: Req) {
     let username: String = req.data.get_value();
-    let message = if Register::create(kwargs!(user= req.user, username = username), &req.query.conn).await  {
+    let message = if Register::create(kwargs!(user= req.user, username = username), &req.query.conn).await {
         "Register success"
     } else {
         "Register failed"
     };
-    res.send(TextModel::new(&req.user, message)).await; 
+    res.send(TextModel::new(&req.user, message)).await;
     Main.execute(res, req).await;
 }
 
@@ -62,7 +62,7 @@ async fn NextAction(res: Res, req: Req) {
 async fn main() {
     let conn = Database::new().await.conn;
     migrate!([RussengerUser, Register], &conn);
-    
+
     russenger::actions![Main, GetUserInput, NextAction, SignUp];
     russenger::launch().await;
 }

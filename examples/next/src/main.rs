@@ -32,7 +32,6 @@ async fn Main(res: Res, req: Req) {
 async fn main() {
     let conn = Database::new().await.conn;
     migrate!([RussengerUser], &conn);
-    
     russenger::actions![Main];
     russenger::launch().await;
 }

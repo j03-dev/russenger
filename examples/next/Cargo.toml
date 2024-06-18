@@ -10,4 +10,4 @@ path = "../.."
 
 [dependencies]
 actix-web = "^4"
-rusql-alchemy = { version = "0.1.0" }
+rusql-alchemy = "0.1.0"

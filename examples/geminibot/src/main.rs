@@ -94,8 +94,7 @@ async fn AskGemini(res: Res, req: Req) {
 async fn main() {
     let conn = Database::new().await.conn;
     migrate!([RussengerUser], &conn);
-   
-    russenger::actions![Main, HelloWorld, AskGemini]; 
+    russenger::actions![Main, HelloWorld, AskGemini];
     russenger::launch().await;
 }
 

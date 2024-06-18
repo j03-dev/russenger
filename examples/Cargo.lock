@@ -853,6 +853,7 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "reqwest",
+ "rusql-alchemy",
  "russenger",
  "serde",
 ]
@@ -979,6 +980,7 @@ name = "hello"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "rusql-alchemy",
  "russenger",
 ]
 
@@ -1413,6 +1415,7 @@ name = "next"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "rusql-alchemy",
  "russenger",
 ]
 

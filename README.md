@@ -6,52 +6,9 @@ Russenger is a Rust library designed to simplify the handling of Facebook Messen
 convenient way to construct and send various types of responses, including text messages, quick replies, generic
 templates, and media attachments.
 
-## Features
-
-Russenger provides the following features:
-
-- **Text messages:** Send text messages to users.
-- **Quick replies:** Send quick replies with buttons to users.
-- **Generic templates:** Send generic templates with images, titles, and buttons to users.
-- **Media attachments:** Send media attachments such as images, audio, and video to users.
-- **Webhook verification:** Verify incoming webhook requests from Facebook.
-- **Button:** A model to create and manipulate buttons in messages.
-- **Getstart:** A model to handle the "Get Started" button in Messenger.
-- **PersistenceMenu:** A model to handle persistent menus in Messenger.
-- **Action:** A model to handle sender actions like typing indicators.
-- **Actix-web Integration**: Russenger continues to leverage Actix-web for improved speed and performance in handling Messenger webhook responses.
-
-### New Features
-- **SeaORM Integration**: [sea_orm](https://www.sea-ql.org/SeaORM/) Russenger now leverages SeaORM for improved database operations.
-
-#### Old Method with `create_action!`
-
-```rust
-use russenger::prelude::*;
-
-create_action!(Main, |res: Res, req: Req| async move {
-    let message: String = req.data.get_value();
-    if message == "Hello" {
-        res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
-    }
-});
-```
-
-#### New Method with `#[action]`
-
-```rust
-use russenger::prelude::*;
-
-#[action]
-async fn Main(res: Res, req: Req) {
-    let message: String = req.data.get_value();
-    if message == "Hello" {
-        res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
-    }
-}
-```
-
-In both examples, we define an action `Main` that sends a welcome message if the user input is "Hello". The new method using `#[action]` is more concise and easier to read.
+## New Features 
+- Now you can creat your own model using [rusql-alchemy](https://github.com.com/russenger/rusql-alchemy) orm
+  - You can see the [examples](https://github.com.com/russenger/rusql-alchemy/examples)
 
 ## How to Create new Project
 - ### **1**: Install Cargo Generate
@@ -74,9 +31,13 @@ Here's an example of how to use Russenger to handle different actions in a chatb
 ```toml
 russenger = "0.2.0"
 actix-web = "4"
+sqlx = "^0.7.0"
+rusql-alchemy = "0.1.0" # the default feature is sqlite
+# rusql-alchemy = { version = "0.1.0", default-features = false, features = ["mysql"] }
+# rusql-alchemy = { version = "0.1.0", default-features = false, features = ["postgres"] }
 ```
 
-#### Environnement `.env`
+#### Environment `.env`
 
 ```bash
 # You can change this
@@ -102,67 +63,73 @@ DATABASE=sqlite:<db_name>
 #### Code `src/main.rs`
 
 ```rust
-use russenger::models::RussengerUser;
 use russenger::prelude::*;
+use russenger::models::RussengerUser;
+
+#[derive(FromRow, Clone, Model)]
+pub struct Register {
+    #[model(primary_key = true, auto = true, null = false)]
+    pub id: Integer,
+    #[model(foreign_key = "RussengerUser.facebook_user_id", unique = true, null = false)]
+    pub user_id: String,
+    #[model(size = 30, unique = true, null = false)]
+    pub username: String,
+}
 
 #[action]
-async fn Main (res: Res, req: Req) {
-    res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
-        .await;
+async fn Main(res: Res, req: Req) {
+    res.send(TextModel::new(&req.user, "Hello!")).await;
+    if let Some(user_register) = Register::get(kwargs!(user_id = req.user), &req.query.conn).await {
+        res.send(TextModel::new(&req.user, &format!("Hello {}", user_register.username)))
+            .await;
+    } else {
+        res.send(TextModel::new(&req.user, "What is your name: "))
+            .await;
+        req.query.set_action(&req.user, SignUp).await;
+        return;
+    }
+    req.query.set_action(&req.user, GetUserInput).await;
+}
 
-    let payload_1 = Payload::new(Option1, Some(Data::new("payload_for_option_1", None)));
-    let payload_2 = Payload::new(Option2, Some(Data::new("payload_for_option_2", None)));
+#[action]
+async fn SignUp(res: Res, req: Req) {
+    let username: String = req.data.get_value();
+    let message = if Register::create(kwargs!(user_id = req.user, username = username), &req.query.conn).await {
+        "Register success"
+    } else {
+        "Register failed"
+    };
+    res.send(TextModel::new(&req.user, message)).await;
+    Main.execute(res, req).await;
+}
 
-    let replies = vec![
-        QuickReply::new("Option1", "", payload_1),
-        QuickReply::new("Option2", "", payload_2),
+#[action]
+async fn GetUserInput(res: Res, req: Req) {
+    let payload = |value: &str| Payload::new(NextAction, Some(Data::new(value, None)));
+
+    // QuickReply
+    let quick_replies: Vec<QuickReply> = vec![
+        QuickReply::new("blue", "", payload("blue")),
+        QuickReply::new("red", "", payload("red")),
     ];
-    res.send(QuickReplyModel::new(
-        &req.user,
-        "Choose an option:",
-        replies,
-    ))
-    .await;
+    let quick_reply_model = QuickReplyModel::new(&req.user, "choose one color", quick_replies);
+    res.send(quick_reply_model).await;
 }
 
 #[action]
-async fn Option1 (res: Res, req: Req) {
-    let value: String = req.data.get_value();
-    let message = format!("You selected Option 1 with payload: {}", value);
-    res.send(TextModel::new(&req.user, &message)).await;
-}
-
-#[action]
-async fn Option2 (res: Res, req: Req) {
-    let value: String = req.data.get_value();
-    let message = format!("You selected Option 2 with payload: {}", value);
-    res.send(TextModel::new(&req.user, &message)).await;
-
-    let generic_elements = vec![GenericElement::new(
-        "Option 2",
-        "https://example.com/option2.jpg", // use existe url
-        "Option 2 description",
-        vec![Button::Postback {
-            title: "Choose Option 2".to_string(),
-            payload: Payload::new(Main, None),
-        }],
-    )];
-
-    res.send(GenericModel::new(
-        &req.user,
-        generic_elements,
-        req.data.get_page(),
-    ))
-    .await;
+async fn NextAction(res: Res, req: Req) {
+    let color: String = req.data.get_value();
+    res.send(TextModel::new(&req.user, &color)).await;
+    Main.execute(res, req).await; // goto Main action
 }
 
 #[russenger::main]
 async fn main() {
     let conn = Database::new().await.conn;
-    migrate!([RussengerUser, &conn);
-    
-    russenger::action![Main, Option1, Option2];
-    russenger.launch().await;
+    migrate!([RussengerUser, Register], &conn);
+
+    russenger::actions![Main, GetUserInput, NextAction, SignUp];
+    russenger::launch().await;
 }
 ```
 
@@ -191,8 +158,7 @@ async fn GetUsername (res: Res, req: Req){
 #[russenger::main]
 async fn main() {
     let conn = Database::new().await.conn;
-    migrate!([RussengerUser, &conn);
-    
+    migrate!([RussengerUser, &conn]);
     russenger::action![Main, GetUsername];
     russenger.launch().await;
 }
@@ -222,8 +188,7 @@ async fn Main (res: Res, req: Req) {
 #[russenger::main]
 async fn main() {
     let conn = Database::new().await.conn;
-    migrate!([RussengerUser, &conn);
-    
+    migrate!([RussengerUser, &conn]);
     russenger::action![Main];
     russenger.launch().await;
 }

@@ -14,7 +14,7 @@ pub struct Register {
 #[action]
 async fn Main(res: Res, req: Req) {
     res.send(TextModel::new(&req.user, "Hello!")).await;
-    if let Some(user_register) = Register::get(kwargs!(user = req.user), &req.query.conn).await {
+    if let Some(user_register) = Register::get(kwargs!(user_id = req.user), &req.query.conn).await {
         res.send(TextModel::new(&req.user, &format!("Hello {}", user_register.username)))
             .await;
     } else {
@@ -29,7 +29,7 @@ async fn Main(res: Res, req: Req) {
 #[action]
 async fn SignUp(res: Res, req: Req) {
     let username: String = req.data.get_value();
-    let message = if Register::create(kwargs!(user= req.user, username = username), &req.query.conn).await {
+    let message = if Register::create(kwargs!(user_id = req.user, username = username), &req.query.conn).await {
         "Register success"
     } else {
         "Register failed"
@@ -43,12 +43,12 @@ async fn GetUserInput(res: Res, req: Req) {
     let payload = |value: &str| Payload::new(NextAction, Some(Data::new(value, None)));
 
     // QuickReply
-    let quickreplies: Vec<QuickReply> = vec![
+    let quick_replies: Vec<QuickReply> = vec![
         QuickReply::new("blue", "", payload("blue")),
         QuickReply::new("red", "", payload("red")),
     ];
-    let quickreplymodel = QuickReplyModel::new(&req.user, "choose one color", quickreplies);
-    res.send(quickreplymodel).await;
+    let quick_reply_model = QuickReplyModel::new(&req.user, "choose one color", quick_replies);
+    res.send(quick_reply_model).await;
 }
 
 #[action]
@@ -62,7 +62,6 @@ async fn NextAction(res: Res, req: Req) {
 async fn main() {
     let conn = Database::new().await.conn;
     migrate!([RussengerUser, Register], &conn);
-
     russenger::actions![Main, GetUserInput, NextAction, SignUp];
     russenger::launch().await;
 }

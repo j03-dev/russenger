@@ -4,3 +4,4 @@
 .zed
 *.sqlite
 .idea
+.env

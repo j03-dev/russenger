@@ -2,65 +2,51 @@
 
 ![Russenger Logo](./image.png)
 
-Russenger is a Rust library designed to simplify the handling of Facebook Messenger webhook responses. It offers a
-convenient way to construct and send various types of responses, including text messages, quick replies, generic
-templates, and media attachments.
+Welcome to Russenger, a Rust library designed to simplify the handling of Facebook Messenger webhook responses. Russenger offers a convenient way to construct and send various types of responses, including text messages, quick replies, generic templates, and media attachments.
 
-## New Features 
-- Now you can creat your own model using [rusql-alchemy](https://github.com.com/russenger/rusql-alchemy) orm
-  - You can see the [examples](https://github.com.com/russenger/rusql-alchemy/examples)
+## Features
 
-## How to Create new Project
-- ### **1**: Install Cargo Generate
+- **Custom Models**: Developers can now use their own models with the Russenger library. This is made possible by the integration with rusql_alchemy, an ORM for sqlx. This means that models are defined in Rust code, eliminating the need to write SQL queries.
+- **Easy to Use**: The Russenger library is designed to be easy to use. It provides a set of modules and macros that abstract away the complexities of building a bot, allowing you to focus on the logic of your application.
+- **Flexible**: The Russenger library is flexible and can be used to build a wide variety of bots. It supports text-based conversations, quick replies, and custom actions.
+
+## Getting Started
+
+To get started with the Russenger library, you'll need to install it as a dependency in your Rust project. You can do this by adding the following line to your `Cargo.toml` file:
+
+```toml
+[dependencies]
+russenger = "0.2.0"
+actix-web = "4"
+sqlx = "^0.7.0"
+rusql-alchemy = "0.1.2" # the default feature is sqlite
+# rusql-alchemy = { version = "0.1.2", features = ["mysql"] }
+# rusql-alchemy = { version = "0.1.2", features = ["postgres"] }
+```
+
+Once you've installed the library, you can start building your bot! Check out the [documentation](https://docs.rs/russenger) for more information on how to use the library.
+
+## Creating a New Project
+
+To create a new project using the Russenger library, you can use the `cargo-generate` tool. Here are the steps:
+
+1. Install `cargo-generate`:
+
 ```bash
 cargo install cargo-generate
 ```
-- ### **2**: Generate new project
+
+2. Generate a new project:
+
 ```bash
 cargo generate --git https://github.com/j03-dev/russenger_template
 ```
 
-## How To Use
+## Examples
 
-### Example
+Here are some examples of what you can build with the Russenger library:
 
-Here's an example of how to use Russenger to handle different actions in a chatbot:
-
-#### Russenger `Cargo.toml`
-
-```toml
-russenger = "0.2.0"
-actix-web = "4"
-sqlx = "^0.7.0"
-rusql-alchemy = "0.1.0" # the default feature is sqlite
-# rusql-alchemy = { version = "0.1.0", default-features = false, features = ["mysql"] }
-# rusql-alchemy = { version = "0.1.0", default-features = false, features = ["postgres"] }
-```
-
-#### Environment `.env`
-
-```bash
-# You can change this
-PORT=6969
-HOST=0.0.0.0
-
-# change this
-VERIFY_TOKEN=<your-verify-token>
-
-# change this
-PAGE_ACCESS_TOKEN=<your-page-access-token>
-
-#### postgres
-# DATABASE=postgres://<user>:<password>@<host>/<db_name>
-
-#### mysql
-# DATABASE=mysql://<user>:<password>@<host>/<db_name>
-
-#### sqlite
-DATABASE=sqlite:<db_name>
-```
-
-#### Code `src/main.rs`
+### A simple bot that greets users and asks for their name
 
 ```rust
 use russenger::prelude::*;
@@ -120,7 +106,7 @@ async fn GetUserInput(res: Res, req: Req) {
 async fn NextAction(res: Res, req: Req) {
     let color: String = req.data.get_value();
     res.send(TextModel::new(&req.user, &color)).await;
-    Main.execute(res, req).await; // goto Main action
+    Main.execute(res, req).await; // go back to Main action
 }
 
 #[russenger::main]
@@ -133,91 +119,50 @@ async fn main() {
 }
 ```
 
-##### Who to get User Input
+This example shows how to create a simple bot that greets users and asks for their name. It uses custom models to store and retrieve user data.
+
+### A bot that sends users a quick reply with a list of options and handles their response
 
 ```rust
 use russenger::models::RussengerUser;
 use russenger::prelude::*;
 
 #[action]
-async fn Main (res: Res, req: Req) {
-    res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
-        .await;
-    res.send(TextModel::new(&req.user, "What is your name: "))
-        .await;
-    req.query.set_action(&req.user, GetUsername).await;
+async fn Main(res: Res, req: Req) {
+    let payload = |value: &str| Payload::new(NextAction, Some(Data::new(value, None)));
+
+    // QuickReply
+    let quick_replies: Vec<QuickReply> = vec![
+        QuickReply::new("Option 1", "", payload("Option 1")),
+        QuickReply::new("Option 2", "", payload("Option 2")),
+        QuickReply::new("Option 3", "", payload("Option 3")),
+    ];
+    let quick_reply_model = QuickReplyModel::new(&req.user, "Choose an option:", quick_replies);
+    res.send(quick_reply_model).await;
 }
 
 #[action]
-async fn GetUsername (res: Res, req: Req){
-    let username: String = req.data.get_value();
-    res.send(TextModel::new(&req.user, &format!("Hello {}", username)))
-        .await;
+async fn NextAction(res: Res, req: Req) {
+    let option: String = req.data.get_value();
+    res.send(TextModel::new(&req.user, &format!("You chose: {}", option))).await;
 }
 
 #[russenger::main]
 async fn main() {
     let conn = Database::new().await.conn;
-    migrate!([RussengerUser, &conn]);
-    russenger::action![Main, GetUsername];
-    russenger.launch().await;
+    migrate!([RussengerUser], &conn);
+    russenger::actions![Main, NextAction];
+    russenger::launch().await;
 }
 ```
 
-##### How to send file from static
+This example shows how to create a bot that sends users a quick reply with a list of options and handles their response.
 
-```rust
-use russenger::models::RussengerUser;
-use russenger::prelude::*;
+## Contributing
 
-#[action]
-async fn Main (res: Res, req: Req) {
-    res.send(TextModel::new(&req.user, "Main, I'm your chatbot!"))
-        .await;
+We welcome contributions to the Russenger library! If you have an idea for a new feature or have found a bug, please open an issue on the [GitHub repository](https://github.com/russenger/russenger). If you'd like to contribute code, please fork the repository and submit a pull request.
 
-    // Send Image File from static file
-    // Add image file, on static dir
-    res.send(MediaModel::new(
-        &req.user,
-        "image",
-        &format!("{host}/static/image.png", host = req.host),
-    ))
-    .await;
-}
+## License
 
-#[russenger::main]
-async fn main() {
-    let conn = Database::new().await.conn;
-    migrate!([RussengerUser, &conn]);
-    russenger::action![Main];
-    russenger.launch().await;
-}
-```
+The Russenger library is licensed under the MIT License. See the [LICENSE](https://github.com/russenger/russenger/blob/main/LICENSE) file for more information.
 
-#### Run
-
-##### Migrate Database `run it once`
-
-if you use `sqlite` as Bb
-
-```bash
-touch <dbname>
-```
-
-```bash
-cargo run migrate
-```
-
-##### Runserver
-
-```bash
-cargo run runserver
-```
-
-In this example, we define three actions: `Main`, `Option1`, and `Option2`. Each action is associated with a function that handles the action. The `Main` action sends a text message and a quick reply with two options. The `Option1` and `Option2` actions handle the user's selection of the respective options.
-
-### EndPoint
-
-- GET `/webhook`: Verify your chatbot with Facebook Messenger. Facebook will send a challenge, and your bot must respond correctly for verification.
-
-- POST `/webhook`: This is where Facebook Messenger sends messages from users. Handle incoming messages and respond accordingly here.

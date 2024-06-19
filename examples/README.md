@@ -16,5 +16,6 @@ To run an example, navigate into the example's directory and use the command `ca
 For example, to run the `hello` example:
 
 ```sh
-cargo run --bin hello
+cd hello
+cargo run runserver
 ``` 

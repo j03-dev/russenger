@@ -6,7 +6,7 @@ Welcome to Russenger, a Rust library designed to simplify the handling of Facebo
 
 ## Features
 
-- **Custom Models**: Developers can now use their own models with the Russenger library. This is made possible by the integration with rusql_alchemy, an ORM for sqlx. This means that models are defined in Rust code, eliminating the need to write SQL queries.
+- **Custom Models**: Developers can now use their own models with the Russenger library. This is made possible by the integration with [rusql-alchemy](https:://github.com/russenger/rusql-alchemy), an ORM for sqlx. This means that models are defined in Rust code, eliminating the need to write SQL queries.
 - **Easy to Use**: The Russenger library is designed to be easy to use. It provides a set of modules and macros that abstract away the complexities of building a bot, allowing you to focus on the logic of your application.
 - **Flexible**: The Russenger library is flexible and can be used to build a wide variety of bots. It supports text-based conversations, quick replies, and custom actions.
 

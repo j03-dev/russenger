@@ -44,8 +44,8 @@
 //!     russenger::launch().await;
 //! }
 //! ```
-use crate::Action;
 use crate::models::RussengerUser;
+use crate::Action;
 
 use rusql_alchemy::prelude::*;
 
@@ -134,9 +134,9 @@ impl Query {
     ///     let username: String = req.data.get_value();
     ///     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await;
     /// }
-    /// 
+    ///
     /// #[russenger::main]
-    /// async fn main() { 
+    /// async fn main() {
     ///     let conn = Database::new().await.conn;
     ///     migrate!([RussengerUser], &conn);
     ///     russenger::actions![Main, GetUserInput];
@@ -144,15 +144,11 @@ impl Query {
     /// }
     /// ```
     pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {
-        if let Some(user) =
+        if let Some(mut user) =
             RussengerUser::get(kwargs!(facebook_user_id = user_id), &self.conn).await
         {
-            RussengerUser {
-                action: action.path(),
-                ..user
-            }
-            .update(&self.conn)
-            .await
+            user.action = action.path();
+            user.update(&self.conn).await
         } else {
             false
         }
@@ -168,12 +164,8 @@ impl Query {
     ///
     /// Returns the action as an `Option<String>`. Returns `None` if the user is not found.
     pub async fn get_action(&self, user_id: &str) -> Option<String> {
-        if let Some(user) =
-            RussengerUser::get(kwargs!(facebook_user_id = user_id), &self.conn).await
-        {
-            Some(user.action)
-        } else {
-            None
-        }
+        RussengerUser::get(kwargs!(facebook_user_id = user_id), &self.conn)
+            .await
+            .map(|user| user.action)
     }
 }

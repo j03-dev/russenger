@@ -16,12 +16,12 @@ To get started with the Russenger library, you'll need to install it as a depend
 
 ```toml
 [dependencies]
-russenger = "0.2.0"
+russenger = "0.2.1"
 actix-web = "4"
 sqlx = "^0.7.0"
-rusql-alchemy = "0.1.2" # the default feature is sqlite
-# rusql-alchemy = { version = "0.1.2", features = ["mysql"] }
-# rusql-alchemy = { version = "0.1.2", features = ["postgres"] }
+rusql-alchemy = "0.2.0" # the default feature is sqlite
+# rusql-alchemy = { version = "0.2.0", features = ["mysql"] }
+# rusql-alchemy = { version = "0.2.0", features = ["postgres"] }
 ```
 
 Once you've installed the library, you can start building your bot! Check out the [documentation](https://docs.rs/russenger) for more information on how to use the library.
@@ -65,7 +65,7 @@ pub struct Register {
 #[action]
 async fn Main(res: Res, req: Req) {
     res.send(TextModel::new(&req.user, "Hello!")).await;
-    if let Some(user_register) = Register::get(kwargs!(user_id = req.user), &req.query.conn).await {
+    if let Some(user_register) = Register::get(kwargs!(user_id == req.user), &req.query.conn).await {
         res.send(TextModel::new(&req.user, &format!("Hello {}", user_register.username)))
             .await;
     } else {

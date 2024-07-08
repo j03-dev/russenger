@@ -1,6 +1,6 @@
 [package]
 name = "russenger"
-version = "0.2.0"
+version = "0.2.1-rc"
 edition = "2021"
 description = "A Rust library designed to simplify the handling of Facebook Messenger webhook responses."
 license = "Apache-2.0"
@@ -21,7 +21,7 @@ path = "src/lib.rs"
 version = "0.1.0"
 
 [dependencies.rusql-alchemy]
-version = "0.1.2"
+version = "0.2.0"
 
 [dependencies]
 actix-web = "^4"

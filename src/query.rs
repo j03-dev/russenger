@@ -80,7 +80,7 @@ impl Query {
     ///
     /// Panics if the connection cannot be established.
     pub async fn new() -> Self {
-        let conn = config::db::Database::new().await.conn;
+        let conn = Database::new().await.conn;
         Self { conn }
     }
 
@@ -145,7 +145,7 @@ impl Query {
     /// ```
     pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {
         if let Some(mut user) =
-            RussengerUser::get(kwargs!(facebook_user_id = user_id), &self.conn).await
+            RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn).await
         {
             user.action = action.path();
             user.update(&self.conn).await
@@ -164,7 +164,7 @@ impl Query {
     ///
     /// Returns the action as an `Option<String>`. Returns `None` if the user is not found.
     pub async fn get_action(&self, user_id: &str) -> Option<String> {
-        RussengerUser::get(kwargs!(facebook_user_id = user_id), &self.conn)
+        RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
             .await
             .map(|user| user.action)
     }

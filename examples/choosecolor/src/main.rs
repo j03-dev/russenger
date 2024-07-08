@@ -1,11 +1,15 @@
-use russenger::prelude::*;
 use russenger::models::RussengerUser;
+use russenger::prelude::*;
 
 #[derive(FromRow, Clone, Model)]
 pub struct Register {
     #[model(primary_key = true)]
     pub id: Serial,
-    #[model(foreign_key = "RussengerUser.facebook_user_id", unique = true, null = false)]
+    #[model(
+        foreign_key = "RussengerUser.facebook_user_id",
+        unique = true,
+        null = false
+    )]
     pub user_id: String,
     #[model(size = 30, unique = true, null = false)]
     pub username: String,
@@ -14,9 +18,13 @@ pub struct Register {
 #[action]
 async fn Main(res: Res, req: Req) {
     res.send(TextModel::new(&req.user, "Hello!")).await;
-    if let Some(user_register) = Register::get(kwargs!(user_id = req.user), &req.query.conn).await {
-        res.send(TextModel::new(&req.user, &format!("Hello {}", user_register.username)))
-            .await;
+    if let Some(user_register) = Register::get(kwargs!(user_id == req.user), &req.query.conn).await
+    {
+        res.send(TextModel::new(
+            &req.user,
+            &format!("Hello {}", user_register.username),
+        ))
+        .await;
     } else {
         res.send(TextModel::new(&req.user, "What is your name: "))
             .await;
@@ -29,7 +37,12 @@ async fn Main(res: Res, req: Req) {
 #[action]
 async fn SignUp(res: Res, req: Req) {
     let username: String = req.data.get_value();
-    let message = if Register::create(kwargs!(user_id = req.user, username = username), &req.query.conn).await {
+    let message = if Register::create(
+        kwargs!(user_id = req.user, username = username),
+        &req.query.conn,
+    )
+    .await
+    {
         "Register success"
     } else {
         "Register failed"

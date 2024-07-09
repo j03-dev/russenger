@@ -50,4 +50,4 @@ pub use crate::response_models::{
     text::TextModel,
     ResponseModel,
 };
-pub use rusql_alchemy::{self, prelude::*};
+pub use crate::rusql_alchemy::{self, prelude::*};

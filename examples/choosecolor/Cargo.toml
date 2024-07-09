@@ -8,10 +8,8 @@ publish = false
 
 [dependencies.russenger]
 path = "../.."
+features = ["postgres"]
 
 [dependencies]
 actix-web = "^4"
 sqlx = "^0.7"
-rusql-alchemy = { version = "0.2.0", default-features = false, features = [
-  "postgres",
-] }

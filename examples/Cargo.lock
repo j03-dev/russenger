@@ -449,7 +449,6 @@ name = "choosecolor"
 version = "0.1.0"
 dependencies = [
  "actix-web",
- "rusql-alchemy",
  "russenger",
  "sqlx",
 ]
@@ -742,7 +741,7 @@ checksum = "55ac459de2512911e4b674ce33cf20befaba382d05b62b008afc1c8b57cbf181"
 dependencies = [
  "futures-core",
  "futures-sink",
- "spin 0.9.8",
+ "spin",
 ]
 
 [[package]]
@@ -853,7 +852,7 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "reqwest",
- "rusql-alchemy",
+ "rusql-alchemy 0.1.2",
  "russenger",
  "serde",
 ]
@@ -980,7 +979,7 @@ name = "hello"
 version = "0.1.0"
 dependencies = [
  "actix-web",
- "rusql-alchemy",
+ "rusql-alchemy 0.1.2",
  "russenger",
 ]
 
@@ -1265,11 +1264,11 @@ checksum = "d4345964bb142484797b161f473a503a434de77149dd8c7427788c6e13379388"
 
 [[package]]
 name = "lazy_static"
-version = "1.4.0"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
+checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 dependencies = [
- "spin 0.5.2",
+ "spin",
 ]
 
 [[package]]
@@ -1415,7 +1414,7 @@ name = "next"
 version = "0.1.0"
 dependencies = [
  "actix-web",
- "rusql-alchemy",
+ "rusql-alchemy 0.1.2",
  "russenger",
 ]
 
@@ -1912,7 +1911,7 @@ dependencies = [
  "cfg-if",
  "getrandom",
  "libc",
- "spin 0.9.8",
+ "spin",
  "untrusted",
  "windows-sys 0.52.0",
 ]
@@ -1945,7 +1944,23 @@ checksum = "07c4159e5fd5731a5880bd19f09f3493df4349ad55e7806ca2010a152e1bf8ff"
 dependencies = [
  "async-trait",
  "dotenv",
- "rusql-alchemy-macro",
+ "rusql-alchemy-macro 0.1.1",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tokio",
+]
+
+[[package]]
+name = "rusql-alchemy"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2158c30688e25991780b9169a33bd6c1997eeacecf019371bff8996b09ec86cd"
+dependencies = [
+ "async-trait",
+ "dotenv",
+ "lazy_static",
+ "rusql-alchemy-macro 0.2.0",
  "serde",
  "serde_json",
  "sqlx",
@@ -1964,8 +1979,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "rusql-alchemy-macro"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "240f1e4c621249b59ba80684a1cb1b2323f5293571c547607a15c4439c5852ba"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "russenger"
-version = "0.1.6"
+version = "0.2.1-rc"
 dependencies = [
  "actix-files",
  "actix-web",
@@ -1973,7 +1999,7 @@ dependencies = [
  "dotenv",
  "lazy_static",
  "reqwest",
- "rusql-alchemy",
+ "rusql-alchemy 0.2.0",
  "russenger_macro",
  "serde",
  "serde_json",
@@ -2284,12 +2310,6 @@ dependencies = [
  "libc",
  "windows-sys 0.52.0",
 ]
-
-[[package]]
-name = "spin"
-version = "0.5.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 
 [[package]]
 name = "spin"

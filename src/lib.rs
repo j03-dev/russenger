@@ -141,8 +141,8 @@ pub mod response_models;
 pub use cli::launch;
 pub use core::action::{Action, ACTION_REGISTRY};
 pub use dotenv::dotenv;
+pub use rusql_alchemy;
 pub use russenger_macro::action;
-
 
 /// The `actions!` macro is used to register actions for the main application.
 ///

@@ -16,12 +16,9 @@ To get started with the Russenger library, you'll need to install it as a depend
 
 ```toml
 [dependencies]
-russenger = "0.2.1"
+russenger = { version = "0.3.O-rc", features = ["postgres"] } # features 'sqlite, postgres, mysql'
 actix-web = "4"
 sqlx = "^0.7.0"
-rusql-alchemy = "0.2.0" # the default feature is sqlite
-# rusql-alchemy = { version = "0.2.0", features = ["mysql"] }
-# rusql-alchemy = { version = "0.2.0", features = ["postgres"] }
 ```
 
 Once you've installed the library, you can start building your bot! Check out the [documentation](https://docs.rs/russenger) for more information on how to use the library.

@@ -1,6 +1,6 @@
 [package]
 name = "russenger"
-version = "0.3.0-rc"
+version = "0.3.1-rc"
 edition = "2021"
 description = "A Rust library designed to simplify the handling of Facebook Messenger webhook responses."
 license = "Apache-2.0"
@@ -26,7 +26,7 @@ mysql = ["rusql-alchemy/mysql"]
 version = "0.1.0"
 
 [dependencies.rusql-alchemy]
-version = "0.2.0"
+version = "0.3.0"
 default-features = false
 
 [dependencies]
@@ -38,6 +38,6 @@ lazy_static = "^1.4.0"
 dotenv = "^0.15.0"
 tokio = "1.38.0"
 tera = "^1.19.1"
-sqlx = "^0.7"
+sqlx = "^0.8"
 reqwest = { version = "0.12.4", features = ["json"] }
 serde = { version = "^1.0", features = ["derive"] }

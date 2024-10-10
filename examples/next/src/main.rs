@@ -24,8 +24,9 @@ async fn Main(res: Res, req: Req) {
     }
 
     let generic = GenericModel::new(&req.user, elements, req.data.get_page());
-    res.send(generic).await; // Send only 10 element
-    Main.next(res, req).await; // Send next 10 element
+    res.send(generic).await?; // Send only 10 element
+    Main.next(res, req).await?; // Send next 10 element
+    Ok(())
 }
 
 #[russenger::main]
@@ -33,5 +34,5 @@ async fn main() {
     let conn = Database::new().await.conn;
     migrate!([RussengerUser], &conn);
     russenger::actions![Main];
-    russenger::launch().await;
+    russenger::launch().await.ok();
 }

@@ -18,6 +18,7 @@
 //! }
 //! ```
 use std::collections::{HashMap, HashSet};
+use std::io::Result;
 use std::sync::Arc;
 
 use tokio::sync::Mutex;
@@ -88,11 +89,11 @@ impl ActionLock {
 /// ```
 #[async_trait::async_trait]
 pub trait Action: Send + Sync {
-    async fn execute(&self, res: Res, req: Req);
+    async fn execute(&self, res: Res, req: Req) -> Result<()>;
 
     fn path(&self) -> String;
 
-    async fn next(&self, res: Res, req: Req) {
+    async fn next(&self, res: Res, req: Req) -> Result<()> {
         let mut page = req.data.get_page().unwrap_or_default();
         page.next();
         let quick_reply: QuickReplyModel<'_> = QuickReplyModel::new(
@@ -107,7 +108,8 @@ pub trait Action: Send + Sync {
                 ),
             )],
         );
-        res.send(quick_reply).await;
+        res.send(quick_reply).await?;
+        Ok(())
     }
 }
 

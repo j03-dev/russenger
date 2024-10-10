@@ -57,7 +57,7 @@ async fn ask_gemini(text: String) -> Result<Response, reqwest::Error> {
 
 #[action]
 async fn Main(res: Res, req: Req) {
-    res.send(GetStartedModel::new(Payload::default())).await;
+    res.send(GetStartedModel::new(Payload::default())).await?;
     res.send(PersistentMenuModel::new(
         &req.user,
         vec![Button::Postback {
@@ -65,14 +65,18 @@ async fn Main(res: Res, req: Req) {
             payload: Payload::new(HelloWorld, None),
         }],
     ))
-    .await;
+    .await?;
+
+    Ok(())
 }
 
 #[action]
 async fn HelloWorld(res: Res, req: Req) {
     let text = "Hello, I'm Gemini";
-    res.send(TextModel::new(&req.user, text)).await;
+    res.send(TextModel::new(&req.user, text)).await?;
     req.query.set_action(&req.user, AskGemini).await;
+
+    Ok(())
 }
 
 #[action]
@@ -81,13 +85,16 @@ async fn AskGemini(res: Res, req: Req) {
     match ask_gemini(text).await {
         Ok(response) => {
             for part in response.candidates[0].content.parts.clone() {
-                res.send(TextModel::new(&req.user, &part.text)).await;
+                res.send(TextModel::new(&req.user, &part.text)).await?;
             }
         }
         Err(err) => {
-            res.send(TextModel::new(&req.user, &err.to_string())).await;
+            res.send(TextModel::new(&req.user, &err.to_string()))
+                .await?;
         }
     };
+
+    Ok(())
 }
 
 #[russenger::main]
@@ -95,6 +102,5 @@ async fn main() {
     let conn = Database::new().await.conn;
     migrate!([RussengerUser], &conn);
     russenger::actions![Main, HelloWorld, AskGemini];
-    russenger::launch().await;
+    russenger::launch().await.ok();
 }
-

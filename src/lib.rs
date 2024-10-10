@@ -131,18 +131,66 @@
 pub use actix_web::main;
 pub use async_trait::async_trait;
 
-pub mod cli;
 pub mod core;
 pub mod models;
 pub mod prelude;
 pub mod query;
 pub mod response_models;
 
-pub use cli::launch;
-pub use core::action::{Action, ACTION_REGISTRY};
+pub use core::{
+    action::{Action, ACTION_REGISTRY},
+    app_state::AppState,
+    services::{index, webhook_core, webhook_verify}, // core services
+};
+
+use anyhow::{bail, Context, Result};
 pub use dotenv::dotenv;
 pub use rusql_alchemy;
 pub use russenger_macro::action;
+
+use actix_files as fs;
+use actix_web::{web, App, HttpServer};
+
+fn print_info(host: &str, port: u16) {
+    let url = format!("http://{}:{}", host, port);
+    println!("Endpoints:");
+    println!("  GET: {}/ - Root endpoint", url);
+    println!("  GET: {}/webhook - Webhook verification endpoint", url);
+    println!("  POST: {}/webhook - Webhook core endpoint", url);
+}
+
+async fn run_server() -> Result<()> {
+    if !ACTION_REGISTRY.lock().await.contains_key("Main") {
+        bail!("'actions!' should contain `Main` action");
+    }
+    let app_state = AppState::init().await;
+    let host = std::env::var("HOST").unwrap_or("0.0.0.0".into());
+    let port = std::env::var("PORT")
+        .unwrap_or("2453".into())
+        .parse()
+        .unwrap_or(2453);
+    print_info(&host, port);
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(app_state.clone()))
+            .service(index)
+            .service(webhook_verify)
+            .service(webhook_core)
+            .service(fs::Files::new("/static", "static").show_files_listing())
+    })
+    .bind((host, port))
+    .context("Failed to run this server: pls check the port if it's already used!")?
+    .run()
+    .await
+    .context("sever is crashed")?;
+    Ok(())
+}
+
+pub async fn launch() -> Result<()> {
+    dotenv()?;
+    run_server().await?;
+    Ok(())
+}
 
 /// The `actions!` macro is used to register actions for the main application.
 ///

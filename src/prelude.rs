@@ -32,10 +32,7 @@
 //! }
 //! ```
 pub use crate::action;
-pub use crate::core::{
-    request::Req,
-    response::{Res, SendResult},
-};
+pub use crate::core::{request::Req, response::Res};
 pub use crate::launch;
 pub use crate::response_models::{
     button::{Button, ButtonModel},

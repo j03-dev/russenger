@@ -5,9 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies.russenger]
-path = "../.."
-
 [dependencies]
-actix-web = "^4"
-rusql-alchemy = "0.1.2"
+russenger.workspace = true
+actix-web.workspace = true
+sqlx.workspace = true

@@ -15,14 +15,9 @@
 //! }
 //! ```
 use std::env;
+use std::io::{Error, ErrorKind::Other, Result};
 
 use crate::response_models::ResponseModel;
-
-#[derive(Debug)]
-pub enum SendResult {
-    Okey(reqwest::Response),
-    Error(reqwest::Error),
-}
 
 /// The `Res` struct represents a response that can be sent to a user.
 ///
@@ -61,7 +56,7 @@ impl Res {
     /// # Errors
     ///
     /// Returns `SendResult::Error` if the send operation fails.
-    pub async fn send<T: ResponseModel>(&self, response_model: T) -> SendResult {
+    pub async fn send<T: ResponseModel>(&self, response_model: T) -> Result<String> {
         let version = env::var("FACEBOOK_API_VERSION").unwrap_or("v15.0".into());
         let page_access_token =
             env::var("PAGE_ACCESS_TOKEN").expect("env variable `PAGE_ACCESS_TOKEN` should be set");
@@ -75,8 +70,14 @@ impl Res {
             .send()
             .await
         {
-            Ok(response) => SendResult::Okey(response),
-            Err(error) => SendResult::Error(error),
+            Ok(response) => {
+                if response.status().is_client_error() {
+                    Err(Error::new(Other, response.text().await.unwrap()))
+                } else {
+                    Ok(response.text().await.unwrap())
+                }
+            }
+            Err(err) => Err(Error::new(Other, err.to_string())),
         }
     }
 }

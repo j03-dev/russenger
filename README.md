@@ -18,7 +18,7 @@ To get started with the Russenger library, you'll need to install it as a depend
 [dependencies]
 russenger = { version = "0.3.O-rc", features = ["postgres"] } # features 'sqlite, postgres, mysql'
 actix-web = "4"
-sqlx = "^0.7.0"
+sqlx = "^0.8.0"
 ```
 
 Once you've installed the library, you can start building your bot! Check out the [documentation](https://docs.rs/russenger) for more information on how to use the library.
@@ -162,4 +162,3 @@ We welcome contributions to the Russenger library! If you have an idea for a new
 ## License
 
 The Russenger library is licensed under the MIT License. See the [LICENSE](https://github.com/russenger/russenger/blob/main/LICENSE) file for more information.
-

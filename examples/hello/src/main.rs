@@ -1,15 +1,17 @@
-use russenger::prelude::*;
 use russenger::models::RussengerUser;
+use russenger::prelude::*;
 
 #[action]
 async fn Main(res: Res, _req: Req) {
     let message: String = req.data.get_value();
     if message.to_lowercase() == "hello" {
         res.send(TextModel::new(&req.user, "Hello, welcome !"))
-            .await;
+            .await?;
     }
     res.send(GetStartedModel::new(Payload::new(Start, None)))
-        .await;
+        .await?;
+
+    Ok(())
 }
 
 #[action]
@@ -21,12 +23,15 @@ async fn Start(res: Res, req: Req) {
             payload: Payload::new(HelloWorld, None),
         }],
     ))
-    .await;
+    .await?;
+
+    Ok(())
 }
 
 #[action]
 async fn HelloWorld(res: Res, req: Req) {
-    res.send(TextModel::new(&req.user, "Hello World")).await; // End
+    res.send(TextModel::new(&req.user, "Hello World")).await?; // End
+    Ok(())
 }
 
 #[russenger::main]
@@ -34,5 +39,5 @@ async fn main() {
     let conn = Database::new().await.conn;
     migrate!([RussengerUser], &conn);
     russenger::actions![Main, HelloWorld, Start];
-    russenger::launch().await;
+    russenger::launch().await.ok();
 }

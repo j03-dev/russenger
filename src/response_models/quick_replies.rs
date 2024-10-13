@@ -36,29 +36,33 @@
 //! ```rust
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
-//! 
+//!
 //! #[action]
 //! async fn Main(res: Res, req: Req) {
 //!     let data = Data::new("HelloWorld", None);
 //!     let payload = Payload::new(HelloWorld, Some(data));
 //!     let quick_replies = vec![QuickReply::new("Button Title", "https://example.com/image.png", payload)];
 //!     let quick_reply = QuickReplyModel::new(&req.user, "Choose an option:", quick_replies);
-//!     res.send(quick_reply).await;
+//!     res.send(quick_reply).await?;
+//!
+//!     Ok(())
 //! }
 //!
 //!
 //! #[action]
 //! async fn HelloWorld(res: Res, req: Req) {
 //!     let hello_world: String = req.data.get_value();
-//!     res.send(TextModel::new(&req.user, &hello_world)).await;
+//!     res.send(TextModel::new(&req.user, &hello_world)).await?;
+//!
+//!     Ok(())
 //! }
-//! 
+//!
 //! #[russenger::main]
 //! async fn main() {
 //!     let conn = Database::new().await.conn;
 //!     migrate!([RussengerUser], &conn);
 //!     russenger::actions![Main, HelloWorld];
-//!     russenger::launch().await;
+//!     russenger::launch().await.ok();
 //! }
 //! ```
 //!
@@ -103,7 +107,9 @@ use super::{payload::Payload, recipient::Recipient};
 /// #[action]
 /// async fn HelloWorld(res: Res, req: Req) {
 ///     let hello_world: String = req.data.get_value();
-///     res.send(TextModel::new(&req.user, &hello_world)).await;
+///     res.send(TextModel::new(&req.user, &hello_world)).await?;
+///
+///     Ok(())
 /// }
 /// ```
 #[derive(Serialize, Debug)]
@@ -136,7 +142,9 @@ impl QuickReply {
     ///
     /// #[action]
     /// async fn SomeAction(res: Res, req: Req) {
-    ///     res.send(TextModel::new(&req.user, "SomeAction")).await;
+    ///     res.send(TextModel::new(&req.user, "SomeAction")).await?;
+    ///
+    ///     Ok(())
     /// }
     /// ```
     pub fn new(title: &str, image_url: &str, payload: Payload) -> Self {
@@ -179,7 +187,9 @@ struct QuickMessage {
 ///     let payload = Payload::new(SomeAction, None);
 ///     let quick_reply = QuickReply::new("Button Title", "https://example.com/image.png", payload);
 ///     let quick_reply_model = QuickReplyModel::new(&req.user, "Message Text", vec![quick_reply]);
-///     res.send(quick_reply_model).await;
+///     res.send(quick_reply_model).await?;
+///
+///     Ok(())
 /// }
 /// ```
 
@@ -214,7 +224,9 @@ impl<'q> QuickReplyModel<'q> {
     ///
     /// #[action]
     /// async fn SomeAction(res: Res, req: Req) {
-    ///     res.send(TextModel::new(&req.user, "SomeAction")).await;
+    ///     res.send(TextModel::new(&req.user, "SomeAction")).await?;
+    ///
+    ///     Ok(())
     /// }
     /// ```
     pub fn new(sender: &'q str, message: &str, quick_replies: Vec<QuickReply>) -> Self {

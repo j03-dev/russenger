@@ -31,28 +31,30 @@
 //! let action = SenderActionModel::new("sender_id", Actions::TypingOn);
 //! let action = SenderActionModel::new("sender_id", Actions::TypingOff);
 //! ```
-//! 
+//!
 //! Usse case:
-//! 
+//!
 //! ```rust
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
-//! 
+//!
 //! #[action]
 //! async fn Main(res: Res, req: Req) {
-//!     res.send(SenderActionModel::new(&req.user, MarkSeen));
-//!     res.send(TextModel::new(&req.user, "Hello, world!"));
+//!     res.send(SenderActionModel::new(&req.user, MarkSeen)).await?;
+//!     res.send(TextModel::new(&req.user, "Hello, world!")).await?;
+//!
+//!     Ok(())
 //! }
-//! 
+//!
 //! #[russenger::main]
 //! async fn main() {
 //!     let conn = Database::new().await.conn;
 //!     migrate!([RussengerUser], &conn);
 //!     russenger::actions![Main];
-//!     russenger::launch().await;
-//! } 
-//! ``` 
-//! 
+//!     russenger::launch().await.ok();
+//! }
+//! ```
+//!
 //!
 //! ## Reference
 //!
@@ -118,7 +120,9 @@ pub enum Actions {
 /// #[action]
 /// async fn Main(res: Res, req: Req) {
 ///     let action = SenderActionModel::new(&req.user, MarkSeen);
-///     res.send(action).await;
+///     res.send(action).await?;
+///
+///     Ok(())
 /// };
 /// ```
 ///

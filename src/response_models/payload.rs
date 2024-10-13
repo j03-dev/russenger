@@ -21,26 +21,30 @@
 //! ```rust
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
-//! 
+//!
 //! #[action]
 //! async fn Main(res: Res, req: Req) {
 //!     let data = Data::new("HelloWorld", None);
 //!     let payload = Payload::new(HelloWorld, Some(data));
-//!     res.send(GetStartedModel::new(payload)).await;   
+//!     res.send(GetStartedModel::new(payload)).await?;
+//!
+//!     Ok(())
 //! }
 //!
 //! #[action]
 //! async fn HelloWorld(res: Res, req: Req) {
 //!    let value: String = req.data.get_value();
-//!    res.send(TextModel::new(&req.user, &value)).await;
+//!    res.send(TextModel::new(&req.user, &value)).await?;
+//!
+//!    Ok(())
 //! }
-//! 
+//!
 //! #[russenger::main]
 //! async fn main() {
 //!     let conn = Database::new().await.conn;
 //!     migrate!([RussengerUser], &conn);
 //!     russenger::actions![Main, HelloWorld];
-//!     russenger::launch().await;
+//!     russenger::launch().await.ok();
 //! }
 //! ```
 //!
@@ -84,7 +88,9 @@ use crate::Action;
 /// #[action]
 /// async fn HelloWorld(res: Res, req: Req) {
 ///    let value: String = req.data.get_value();
-///    res.send(TextModel::new(&req.user, &value)).await;
+///    res.send(TextModel::new(&req.user, &value)).await?;
+///
+///    Ok(())
 /// }
 /// ```
 ///
@@ -120,7 +126,9 @@ impl Payload {
     ///
     /// #[action]
     /// async fn SomeAction(res: Res, req: Req) {
-    ///    res.send(TextModel::new(&req.user, "SomeAction")).await;
+    ///    res.send(TextModel::new(&req.user, "SomeAction")).await?;
+    ///
+    ///    Ok(())
     /// }
     ///
     /// ```
@@ -146,7 +154,7 @@ impl Payload {
     ///
     /// ```rust
     /// use russenger::prelude::*;
-    /// 
+    ///
     /// let data = Some(Data::new("key", None));
     /// let payload = Payload::new_with_path("Main".to_string(), data);
     /// ```
@@ -185,7 +193,7 @@ impl std::fmt::Display for Payload {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match serde_json::to_string(self) {
             Ok(json_string) => write!(f, "{}", json_string),
-            Err(_) => write!(f, "") // Outputs an empty string if there is an error in serialization
+            Err(_) => write!(f, ""), // Outputs an empty string if there is an error in serialization
         }
     }
 }

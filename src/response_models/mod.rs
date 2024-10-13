@@ -39,7 +39,9 @@
 //! #[action]
 //! async fn Main(res: Res, req: Req) {
 //!     let text_model = TextModel::new(&req.user, "Hello, user1!");
-//!     res.send(text_model).await;
+//!     res.send(text_model).await?;
+//!
+//!     Ok(())
 //! }
 //! ```
 pub mod button;

@@ -16,12 +16,16 @@
 //!         // Add more buttons here
 //!     ];
 //!     let button_model = ButtonModel::new("sender_id", "Hello, user1!", buttons);
-//!     res.send(button_model).await;
+//!     res.send(button_model).await?;
+//!
+//!     Ok(())
 //! }
 //! #[action]
 //! async fn HelloWorld(res: Res, req: Req) {
 //!     let value: String = req.data.get_value();
-//!     res.send(TextModel::new(&req.user, &value)).await;
+//!     res.send(TextModel::new(&req.user, &value)).await?;
+//!
+//!     Ok(())
 //! }
 //!
 //! #[russenger::main]
@@ -29,7 +33,7 @@
 //!     let conn = Database::new().await.conn;
 //!     migrate!([RussengerUser], &conn);
 //!     russenger::actions![Main, HelloWorld];
-//!     russenger::launch().await;
+//!     russenger::launch().await.ok();
 //! }
 //! ```
 use serde::Serialize;
@@ -87,7 +91,9 @@ use super::{payload::Payload, recipient::Recipient, ResponseModel};
 /// #[action]
 /// async fn HelloWorld(res: Res, req: Req) {
 ///     let payload: String = req.data.get_value();
-///     res.send(TextModel::new(&req.user, &payload)).await;
+///     res.send(TextModel::new(&req.user, &payload)).await?;
+///
+///     Ok(())
 /// }
 /// ```
 #[derive(Clone, Debug, Serialize)]
@@ -161,7 +167,9 @@ struct ButtonAttachement<'a> {
 ///         Button::WebUrl {title: "Click Me".to_owned(), url: "https://link.test.com".to_owned()},
 ///         // More Button ...
 ///     ];
-///     res.send(ButtonModel::new(&req.user, "Option", buttons)).await;
+///     res.send(ButtonModel::new(&req.user, "Option", buttons)).await?;
+///
+///     Ok(())
 /// }
 /// ```
 ///

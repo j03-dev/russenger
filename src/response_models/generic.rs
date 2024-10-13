@@ -33,13 +33,17 @@
 //!     ];
 //!
 //!     let generic = GenericModel::new(&req.user, elements, None);
-//!     res.send(generic).await;
+//!     res.send(generic).await?;
+//!
+//!     Ok(())
 //! }
 //!
 //! #[action]
 //! async fn HelloWorld(res: Res, req: Req) {
 //!     let hello_world: String = req.data.get_value();
-//!     res.send(TextModel::new(&req.user, &hello_world)).await;
+//!     res.send(TextModel::new(&req.user, &hello_world)).await?;
+//!
+//!     Ok(())
 //! }
 //! ```
 //!
@@ -92,7 +96,9 @@ use super::{
 /// #[action]
 /// async fn HelloWorld(res: Res, req: Req) {
 ///     let hello_world: String = req.data.get_value();
-///     res.send(TextModel::new(&req.user, &hello_world)).await;
+///     res.send(TextModel::new(&req.user, &hello_world)).await?;
+///
+///     Ok(())
 /// }
 /// ```
 #[derive(Debug, Clone, Serialize)]
@@ -141,7 +147,9 @@ impl GenericElement {
     /// #[action]
     /// async fn HelloWorld(res: Res, req: Req) {
     ///     let hello_world: String = req.data.get_value();
-    ///     res.send(TextModel::new(&req.user, &hello_world)).await;
+    ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
+    ///
+    ///     Ok(())
     /// }
     /// ```
     ///
@@ -223,13 +231,17 @@ struct GenericMessage {
 ///     ];
 ///
 ///     let message = GenericModel::new(&req.user, elements, None);
-///     res.send(message).await;
+///     res.send(message).await?;
+///
+///     Ok(())
 /// }
 ///
 /// #[action]
 /// async fn HelloWorld(res: Res, req: Req) {
 ///     let hello_world: String = req.data.get_value();
-///    res.send(TextModel::new(&req.user, &hello_world)).await;
+///    res.send(TextModel::new(&req.user, &hello_world)).await?;
+///
+///    Ok(())
 /// }
 /// ```
 ///
@@ -279,7 +291,9 @@ impl<'g> GenericModel<'g> {
     /// #[action]
     /// async fn HelloWorld(res: Res, req: Req) {
     ///     let hello_world: String = req.data.get_value();
-    ///    res.send(TextModel::new(&req.user, &hello_world)).await;
+    ///    res.send(TextModel::new(&req.user, &hello_world)).await?;
+    ///
+    ///    Ok(())
     /// }
     /// ```
     ///

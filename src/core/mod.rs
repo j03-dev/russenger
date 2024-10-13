@@ -21,7 +21,9 @@
 //!
 //! #[action]
 //! async fn Greet(res: Res, req: Req) {
-//!     res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+//!     res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await?;
+//!
+//!     Ok(())
 //! }
 //! ```
 

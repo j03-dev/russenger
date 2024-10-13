@@ -26,7 +26,9 @@
 //!     let text = TextModel::new(&req.user, "Sending file... Please wait!");
 //!     res.send(text).await;
 //!     let url = format!("{host}/static/video.mp4", host = req.host);
-//!     res.send(MediaModel::new(&req.user, "video", &url)).await;
+//!     res.send(MediaModel::new(&req.user, "video", &url)).await?;
+//!
+//!     Ok(())
 //! }
 //! ```
 //!
@@ -91,7 +93,9 @@ struct Attachment<'s> {
 ///     let text = TextModel::new(&req.user, "Sending file... Please wait!");
 ///     res.send(text).await;
 ///     let url = format!("{host}/static/video.mp4", host = req.host);
-///     res.send(MediaModel::new(&req.user, "video", &url)).await;
+///     res.send(MediaModel::new(&req.user, "video", &url)).await?;
+///
+///     Ok(())
 /// }
 /// ```
 ///

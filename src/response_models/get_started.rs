@@ -21,7 +21,9 @@
 //!
 //! #[action]
 //! async fn Main(res: Res, req: Req) {
-//!     res.send(GetStartedModel::new(Payload::default())).await;
+//!     res.send(GetStartedModel::new(Payload::default())).await?;
+//!
+//!     Ok(())
 //! }
 //! ```
 //!
@@ -57,7 +59,9 @@ use super::{payload::Payload, ResponseModel};
 ///
 /// #[action]
 /// async fn Main(res: Res, req: Req) {
-///     res.send(GetStartedModel::new(Payload::default())).await;
+///     res.send(GetStartedModel::new(Payload::default())).await?;
+///
+///     Ok(())
 /// }
 /// ```
 ///

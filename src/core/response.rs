@@ -11,7 +11,9 @@
 //!
 //! #[action]
 //! async fn Main(res: Res, req: Req) {
-//!     res.send(TextModel::new(&req.user, "Hello World")).await;
+//!     res.send(TextModel::new(&req.user, "Hello World")).await?;
+//!
+//!     Ok(())
 //! }
 //! ```
 use std::env;

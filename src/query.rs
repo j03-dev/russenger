@@ -25,15 +25,19 @@
 //!
 //! #[action]
 //! async fn Main(res: Res, req: Req) {
-//!     res.send(TextModel::new(&req.user, "What is your name: ")).await;
+//!     res.send(TextModel::new(&req.user, "What is your name: ")).await?;
 //!     req.query.set_action(&req.user, GetUserInput).await;
+//!
+//!     Ok(())
 //! }
 //!
 //! #[action]
 //! async fn GetUserInput(res: Res, req: Req) {
 //!     let username: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await;
-//!     Main.execute(res, req).await; // go back to Main Action
+//!     Main.execute(res, req).await?; // go back to Main Action
+//!
+//!     Ok(())
 //! }
 //!
 //! #[russenger::main]
@@ -41,7 +45,7 @@
 //!     let conn = Database::new().await.conn;
 //!     migrate!([RussengerUser], &conn);
 //!     russenger::actions![Main, GetUserInput];
-//!     russenger::launch().await;
+//!     russenger::launch().await.ok();
 //! }
 //! ```
 use crate::models::RussengerUser;
@@ -125,14 +129,18 @@ impl Query {
     ///
     /// #[action]
     /// async fn Main(res: Res, req: Req) {
-    ///     res.send(TextModel::new(&req.user, "What is your name: ")).await;
+    ///     res.send(TextModel::new(&req.user, "What is your name: ")).await?;
     ///     req.query.set_action(&req.user, GetUserInput).await;
+    ///
+    ///     Ok(())
     /// }
     ///
     /// #[action]
     /// async fn GetUserInput(res: Res, req: Req) {
     ///     let username: String = req.data.get_value();
-    ///     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await;
+    ///     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await?;
+    ///
+    ///     Ok(())
     /// }
     ///
     /// #[russenger::main]
@@ -140,7 +148,7 @@ impl Query {
     ///     let conn = Database::new().await.conn;
     ///     migrate!([RussengerUser], &conn);
     ///     russenger::actions![Main, GetUserInput];
-    ///     russenger::launch().await;
+    ///     russenger::launch().await.ok();
     /// }
     /// ```
     pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {

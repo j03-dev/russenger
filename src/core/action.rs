@@ -14,7 +14,9 @@
 //! #[action]
 //! async fn HelloWorld(res: Res, req: Req) {
 //!     let hello_world: String = req.data.get_value();
-//!     res.send(TextModel::new(&req.user, &hello_world)).await;
+//!     res.send(TextModel::new(&req.user, &hello_world)).await?;
+//!
+//!     Ok(())
 //! }
 //! ```
 use std::collections::{HashMap, HashSet};
@@ -83,8 +85,10 @@ impl ActionLock {
 ///     let message: String = req.data.get_value();
 ///
 ///     if message == "Hello" {
-///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await?;
 ///     }
+///
+///     Ok(())
 /// }
 /// ```
 #[async_trait::async_trait]
@@ -135,8 +139,10 @@ lazy_static::lazy_static! {
     ///     let message: String = req.data.get_value();
     ///
     ///     if message == "Hello" {
-    ///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+    ///         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await?;
     ///     }
+    ///
+    ///     Ok(())
     /// }
     ///
     /// #[russenger::main]

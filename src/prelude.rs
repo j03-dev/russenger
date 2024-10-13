@@ -18,8 +18,10 @@
 //! async fn Main (res: Res, req: Req) {
 //!     let message: String = req.data.get_value();
 //!     if message == "Hi" {
-//!         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await;
+//!         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await?;
 //!     }
+//!
+//!     Ok(())
 //! }
 //!
 //! #[russenger::main]
@@ -28,7 +30,7 @@
 //!     migrate!([RussengerUser], &conn);
 //!
 //!     russenger::actions![Main];
-//!     russenger::launch().await;
+//!     russenger::launch().await.ok();
 //! }
 //! ```
 pub use crate::action;

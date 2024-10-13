@@ -29,8 +29,8 @@
 //!
 //! #[derive(FromRow, Clone, Model)]
 //! pub struct Register {
-//!     #[model(primary_key = true)]
-//!     pub id: Serial,
+//!     #[model(primary_key = true, auto_increment = true, null = false)]
+//!     pub id: Integer,
 //!     #[model(foreign_key = "RussengerUser.facebook_user_id", unique = true, null = false)]
 //!     pub user_id: String,
 //!     #[model(size = 30, unique = true, null = false)]
@@ -40,24 +40,26 @@
 //! #[action]
 //! async fn Main(res: Res, req: Req) {
 //!     // Send a greeting message to the user
-//!     res.send(TextModel::new(&req.user, "Hello!")).await;
+//!     res.send(TextModel::new(&req.user, "Hello!")).await?;
 //!
 //!     // Check if the user is registered
 //!     if let Some(user_register) = Register::get(kwargs!(user_id = req.user), &req.query.conn).await {
 //!         // If the user is registered, send a personalized greeting message
 //!         res.send(TextModel::new(&req.user, &format!("Hello {}", user_register.username)))
-//!             .await;
+//!             .await?;
 //!     } else {
 //!         // If the user is not registered, ask for their name
 //!         res.send(TextModel::new(&req.user, "What is your name: "))
-//!             .await;
+//!             .await?;
 //!         // Set the next action to SignUp
 //!         req.query.set_action(&req.user, SignUp).await;
-//!         return;
+//!         return Ok(());
 //!     }
 //!
 //!     // If the user is registered, set the next action to GetUserInput
 //!     req.query.set_action(&req.user, GetUserInput).await;
+//!
+//!     Ok(())
 //! }
 //!
 //! #[action]
@@ -73,10 +75,12 @@
 //!     };
 //!
 //!     // Send a message to the user indicating whether the registration was successful
-//!     res.send(TextModel::new(&req.user, message)).await;
+//!     res.send(TextModel::new(&req.user, message)).await?;
 //!
 //!     // Go back to the Main action
-//!     Main.execute(res, req).await;
+//!     Main.execute(res, req).await?;
+//!
+//!     Ok(())
 //! }
 //!
 //! #[action]
@@ -92,7 +96,9 @@
 //!     let quick_reply_model = QuickReplyModel::new(&req.user, "choose one color", quick_replies);
 //!
 //!     // Send the QuickReplyModel to the user
-//!     res.send(quick_reply_model).await;
+//!     res.send(quick_reply_model).await?;
+//!
+//!     Ok(())
 //! }
 //!
 //! #[action]
@@ -101,29 +107,27 @@
 //!     let color: String = req.data.get_value();
 //!
 //!     // Send a message to the user confirming their choice
-//!     res.send(TextModel::new(&req.user, &color)).await;
+//!     res.send(TextModel::new(&req.user, &color)).await?;
 //!
 //!     // Go back to the Main action
-//!     Main.execute(res, req).await;
+//!     Main.execute(res, req).await?;
+//!
+//!     Ok(())
 //! }
-//! ```
 //!
-//! Registering actions for the main application:
-//!
-//! ```rust
 //! #[russenger::main]
 //! async fn main() {
 //!     // Connect to the database
 //!     let conn = Database::new().await.conn;
 //!
 //!     // Migrate the database schema
-//!     migrate!([RussengerUser, Register], &conn);
+//!     migrate!([RussengerUser], &conn);
 //!
 //!     // Register the actions for the main application
 //!     russenger::actions![Main, SignUp, GetUserInput, NextAction];
 //!
 //!     // Launch the main application
-//!     russenger::launch().await;
+//!     russenger::launch().await.ok();
 //! }
 //! ```
 //!

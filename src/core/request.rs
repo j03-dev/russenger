@@ -18,7 +18,9 @@
 //! async fn HelloWorld(res: Res, req: Req) {
 //!     let user: String = req.user;
 //!     let message: String  = req.data.get_value();
-//!     res.send(TextModel::new(&user, "Hello, world!")).await;
+//!     res.send(TextModel::new(&user, "Hello, world!")).await?;
+//!
+//!     Ok(())
 //! }
 //!```
 //! Use the `Req` to get the user and query from a request:
@@ -29,14 +31,18 @@
 //!
 //! #[action]
 //! async fn Main(res: Res, req: Req) {
-//!     res.send(TextModel::new(&req.user, "What is your name")).await;
+//!     res.send(TextModel::new(&req.user, "What is your name")).await?;
 //!     req.query.set_action(&req.user, Name).await;
+//!
+//!     Ok(())
 //! }
 //!
 //! #[action]
 //! async fn Name(res: Res, req: Req) {
-//!   let name: String = req.data.get_value();
-//!   res.send(TextModel::new(&req.user, &format!("Hello, {}!", name))).await;
+//!     let name: String = req.data.get_value();
+//!     res.send(TextModel::new(&req.user, &format!("Hello, {}!", name))).await?;
+//!
+//!     Ok(())
 //! }
 //!
 //! #[russenger::main]
@@ -44,7 +50,7 @@
 //!     let conn = Database::new().await.conn;
 //!     migrate!([RussengerUser], &conn);
 //!     russenger::actions![Main, Name];
-//!     russenger::launch().await;
+//!     russenger::launch().await.ok();
 //! }
 //! ```
 use crate::query::Query;
@@ -71,7 +77,9 @@ pub struct Req {
     /// #[action]
     /// async fn HelloWorld(res: Res, req: Req) {
     ///     let user: String = req.user;
-    ///     res.send(TextModel::new(&user, "Hello, world!")).await;
+    ///     res.send(TextModel::new(&user, "Hello, world!")).await?;
+    ///
+    ///     Ok(())
     /// }
     /// ```
     pub user: String,
@@ -101,10 +109,14 @@ pub struct Req {
     /// #[action]
     /// async fn Main(res: Res, req: Req) {
     ///     req.query.set_action(&req.user, NextAction).await; // goto NextAction
+    ///
+    ///     Ok(())
     /// }
     ///
     /// #[action]
-    /// async fn NextAction(res: Res, req: Req) {}
+    /// async fn NextAction(res: Res, req: Req) {
+    ///     Ok(())
+    /// }
     /// ```
     pub query: Query,
 
@@ -149,9 +161,11 @@ pub struct Req {
     ///
     /// #[action]
     /// async fn Main(res: Res, req: Req) {
-    ///    let image_url = &format!("{host}/image.jpg", host = req.host);
-    ///    let media = MediaModel::new(&req.user, "image", image_url);
-    ///    res.send(media).await;
+    ///     let image_url = &format!("{host}/image.jpg", host = req.host);
+    ///     let media = MediaModel::new(&req.user, "image", image_url);
+    ///     res.send(media).await?;
+    ///
+    ///     Ok(())
     /// }
     /// ```
     pub host: String,

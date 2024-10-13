@@ -23,7 +23,7 @@
 //! #[action]
 //! async fn Main(res: Res, req: Req) {
 //!     // Need Getstart First Before Send PersistenceMenu
-//!     res.send(GetStartedModel::new(Payload::default())).await;
+//!     res.send(GetStartedModel::new(Payload::default())).await?;
 //!     let buttons = vec![
 //!         Button::Postback {
 //!             title: "Option 1".to_owned(),
@@ -33,12 +33,16 @@
 //!     ];
 //!
 //!     let menu = PersistentMenuModel::new(&req.user, buttons);
-//!     res.send(menu).await;
+//!     res.send(menu).await?;
+//!
+//!     Ok(())
 //! }
 //!
 //! #[action]
 //! async fn Option1(res: Res, req: Req) {
-//!     res.send(TextModel::new(&req.user, "Option_1")).await;
+//!     res.send(TextModel::new(&req.user, "Option_1")).await?;
+//!
+//!     Ok(())
 //! }
 //! ```
 //!
@@ -81,11 +85,11 @@ struct Menu<'m> {
 ///
 /// ```rust
 /// use russenger::prelude::*;
-/// 
+///
 /// #[action]
 /// async fn Main(res: Res, req: Req) {
 ///     // Need Getstart Frist Before Send PersistenceMenu
-///     res.send(GetStartedModel::new(Payload::default())).await;
+///     res.send(GetStartedModel::new(Payload::default())).await?;
 ///     let buttons = vec![
 ///         Button::Postback {
 ///             title: "Option 1".to_owned(),
@@ -95,13 +99,17 @@ struct Menu<'m> {
 ///     ];
 ///
 ///     let menu = PersistentMenuModel::new(&req.user, buttons);
-///     res.send(menu).await;
+///     res.send(menu).await?;
+///
+///     Ok(())
 /// }
 ///
 ///
 /// #[action]
 /// async fn Option1(res: Res, req: Req) {
-///     res.send(TextModel::new(&req.user, "Option_1")).await;
+///     res.send(TextModel::new(&req.user, "Option_1")).await?;
+///
+///     Ok(())
 /// }
 /// ```
 ///
@@ -143,7 +151,9 @@ impl<'p> PersistentMenuModel<'p> {
     ///
     /// #[action]
     /// async fn Option1(res: Res, req: Req) {
-    ///     res.send(TextModel::new(&req.user, "Option_1")).await;
+    ///     res.send(TextModel::new(&req.user, "Option_1")).await?;
+    ///
+    ///     Ok(())
     /// }
     /// ```
     ///

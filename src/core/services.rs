@@ -12,6 +12,7 @@
 use std::str::FromStr;
 
 use actix_web::{dev, get, post, web, HttpResponse};
+use anyhow::Result;
 
 use super::{
     action::{ACTION_LOCK, ACTION_REGISTRY},
@@ -47,7 +48,7 @@ enum Executable<'a> {
     TextMessage(&'a str, &'a str, &'a str, Query),
 }
 
-async fn run(executable: Executable<'_>) -> std::io::Result<()> {
+async fn run(executable: Executable<'_>) -> Result<()> {
     match executable {
         Executable::Payload(user, payload, host, query) => {
             let payload = Payload::from_str(payload).unwrap_or_default();

@@ -17,7 +17,8 @@
 //! }
 //! ```
 use std::env;
-use std::io::{Error, ErrorKind::Other, Result};
+
+use anyhow::{bail, Result};
 
 use crate::response_models::ResponseModel;
 
@@ -74,12 +75,12 @@ impl Res {
         {
             Ok(response) => {
                 if response.status().is_client_error() {
-                    Err(Error::new(Other, response.text().await.unwrap()))
+                    bail!(response.text().await.unwrap())
                 } else {
                     Ok(response.text().await.unwrap())
                 }
             }
-            Err(err) => Err(Error::new(Other, err.to_string())),
+            Err(err) => bail!(err.to_string()),
         }
     }
 }

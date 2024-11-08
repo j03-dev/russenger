@@ -147,6 +147,7 @@ pub use core::{
     services::{index, webhook_core, webhook_verify}, // core services
 };
 
+pub use anyhow;
 use anyhow::{bail, Context, Result};
 pub use dotenv::dotenv;
 pub use rusql_alchemy;

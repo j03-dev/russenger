@@ -20,9 +20,9 @@
 //! }
 //! ```
 use std::collections::{HashMap, HashSet};
-use std::io::Result;
 use std::sync::Arc;
 
+use anyhow::Result;
 use tokio::sync::Mutex;
 
 use super::{request::Req, response::Res};

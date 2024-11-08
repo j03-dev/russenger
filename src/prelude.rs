@@ -34,6 +34,7 @@
 //! }
 //! ```
 pub use crate::action;
+pub use crate::anyhow;
 pub use crate::core::{request::Req, response::Res};
 pub use crate::launch;
 pub use crate::response_models::{

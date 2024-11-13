@@ -16,7 +16,7 @@ To get started with the Russenger library, you'll need to install it as a depend
 
 ```toml
 [dependencies]
-russenger = { version = "0.3.O-rc", features = ["postgres"] } # features 'sqlite, postgres, mysql'
+russenger = { version = "0.3.1-rc", features = ["postgres"] } # features 'sqlite, postgres, mysql'
 actix-web = "4"
 sqlx = "^0.8.0"
 ```
@@ -111,16 +111,17 @@ async fn NextAction(res: Res, req: Req) {
     res.send(TextModel::new(&req.user, &color)).await?;
     Main.execute(res, req).await?; // go back to Main action
 
-    Ok(()
+    Ok(())
 }
 
 #[russenger::main]
-async fn main() {
+async fn main() -> error::Result<()>{
     let conn = Database::new().await.conn;
     migrate!([RussengerUser, Register], &conn);
 
     russenger::actions![Main, GetUserInput, NextAction, SignUp];
-    russenger::launch().await.ok();
+    russenger::launch().await?;
+    Ok(())
 }
 ```
 
@@ -153,11 +154,12 @@ async fn NextAction(res: Res, req: Req) {
 }
 
 #[russenger::main]
-async fn main() {
+async fn main()  -> error::Result<()>{
     let conn = Database::new().await.conn;
     migrate!([RussengerUser], &conn);
     russenger::actions![Main, NextAction];
-    russenger::launch().await;
+    russenger::launch().await?;
+    Ok(())
 }
 ```
 

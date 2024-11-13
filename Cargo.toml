@@ -50,6 +50,4 @@ lazy_static = "1.4.0"
 
 # Error handling
 anyhow = "1.0.89"
-
-# Logging and tracing
-tracing = "0.1.40"
+log = "0.4.22"

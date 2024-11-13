@@ -88,18 +88,18 @@ pub async fn webhook_core(
             if let Some(quick_reply) = message.get_quick_reply() {
                 let payload = quick_reply.get_payload();
                 if let Err(e) = run(Executable::Payload(user, payload, host, query)).await {
-                    tracing::error!("Error handling payload: {:?}", e);
+                    log::error!("Error handling payload: {:?}", e);
                 }
             } else {
                 let text = message.get_text();
                 if let Err(e) = run(Executable::TextMessage(user, &text, host, query)).await {
-                    tracing::error!("Error handling text message: {:?}", e);
+                    log::error!("Error handling text message: {:?}", e);
                 }
             }
         } else if let Some(postback) = data.get_postback() {
             let payload = postback.get_payload();
             if let Err(e) = run(Executable::Payload(user, payload, host, query)).await {
-                tracing::error!("Error handling postback: {:?}", e);
+                log::error!("Error handling postback: {:?}", e);
             }
         }
     }

@@ -62,9 +62,11 @@ async fn run(executable: Executable<'_>) -> Result<()> {
         }
         Executable::TextMessage(user, text_message, host, query) => {
             let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
+            println!("Action path: {}", action_path);
             let req = Req::new(user, query, Data::new(text_message, None), host);
             if let Some(action) = ACTION_REGISTRY.lock().await.get(&action_path) {
-                action.execute(res, req).await?;
+                let result = action.execute(res, req).await;
+                println!("Error on action execution: {:?}", result);
             }
         }
     }

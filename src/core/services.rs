@@ -82,30 +82,29 @@ pub async fn webhook_core(
     let user = data.get_sender();
     let host = conn.host();
     query.create(user).await;
-    let mut error = None;
+
     if ACTION_LOCK.lock(user).await {
-        error = {
-            if let Some(message) = data.get_message() {
-                if let Some(quick_reply) = message.get_quick_reply() {
-                    let payload = quick_reply.get_payload();
-                    run(Executable::Payload(user, payload, host, query)).await
-                } else {
-                    let text = message.get_text();
-                    run(Executable::TextMessage(user, &text, host, query)).await
+        if let Some(message) = data.get_message() {
+            if let Some(quick_reply) = message.get_quick_reply() {
+                let payload = quick_reply.get_payload();
+                if let Err(e) = run(Executable::Payload(user, payload, host, query)).await {
+                    tracing::error!("Error handling payload: {:?}", e);
                 }
-            } else if let Some(postback) = data.get_postback() {
-                let payload = postback.get_payload();
-                run(Executable::Payload(user, payload, host, query)).await
             } else {
-                Ok(())
+                let text = message.get_text();
+                if let Err(e) = run(Executable::TextMessage(user, &text, host, query)).await {
+                    tracing::error!("Error handling text message: {:?}", e);
+                }
+            }
+        } else if let Some(postback) = data.get_postback() {
+            let payload = postback.get_payload();
+            if let Err(e) = run(Executable::Payload(user, payload, host, query)).await {
+                tracing::error!("Error handling postback: {:?}", e);
             }
         }
-        .err();
     }
+
     ACTION_LOCK.unlock(user).await;
-    if let Some(err) = error {
-        HttpResponse::BadRequest().body(err.to_string())
-    } else {
-        HttpResponse::Ok().finish()
-    }
+
+    HttpResponse::Ok().finish()
 }

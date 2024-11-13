@@ -19,7 +19,6 @@ mysql = ["rusql-alchemy/mysql"]
 
 [dependencies.russenger_macro]
 version = "0.1.2"
-branch = "main"
 
 [dependencies.rusql-alchemy]
 version = "0.3.0"

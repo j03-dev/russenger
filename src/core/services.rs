@@ -62,11 +62,9 @@ async fn run(executable: Executable<'_>) -> Result<()> {
         }
         Executable::TextMessage(user, text_message, host, query) => {
             let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
-            println!("Action path: {}", action_path);
             let req = Req::new(user, query, Data::new(text_message, None), host);
             if let Some(action) = ACTION_REGISTRY.lock().await.get(&action_path) {
-                let result = action.execute(res, req).await;
-                println!("Error on action execution: {:?}", result);
+                action.execute(res, req).await?;
             }
         }
     }
@@ -95,13 +93,13 @@ pub async fn webhook_core(
             } else {
                 let text = message.get_text();
                 if let Err(e) = run(Executable::TextMessage(user, &text, host, query)).await {
-                    log::error!("Error handling text message: {:?}", e);
+                    eprintln!("Error handling text message: {:?}", e);
                 }
             }
         } else if let Some(postback) = data.get_postback() {
             let payload = postback.get_payload();
             if let Err(e) = run(Executable::Payload(user, payload, host, query)).await {
-                log::error!("Error handling postback: {:?}", e);
+                eprintln!("Error handling postback: {:?}", e);
             }
         }
     }

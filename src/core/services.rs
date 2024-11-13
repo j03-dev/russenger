@@ -88,7 +88,7 @@ pub async fn webhook_core(
             if let Some(quick_reply) = message.get_quick_reply() {
                 let payload = quick_reply.get_payload();
                 if let Err(e) = run(Executable::Payload(user, payload, host, query)).await {
-                    log::error!("Error handling payload: {:?}", e);
+                    eprintln!("Error handling payload: {:?}", e);
                 }
             } else {
                 let text = message.get_text();
@@ -107,4 +107,4 @@ pub async fn webhook_core(
     ACTION_LOCK.unlock(user).await;
 
     HttpResponse::Ok().finish()
-}
+} 

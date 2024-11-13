@@ -1992,7 +1992,6 @@ dependencies = [
  "async-trait",
  "dotenv",
  "lazy_static",
- "log",
  "reqwest",
  "rusql-alchemy",
  "russenger_macro",

@@ -22,10 +22,10 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-use anyhow::Result;
 use tokio::sync::Mutex;
 
 use super::{request::Req, response::Res};
+use crate::error::Result;
 use crate::response_models::data::Data;
 use crate::response_models::payload::Payload;
 use crate::response_models::quick_replies::{QuickReply, QuickReplyModel};

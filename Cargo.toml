@@ -19,7 +19,7 @@ mysql = ["rusql-alchemy/mysql"]
 
 [dependencies.russenger_macro]
 git = "https://github.com/j03-dev/russenger_macro"
-version = "0.1.1"
+version = "0.1.2"
 branch = "main"
 
 [dependencies.rusql-alchemy]

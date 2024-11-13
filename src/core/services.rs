@@ -11,8 +11,8 @@
 //! * `POST /webhook`: This endpoint handles the webhook core.
 use std::str::FromStr;
 
+use crate::error::Result;
 use actix_web::{dev, get, post, web, HttpResponse};
-use anyhow::Result;
 
 use super::{
     action::{ACTION_LOCK, ACTION_REGISTRY},

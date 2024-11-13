@@ -146,10 +146,13 @@ pub use core::{
     app_state::AppState,
     services::{index, webhook_core, webhook_verify}, // core services
 };
+pub mod error {
+    pub use anyhow::*;
+}
 
 pub use anyhow;
-use anyhow::{bail, Context, Result};
 pub use dotenv::dotenv;
+use error::{bail, Context, Result};
 pub use rusql_alchemy;
 pub use russenger_macro::action;
 

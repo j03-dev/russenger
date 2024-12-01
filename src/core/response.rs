@@ -60,7 +60,7 @@ impl Res {
     ///
     /// Returns `SendResult::Error` if the send operation fails.
     pub async fn send<T: ResponseModel>(&self, response_model: T) -> Result<String> {
-        let version = env::var("FACEBOOK_API_VERSION").unwrap_or("v15.0".into());
+        let version = env::var("FACEBOOK_API_VERSION").unwrap_or("v16.0".into());
         let page_access_token =
             env::var("PAGE_ACCESS_TOKEN").expect("env variable `PAGE_ACCESS_TOKEN` should be set");
         let url_api = format!(

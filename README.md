@@ -21,6 +21,17 @@ actix-web = "4"
 sqlx = "^0.8.0"
 ```
 
+env
+
+```
+PORT=8000
+HOST=0.0.0.0
+VERIFY_TOKEN=your_verify_token
+FACEBOOK_API_VERSION=v19.0
+DATABASE_URL=postgres://<username>:<password>@<hostname>/<dbname>
+PAGE_ACCESS_TOKEN=your_page_acces_token_from_facebook_developer
+```
+
 Once you've installed the library, you can start building your bot! Check out the [documentation](https://docs.rs/russenger) for more information on how to use the library.
 
 ## Creating a New Project
@@ -61,7 +72,7 @@ pub struct Register {
 
 #[action]
 async fn Main(res: Res, req: Req) {
-    res.send(TextModel::new(&req.user, "Hello!")).await;
+    res.send(TextModel::new(&req.user, "Hello!")).await?;
     if let Some(user_register) = Register::get(kwargs!(user_id == req.user), &req.query.conn).await {
         res.send(TextModel::new(&req.user, &format!("Hello {}", user_register.username)))
             .await?;
@@ -102,7 +113,7 @@ async fn GetUserInput(res: Res, req: Req) {
     let quick_reply_model = QuickReplyModel::new(&req.user, "choose one color", quick_replies);
     res.send(quick_reply_model).await?;
 
-    Ok(()
+    Ok(())
 }
 
 #[action]
@@ -144,13 +155,16 @@ async fn Main(res: Res, req: Req) {
         QuickReply::new("Option 3", "", payload("Option 3")),
     ];
     let quick_reply_model = QuickReplyModel::new(&req.user, "Choose an option:", quick_replies);
-    res.send(quick_reply_model).await;
+    res.send(quick_reply_model).await?;
+
+    Ok(())
 }
 
 #[action]
 async fn NextAction(res: Res, req: Req) {
     let option: String = req.data.get_value();
-    res.send(TextModel::new(&req.user, &format!("You chose: {}", option))).await;
+    res.send(TextModel::new(&req.user, &format!("You chose: {}", option))).await?;
+    Ok(())
 }
 
 #[russenger::main]

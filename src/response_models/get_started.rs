@@ -73,11 +73,11 @@ use super::{payload::Payload, ResponseModel};
 ///
 /// [Facebook Messenger Platform - Get Started Button](https://developers.facebook.com/docs/messenger-platform/reference/messenger-profile-api/get-started-button)
 #[derive(Debug, Clone, Serialize)]
-pub struct GetStartedModel {
+pub struct GetStartedButtonModel {
     get_started: serde_json::Value,
 }
 
-impl GetStartedModel {
+impl GetStartedButtonModel {
     /// Creates a new `GetStartedModel` instance.
     ///
     /// # Parameters
@@ -103,6 +103,6 @@ impl GetStartedModel {
     }
 }
 
-impl ResponseModel for GetStartedModel {
+impl ResponseModel for GetStartedButtonModel {
     const END_POINT: &'static str = "messenger_profile";
 }

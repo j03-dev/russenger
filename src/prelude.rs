@@ -35,12 +35,13 @@
 //! ```
 pub use crate::action;
 pub use crate::core::{request::Req, response::Res};
+pub use crate::error;
 pub use crate::launch;
 pub use crate::response_models::{
     button::{Button, ButtonModel},
     data::Data,
     generic::{GenericElement, GenericModel},
-    get_started::GetStartedModel,
+    get_started::GetStartedButtonModel,
     media::MediaModel,
     payload::Payload,
     persistent_menu::PersistentMenuModel,
@@ -50,4 +51,3 @@ pub use crate::response_models::{
     ResponseModel,
 };
 pub use crate::rusql_alchemy::{self, prelude::*};
-pub use crate::error;

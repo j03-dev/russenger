@@ -105,7 +105,7 @@ pub trait Action: Send + Sync {
             "Navigation",
             vec![QuickReply::new(
                 "Next",
-                "",
+                None,
                 Payload::new_with_path(
                     self.path(),
                     Some(Data::new(req.data.get_value::<String>(), Some(page))),

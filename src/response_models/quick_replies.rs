@@ -117,7 +117,7 @@ pub struct QuickReply {
     content_type: String,
     title: String,
     payload: String,
-    image_url: String,
+    image_url: Option<String>,
 }
 
 impl QuickReply {
@@ -147,12 +147,12 @@ impl QuickReply {
     ///     Ok(())
     /// }
     /// ```
-    pub fn new(title: &str, image_url: &str, payload: Payload) -> Self {
+    pub fn new(title: &str, image_url: Option<String>, payload: Payload) -> Self {
         Self {
             content_type: "text".to_owned(),
             title: title.to_owned(),
             payload: payload.to_string(),
-            image_url: image_url.to_owned(),
+            image_url,
         }
     }
 }

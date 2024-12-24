@@ -57,7 +57,8 @@ async fn ask_gemini(text: String) -> Result<Response, reqwest::Error> {
 
 #[action]
 async fn Main(res: Res, req: Req) {
-    res.send(GetStartedModel::new(Payload::default())).await?;
+    res.send(GetStartedButtonModel::new(Payload::default()))
+        .await?;
     res.send(PersistentMenuModel::new(
         &req.user,
         vec![Button::Postback {

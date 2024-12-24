@@ -8,7 +8,7 @@ async fn Main(res: Res, _req: Req) {
         res.send(TextModel::new(&req.user, "Hello, welcome !"))
             .await?;
     }
-    res.send(GetStartedModel::new(Payload::new(Start, None)))
+    res.send(GetStartedButtonModel::new(Payload::new(Start, None)))
         .await?;
 
     Ok(())

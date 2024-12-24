@@ -61,8 +61,8 @@ async fn GetUserInput(res: Res, req: Req) {
 
     // QuickReply
     let quick_replies: Vec<QuickReply> = vec![
-        QuickReply::new("blue", "", payload("blue")),
-        QuickReply::new("red", "", payload("red")),
+        QuickReply::new("blue", None, payload("blue")),
+        QuickReply::new("red", None, payload("red")),
     ];
     let quick_reply_model = QuickReplyModel::new(&req.user, "choose one color", quick_replies);
     res.send(quick_reply_model).await?;

@@ -147,12 +147,12 @@ impl QuickReply {
     ///     Ok(())
     /// }
     /// ```
-    pub fn new(title: &str, image_url: Option<String>, payload: Payload) -> Self {
+    pub fn new(title: &str, image_url: Option<&String>, payload: Payload) -> Self {
         Self {
             content_type: "text".to_owned(),
             title: title.to_owned(),
             payload: payload.to_string(),
-            image_url,
+            image_url: image_url.cloned(),
         }
     }
 }

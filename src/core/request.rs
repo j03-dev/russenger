@@ -161,7 +161,7 @@ pub struct Req {
     ///
     /// #[action]
     /// async fn Main(res: Res, req: Req) {
-    ///     let image_url = &format!("{host}/image.jpg", host = req.host);
+    ///     let image_url = &format!("{host}/static/image.jpg", host = req.host);
     ///     let media = MediaModel::new(&req.user, "image", image_url);
     ///     res.send(media).await?;
     ///

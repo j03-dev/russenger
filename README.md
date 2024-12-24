@@ -16,7 +16,7 @@ To get started with the Russenger library, you'll need to install it as a depend
 
 ```toml
 [dependencies]
-russenger = { version = "0.3.2-rc", features = ["postgres"] } # features 'sqlite, postgres, mysql'
+russenger = { version = "0.3.3-rc", features = ["postgres"] } # features 'sqlite, postgres, mysql'
 actix-web = "4"
 sqlx = "^0.8.0"
 ```
@@ -107,8 +107,8 @@ async fn GetUserInput(res: Res, req: Req) {
 
     // QuickReply
     let quick_replies: Vec<QuickReply> = vec![
-        QuickReply::new("blue", "", payload("blue")),
-        QuickReply::new("red", "", payload("red")),
+        QuickReply::new("blue", None, payload("blue")),
+        QuickReply::new("red", None, payload("red")),
     ];
     let quick_reply_model = QuickReplyModel::new(&req.user, "choose one color", quick_replies);
     res.send(quick_reply_model).await?;
@@ -150,9 +150,9 @@ async fn Main(res: Res, req: Req) {
 
     // QuickReply
     let quick_replies: Vec<QuickReply> = vec![
-        QuickReply::new("Option 1", "", payload("Option 1")),
-        QuickReply::new("Option 2", "", payload("Option 2")),
-        QuickReply::new("Option 3", "", payload("Option 3")),
+        QuickReply::new("Option 1", None, payload("Option 1")),
+        QuickReply::new("Option 2", None, payload("Option 2")),
+        QuickReply::new("Option 3", None, payload("Option 3")),
     ];
     let quick_reply_model = QuickReplyModel::new(&req.user, "Choose an option:", quick_replies);
     res.send(quick_reply_model).await?;

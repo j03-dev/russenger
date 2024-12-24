@@ -41,7 +41,7 @@
 //! async fn Main(res: Res, req: Req) {
 //!     let data = Data::new("HelloWorld", None);
 //!     let payload = Payload::new(HelloWorld, Some(data));
-//!     let quick_replies = vec![QuickReply::new("Button Title", "https://example.com/image.png", payload)];
+//!     let quick_replies = vec![QuickReply::new("Button Title", Some("https://example.com/image.png"), payload)];
 //!     let quick_reply = QuickReplyModel::new(&req.user, "Choose an option:", quick_replies);
 //!     res.send(quick_reply).await?;
 //!
@@ -102,7 +102,7 @@ use super::{payload::Payload, recipient::Recipient};
 ///
 /// let data = Data::new("HelloWorld", None);
 /// let payload = Payload::new(HelloWorld, Some(data));
-/// let quick_reply = QuickReply::new("Button Title", "https://example.com/image.png", payload);
+/// let quick_reply = QuickReply::new("Button Title", Some("https://example.com/image.png"), payload);
 ///
 /// #[action]
 /// async fn HelloWorld(res: Res, req: Req) {

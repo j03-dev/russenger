@@ -13,6 +13,7 @@ use std::str::FromStr;
 
 use crate::error::Result;
 use actix_web::{dev, get, post, web, HttpResponse};
+use anyhow::Context;
 
 use super::{
     action::{ACTION_LOCK, ACTION_REGISTRY},
@@ -55,17 +56,21 @@ async fn run(executable: Executable<'_>) -> Result<()> {
             {
                 let data = payload.get_data();
                 let req = Req::new(user, query, data, host);
-                if let Some(action) = ACTION_REGISTRY.lock().await.get(&payload.get_path()) {
-                    action.execute(res, req).await?;
-                }
+                let action_registry = ACTION_REGISTRY.lock().await;
+                let action = action_registry
+                    .get(&payload.get_path())
+                    .context("do not find the action")?;
+                action.execute(res, req).await?;
             }
         }
         Executable::TextMessage(user, text_message, host, query) => {
             let action_path = query.get_action(user).await.unwrap_or("Main".to_string());
             let req = Req::new(user, query, Data::new(text_message, None), host);
-            if let Some(action) = ACTION_REGISTRY.lock().await.get(&action_path) {
-                action.execute(res, req).await?;
-            }
+            let action_registry = ACTION_REGISTRY.lock().await;
+            let action = action_registry
+                .get(&action_path)
+                .context("do not find the action")?;
+            action.execute(res, req).await?;
         }
     }
 

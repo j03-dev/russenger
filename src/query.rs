@@ -83,7 +83,7 @@ impl Query {
     /// # Panics
     ///
     /// Panics if the connection cannot be established.
-    pub async fn new() -> Self {
+    pub(crate) async fn new() -> Self {
         let conn = Database::new().await.conn;
         Self { conn }
     }

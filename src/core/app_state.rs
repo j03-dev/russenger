@@ -4,6 +4,7 @@
 //! It contains the following fields:
 //! - `query`: A `Query` instance used to interact with the database.
 use crate::query::Query;
+use anyhow::Result;
 
 /// # App State
 ///
@@ -19,10 +20,10 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub async fn init() -> Self {
-        let query: Query = Query::new().await;
+    pub async fn init() -> Result<Self> {
+        let query: Query = Query::new().await?;
         let template_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*");
-        let templates = tera::Tera::new(template_dir).unwrap();
-        Self { query, templates }
+        let templates = tera::Tera::new(template_dir)?;
+        Ok(Self { query, templates })
     }
 }

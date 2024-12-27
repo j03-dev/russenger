@@ -21,7 +21,7 @@ mysql = ["rusql-alchemy/mysql"]
 version = "0.1.2"
 
 [dependencies.rusql-alchemy]
-version = "0.3.0"
+version = "0.4.1-rc"
 default-features = false
 
 [dependencies]

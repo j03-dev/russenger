@@ -50,6 +50,7 @@
 //! ```
 use crate::models::RussengerUser;
 use crate::Action;
+use anyhow::Result;
 
 use rusql_alchemy::prelude::*;
 
@@ -83,9 +84,9 @@ impl Query {
     /// # Panics
     ///
     /// Panics if the connection cannot be established.
-    pub(crate) async fn new() -> Self {
-        let conn = Database::new().await.conn;
-        Self { conn }
+    pub(crate) async fn new() -> Result<Self> {
+        let conn = Database::new().await?.conn;
+        Ok(Self { conn })
     }
 
     /// Runs database migrations.

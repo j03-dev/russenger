@@ -171,7 +171,7 @@ async fn run_server() -> Result<()> {
     if !ACTION_REGISTRY.lock().await.contains_key("Main") {
         bail!("'actions!' should contain `Main` action");
     }
-    let app_state = AppState::init().await;
+    let app_state = AppState::init().await?;
     let host = std::env::var("HOST").unwrap_or("0.0.0.0".into());
     let port = std::env::var("PORT")
         .unwrap_or("2453".into())

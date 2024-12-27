@@ -49,4 +49,4 @@ dotenv = "0.15.0"
 lazy_static = "1.4.0"
 
 # Error handling
-anyhow = "1.0.89"
+anyhow = "1.0.95"

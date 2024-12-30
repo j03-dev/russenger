@@ -18,7 +18,7 @@
 //! ```
 use std::env;
 
-use anyhow::{bail, Result};
+use anyhow::Result;
 
 use crate::response_models::ResponseModel;
 
@@ -75,12 +75,12 @@ impl Res {
         {
             Ok(response) => {
                 if response.status().is_client_error() {
-                    bail!(response.text().await.unwrap())
+                    Err(anyhow::anyhow!(response.text().await?))
                 } else {
                     Ok(response.text().await.unwrap())
                 }
             }
-            Err(err) => bail!(err.to_string()),
+            Err(err) => Err(anyhow::anyhow!(err)),
         }
     }
 }

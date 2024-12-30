@@ -49,7 +49,6 @@
 //! }
 //! ```
 use crate::models::RussengerUser;
-use crate::Action;
 use anyhow::Result;
 
 use rusql_alchemy::prelude::*;
@@ -155,11 +154,11 @@ impl Query {
     ///     russenger::launch().await.ok();
     /// }
     /// ```
-    pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {
+    pub async fn set_action(&self, user_id: &str, path: &str) -> bool {
         if let Some(mut user) =
             RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn).await
         {
-            user.action = action.path();
+            user.action_path = path.to_owned();
             user.update(&self.conn).await
         } else {
             false
@@ -178,6 +177,6 @@ impl Query {
     pub async fn get_action(&self, user_id: &str) -> Option<String> {
         RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
             .await
-            .map(|user| user.action)
+            .map(|user| user.action_path)
     }
 }

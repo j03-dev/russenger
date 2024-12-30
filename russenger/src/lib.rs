@@ -142,7 +142,7 @@ pub mod query;
 pub mod response_models;
 
 pub use core::{
-    action::{Action, ACTION_REGISTRY},
+    action::{app, Add},
     app_state::AppState,
     services::{index, webhook_core, webhook_verify}, // core services
 };
@@ -168,7 +168,7 @@ fn print_info(host: &str, port: u16) {
 }
 
 async fn run_server() -> Result<()> {
-    if !ACTION_REGISTRY.lock().await.contains_key("Main") {
+    if !app.lock().await.contains_key("Main") {
         bail!("'actions!' should contain `Main` action");
     }
     let app_state = AppState::init().await?;
@@ -198,50 +198,4 @@ pub async fn launch() -> Result<()> {
     dotenv()?;
     run_server().await?;
     Ok(())
-}
-
-/// The `actions!` macro is used to register actions for the main application.
-///
-/// # Syntax
-///
-/// ```rust
-/// russenger::actions![Action1, Action2, ...];
-/// ```
-///
-/// # Arguments
-///
-/// * `Action1`, `Action2`, ...: The actions to register. These should be instances of a struct that implements the `Action` trait.
-///
-/// # Example
-///
-/// ```rust
-/// use russenger::models::RussengerUser;
-/// use russenger::prelude::*;
-///
-/// #[action]
-/// async fn Main(res: Res, req: Req) {
-///     // ...
-/// }
-///
-/// #[action]
-/// async fn GetUserInput(res: Res, req: Req) {
-///     // ...
-/// }
-///
-/// #[russenger::main]
-/// async fn main() {
-///     let conn = Database::new().await.conn;
-///     migrate!([RussengerUser], &conn);
-///     russenger::actions![Main, GetUserInput];
-///     russenger::launch().await;
-/// }
-/// ```
-///
-/// In this example, the `Main` and `GetUserInput` actions are registered using the `actions!` macro.
-#[macro_export]
-macro_rules! actions {
-    [$($action:expr),* $(,)?] => {
-        use russenger::{Action, ACTION_REGISTRY};
-        $(ACTION_REGISTRY.lock().await.insert($action.path(), Box::new($action));)*
-    };
 }

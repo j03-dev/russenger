@@ -39,7 +39,7 @@ use crate::{query::Query, response_models::ResponseModel};
 /// let res = Res;
 /// let response_model = TextModel::new("sender_id", "Hello, user1!");
 ///
-/// let send_result = res.send(response_model);
+/// let send_result = res.send(response_model).await?;
 /// ```
 ///
 /// # Methods

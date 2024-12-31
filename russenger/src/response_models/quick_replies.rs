@@ -101,11 +101,11 @@ use super::{payload::Payload, recipient::Recipient};
 /// use russenger::prelude::*;
 ///
 /// let data = Data::new("HelloWorld", None);
-/// let payload = Payload::new(HelloWorld, Some(data));
+/// let payload = Payload::new("/hello_world", Some(data));
 /// let quick_reply = QuickReply::new("Button Title", Some("https://example.com/image.png"), payload);
 ///
 /// #[action]
-/// async fn HelloWorld(res: Res, req: Req) {
+/// async fn helloworld(res: Res, req: Req) -> Result<()> {
 ///     let hello_world: String = req.data.get_value();
 ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
 ///
@@ -137,11 +137,11 @@ impl QuickReply {
     ///
     /// ```rust
     /// use russenger::prelude::*;
-    /// let payload = Payload::new(SomeAction, None);
+    /// let payload = Payload::new("/some_action", None);
     /// let quick_reply = QuickReply::new("Button Title", "https://example.com/image.png", payload);
     ///
     /// #[action]
-    /// async fn SomeAction(res: Res, req: Req) {
+    /// async fn some_action(res: Res, req: Req) -> Result<()> {
     ///     res.send(TextModel::new(&req.user, "SomeAction")).await?;
     ///
     ///     Ok(())
@@ -183,8 +183,8 @@ struct QuickMessage {
 /// use russenger::prelude::*;
 ///
 /// #[action]
-/// async fn SomeAction(res: Res, req: Req) {
-///     let payload = Payload::new(SomeAction, None);
+/// async fn SomeAction(res: Res, req: Req) -> Result<()> {
+///     let payload = Payload::new("/some_action", None);
 ///     let quick_reply = QuickReply::new("Button Title", "https://example.com/image.png", payload);
 ///     let quick_reply_model = QuickReplyModel::new(&req.user, "Message Text", vec![quick_reply]);
 ///     res.send(quick_reply_model).await?;

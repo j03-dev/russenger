@@ -152,7 +152,7 @@ pub mod error {
 
 pub use anyhow;
 pub use dotenv::dotenv;
-use error::{bail, Context, Result};
+use error::{Context, Result};
 pub use rusql_alchemy;
 pub use russenger_macro::action;
 
@@ -168,9 +168,6 @@ fn print_info(host: &str, port: u16) {
 }
 
 async fn run_server() -> Result<()> {
-    if !app.lock().await.contains_key("Main") {
-        bail!("'actions!' should contain `Main` action");
-    }
     let app_state = AppState::init().await?;
     let host = std::env::var("HOST").unwrap_or("0.0.0.0".into());
     let port = std::env::var("PORT")

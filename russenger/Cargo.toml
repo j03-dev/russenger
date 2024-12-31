@@ -42,9 +42,6 @@ tera.workspace = true
 # Environment and Configuration
 dotenv.workspace = true
 
-# Utility libraries
-lazy_static.workspace = true
-
 # Error handling
 anyhow.workspace = true
 

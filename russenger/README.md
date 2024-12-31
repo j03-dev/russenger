@@ -1,7 +1,5 @@
 # Russenger - Facebook Messenger Webhook Handling in Rust
 
-![Russenger Logo](./image.png)
-
 Welcome to Russenger, a Rust library designed to simplify the handling of Facebook Messenger webhook responses. Russenger offers a convenient way to construct and send various types of responses, including text messages, quick replies, generic templates, and media attachments.
 
 ## Features

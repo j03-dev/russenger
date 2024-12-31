@@ -1,13 +1,13 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Sender {
-    id: String,
+    pub id: String,
 }
 
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct QuickReplyPayload {
-    payload: String,
+    pub payload: String,
 }
 
 impl QuickReplyPayload {
@@ -16,10 +16,10 @@ impl QuickReplyPayload {
     }
 }
 
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct Message {
-    text: Option<String>,
-    quick_reply: Option<QuickReplyPayload>,
+    pub text: Option<String>,
+    pub quick_reply: Option<QuickReplyPayload>,
 }
 
 impl Message {
@@ -32,9 +32,9 @@ impl Message {
     }
 }
 
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct Postback {
-    payload: String,
+    pub payload: String,
 }
 
 impl Postback {
@@ -43,21 +43,21 @@ impl Postback {
     }
 }
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Messaging {
-    sender: Sender,
-    postback: Option<Postback>,
-    message: Option<Message>,
+    pub sender: Sender,
+    pub postback: Option<Postback>,
+    pub message: Option<Message>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Entry {
-    messaging: Vec<Messaging>,
+    pub messaging: Vec<Messaging>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct InComingData {
-    entry: Vec<Entry>,
+    pub entry: Vec<Entry>,
 }
 
 impl InComingData {

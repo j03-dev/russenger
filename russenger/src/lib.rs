@@ -142,7 +142,7 @@ pub mod query;
 pub mod response_models;
 
 pub use core::{
-    action::{app, Add},
+    action::Add,
     app_state::AppState,
     services::{index, webhook_core, webhook_verify}, // core services
 };
@@ -167,8 +167,7 @@ fn print_info(host: &str, port: u16) {
     println!("  POST: {}/webhook - Webhook core endpoint", url);
 }
 
-async fn run_server() -> Result<()> {
-    let app_state = AppState::init().await?;
+async fn run_server(app_state: AppState) -> Result<()> {
     let host = std::env::var("HOST").unwrap_or("0.0.0.0".into());
     let port = std::env::var("PORT")
         .unwrap_or("2453".into())
@@ -191,8 +190,8 @@ async fn run_server() -> Result<()> {
     Ok(())
 }
 
-pub async fn launch() -> Result<()> {
+pub async fn launch(app_state: AppState) -> Result<()> {
     dotenv()?;
-    run_server().await?;
+    run_server(app_state).await?;
     Ok(())
 }

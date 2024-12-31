@@ -19,8 +19,17 @@
 use std::env;
 
 use anyhow::Result;
+use reqwest::Response;
+use serde::Serialize;
 
-use crate::response_models::ResponseModel;
+use crate::{
+    core::incoming_data::{InComingData, Message, QuickReplyPayload},
+    prelude::Payload,
+    query::Query,
+    response_models::ResponseModel,
+};
+
+use super::incoming_data::{Entry, Messaging, Sender};
 
 /// The `Res` struct represents a response that can be sent to a user.
 ///
@@ -43,7 +52,11 @@ use crate::response_models::ResponseModel;
 /// # Methods
 ///
 /// * `send`: Sends a response to a user. It takes a `ResponseModel` as an argument and returns a `SendResult`.
-pub struct Res;
+pub struct Res {
+    query: Query,
+    sender_id: String,
+    host: String,
+}
 
 impl Res {
     /// Sends a response to a user.
@@ -67,12 +80,8 @@ impl Res {
             "https://graph.facebook.com/{version}/me/{endpoint}?access_token={page_access_token}",
             endpoint = response_model.get_endpoint()
         );
-        match reqwest::Client::new()
-            .post(url_api)
-            .json(&response_model)
-            .send()
-            .await
-        {
+
+        match fetch_post(&url_api, response_model).await {
             Ok(response) => {
                 if response.status().is_client_error() {
                     Err(anyhow::anyhow!(response.text().await?))
@@ -83,4 +92,42 @@ impl Res {
             Err(err) => Err(anyhow::anyhow!(err)),
         }
     }
+
+    pub fn new(host: &str, sender_id: &str, query: Query) -> Self {
+        Self {
+            query,
+            sender_id: sender_id.to_owned(),
+            host: host.to_owned(),
+        }
+    }
+
+    pub async fn redirect(&self, path: &str) -> Result<()> {
+        let body = InComingData {
+            entry: vec![Entry {
+                messaging: vec![Messaging {
+                    sender: Sender {
+                        id: self.sender_id.clone(),
+                    },
+                    postback: None,
+                    message: Some(Message {
+                        text: None,
+                        quick_reply: Some(QuickReplyPayload {
+                            payload: Payload::new(path, None).to_string(),
+                        }),
+                    }),
+                }],
+            }],
+        };
+
+        let url = format!("https://{host}/webhook", host = self.host);
+        println!("send redirect: {url}");
+        let response = fetch_post(&url, body).await?;
+        println!("{response:#?}");
+        self.query.set_path(&self.sender_id, path).await;
+        Ok(())
+    }
+}
+
+async fn fetch_post<T: Serialize>(url: &str, body: T) -> Result<Response> {
+    Ok(reqwest::Client::new().post(url).json(&body).send().await?)
 }

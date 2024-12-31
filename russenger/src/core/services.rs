@@ -51,7 +51,7 @@ async fn handle(message: Message<'_>, router: Arc<Mutex<Router>>) -> Result<()> 
             let payload = Payload::from_str(payload).unwrap_or_default();
             {
                 let data = payload.get_data();
-                let res = Res::new(host, user, query.clone());
+                let res = Res::new(user, query.clone());
                 let req = Req::new(user, query, data, host);
                 let path = payload.get_path();
 
@@ -65,7 +65,7 @@ async fn handle(message: Message<'_>, router: Arc<Mutex<Router>>) -> Result<()> 
         }
         Message::TextMessage(user, text_message, host, query) => {
             let path = query.get_path(user).await.unwrap_or("/".to_string());
-            let res = Res::new(host, user, query.clone());
+            let res = Res::new(user, query.clone());
             let req = Req::new(user, query, Data::new(text_message, None), host);
             match router.lock().await.get(&path) {
                 Some(action) => action(res, req).await?,

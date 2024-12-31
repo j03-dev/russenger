@@ -154,7 +154,7 @@ impl Query {
     ///     russenger::launch().await.ok();
     /// }
     /// ```
-    pub async fn set_path(&self, user_id: &str, path: &str) -> bool {
+    pub(crate) async fn set_path(&self, user_id: &str, path: &str) -> bool {
         if let Some(mut user) =
             RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn).await
         {

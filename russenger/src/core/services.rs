@@ -16,7 +16,7 @@ use actix_web::{dev, get, post, web, HttpResponse};
 use tokio::sync::Mutex;
 
 use super::{
-    action::Router, app_state::AppState, incoming_data::InComingData, request::Req,
+    action::Router, app_state::App, incoming_data::InComingData, request::Req,
     request_handler::WebQuery, response::Res,
 };
 
@@ -26,7 +26,7 @@ use crate::{
 };
 
 #[get("/")]
-async fn index(data: web::Data<AppState>) -> Result<HttpResponse, actix_web::Error> {
+async fn index(data: web::Data<App>) -> Result<HttpResponse, actix_web::Error> {
     let template = &data.templates;
     let ctx = tera::Context::new();
     let body = template
@@ -82,7 +82,7 @@ async fn handle(message: Message<'_>, router: Arc<Mutex<Router>>) -> Result<()> 
 #[post("/webhook")]
 pub async fn webhook_core(
     data: web::Json<InComingData>,
-    app_state: web::Data<AppState>,
+    app_state: web::Data<App>,
     conn: dev::ConnectionInfo,
 ) -> HttpResponse {
     let query = app_state.query.clone();

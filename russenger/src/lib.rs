@@ -143,7 +143,7 @@ pub mod response_models;
 
 pub use core::{
     action::Add,
-    app_state::AppState,
+    app_state::App,
     services::{index, webhook_core, webhook_verify}, // core services
 };
 pub mod error {
@@ -157,7 +157,7 @@ pub use rusql_alchemy;
 pub use russenger_macro::action;
 
 use actix_files as fs;
-use actix_web::{web, App, HttpServer};
+use actix_web::{web, App as ActixApp, HttpServer};
 
 fn print_info(host: &str, port: u16) {
     let url = format!("http://{}:{}", host, port);
@@ -167,7 +167,7 @@ fn print_info(host: &str, port: u16) {
     println!("  POST: {}/webhook - Webhook core endpoint", url);
 }
 
-async fn run_server(app_state: AppState) -> Result<()> {
+async fn run_server(app: App) -> Result<()> {
     let host = std::env::var("HOST").unwrap_or("0.0.0.0".into());
     let port = std::env::var("PORT")
         .unwrap_or("2453".into())
@@ -175,8 +175,8 @@ async fn run_server(app_state: AppState) -> Result<()> {
         .unwrap_or(2453);
     print_info(&host, port);
     HttpServer::new(move || {
-        App::new()
-            .app_data(web::Data::new(app_state.clone()))
+        ActixApp::new()
+            .app_data(web::Data::new(app.clone()))
             .service(index)
             .service(webhook_verify)
             .service(webhook_core)
@@ -190,7 +190,7 @@ async fn run_server(app_state: AppState) -> Result<()> {
     Ok(())
 }
 
-pub async fn launch(app_state: AppState) -> Result<()> {
+pub async fn launch(app_state: App) -> Result<()> {
     dotenv()?;
     run_server(app_state).await?;
     Ok(())

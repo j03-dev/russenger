@@ -41,14 +41,14 @@ impl ActionLock {
 ///
 /// * `query`: A `Query` that represents the query made by the user.
 #[derive(Clone)]
-pub struct AppState {
+pub struct App {
     pub templates: tera::Tera,
     pub query: Query,
     pub router: Arc<Mutex<Router>>,
     pub action_lock: ActionLock,
 }
 
-impl AppState {
+impl App {
     pub async fn init() -> Result<Self> {
         let query: Query = Query::new().await?;
         let template_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*");

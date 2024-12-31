@@ -13,6 +13,7 @@ use std::{str::FromStr, sync::Arc};
 
 use crate::error::Result;
 use actix_web::{dev, get, post, web, HttpResponse};
+use tokio::sync::Mutex;
 
 use super::{
     action::Router, app_state::AppState, incoming_data::InComingData, request::Req,
@@ -44,7 +45,7 @@ enum Message<'a> {
     TextMessage(&'a str, &'a str, &'a str, Query),
 }
 
-async fn handle(message: Message<'_>, router: Arc<Router>) -> Result<()> {
+async fn handle(message: Message<'_>, router: Arc<Mutex<Router>>) -> Result<()> {
     match message {
         Message::Payload(user, payload, host, query) => {
             let payload = Payload::from_str(payload).unwrap_or_default();
@@ -54,7 +55,7 @@ async fn handle(message: Message<'_>, router: Arc<Router>) -> Result<()> {
                 let req = Req::new(user, query, data, host);
                 let path = payload.get_path();
 
-                match router.get(&path) {
+                match router.lock().await.get(&path) {
                     Some(action) => action(res, req).await?,
                     None => {
                         eprintln!("Error 404: Action {:?} not found", path);
@@ -66,7 +67,7 @@ async fn handle(message: Message<'_>, router: Arc<Router>) -> Result<()> {
             let path = query.get_path(user).await.unwrap_or("/".to_string());
             let res = Res::new(host, user, query.clone());
             let req = Req::new(user, query, Data::new(text_message, None), host);
-            match router.get(&path) {
+            match router.lock().await.get(&path) {
                 Some(action) => action(res, req).await?,
                 None => {
                     eprintln!("Error 404: Action {:?} not found", path);

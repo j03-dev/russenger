@@ -9,7 +9,7 @@ use crate::query::Query;
 use anyhow::Result;
 use tokio::sync::Mutex;
 
-use super::action::Router;
+use super::action::{Action, Router};
 
 #[derive(Clone)]
 pub struct ActionLock {
@@ -44,7 +44,7 @@ impl ActionLock {
 pub struct AppState {
     pub templates: tera::Tera,
     pub query: Query,
-    pub router: Arc<Router>,
+    pub router: Arc<Mutex<Router>>,
     pub action_lock: ActionLock,
 }
 
@@ -56,14 +56,14 @@ impl AppState {
         Ok(Self {
             query,
             templates,
-            router: Arc::new(Router::new()),
+            router: Arc::new(Mutex::new(Router::new())),
             action_lock: ActionLock {
                 locked_users: Arc::new(Mutex::new(HashSet::new())),
             },
         })
     }
 
-    pub fn set_router(&mut self, router: Router) {
-        self.router = Arc::new(router);
+    pub async fn add(&mut self, path: &str, action: Action) {
+        self.router.lock().await.insert(path.to_owned(), action);
     }
 }

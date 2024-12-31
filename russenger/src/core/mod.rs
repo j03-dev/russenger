@@ -28,7 +28,7 @@
 //! ```
 
 pub mod action;
-pub mod app_state;
+pub mod app;
 pub mod request;
 pub mod request_handler;
 pub mod response;

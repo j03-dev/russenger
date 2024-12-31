@@ -154,7 +154,7 @@ impl Query {
     ///     russenger::launch().await.ok();
     /// }
     /// ```
-    pub async fn set_action(&self, user_id: &str, path: &str) -> bool {
+    pub async fn set_path(&self, user_id: &str, path: &str) -> bool {
         if let Some(mut user) =
             RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn).await
         {
@@ -174,7 +174,7 @@ impl Query {
     /// # Returns
     ///
     /// Returns the action as an `Option<String>`. Returns `None` if the user is not found.
-    pub async fn get_action(&self, user_id: &str) -> Option<String> {
+    pub async fn get_path(&self, user_id: &str) -> Option<String> {
         RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
             .await
             .map(|user| user.action_path)

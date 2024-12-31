@@ -16,7 +16,7 @@ To get started with the Russenger library, you'll need to install it as a depend
 
 ```toml
 [dependencies]
-russenger = { version = "0.3.3-rc", features = ["postgres"] } # features 'sqlite, postgres, mysql'
+russenger = { version = "0.3.4-rc", features = ["postgres"] } # features 'sqlite, postgres, mysql'
 actix-web = "4"
 sqlx = "^0.8.0"
 ```

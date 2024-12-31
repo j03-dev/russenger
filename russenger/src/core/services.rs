@@ -63,7 +63,7 @@ async fn handle(message: Message<'_>) -> Result<()> {
             }
         }
         Message::TextMessage(user, text_message, host, query) => {
-            let path = query.get_action(user).await.unwrap_or("/".to_string());
+            let path = query.get_path(user).await.unwrap_or("/".to_string());
             let req = Req::new(user, query, Data::new(text_message, None), host);
             let action_registry = app.lock().await;
             match action_registry.get(&path) {

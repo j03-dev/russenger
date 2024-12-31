@@ -34,7 +34,11 @@
 //! }
 //! ```
 pub use crate::action;
-pub use crate::core::{action::Action, request::Req, response::Res};
+pub use crate::core::{
+    action::{Action, Add},
+    request::Req,
+    response::Res,
+};
 pub use crate::error::{self, Result};
 pub use crate::launch;
 pub use crate::response_models::{

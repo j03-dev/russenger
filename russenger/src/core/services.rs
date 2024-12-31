@@ -11,7 +11,7 @@
 //! * `POST /webhook`: This endpoint handles the webhook core.
 use std::str::FromStr;
 
-use crate::error::Result;
+use crate::{core::action::action_lock, error::Result};
 use actix_web::{dev, get, post, web, HttpResponse};
 
 use super::{
@@ -89,7 +89,7 @@ pub async fn webhook_core(
     let host = conn.host();
     query.create(user).await;
 
-    if app_state.action_lock.lock(user).await {
+    if action_lock.lock(user).await {
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {
                 let payload = quick_reply.get_payload();
@@ -109,7 +109,7 @@ pub async fn webhook_core(
             }
         }
     }
-    app_state.action_lock.unlock(user).await;
+    action_lock.unlock(user).await;
 
     HttpResponse::Ok().finish()
 }

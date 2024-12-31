@@ -98,6 +98,7 @@ pub async fn webhook_core(
                 }
             } else {
                 let text = message.get_text();
+                println!("{text:?}");
                 if let Err(e) = handle(Message::TextMessage(user, &text, host, query)).await {
                     eprintln!("Error handling text message: {:?}", e);
                 }

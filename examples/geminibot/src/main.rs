@@ -1,69 +1,71 @@
-use russenger::dotenv;
 use russenger::models::RussengerUser;
 use russenger::prelude::*;
-use serde::Deserialize;
-use serde::Serialize;
 
-const URL: &str =
-    "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=";
+mod gemini {
+    use russenger::dotenv;
+    use serde::Deserialize;
+    use serde::Serialize;
+    const URL: &str =
+        "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=";
 
-#[derive(Serialize, Deserialize, Clone)]
-struct Part {
-    text: String,
-}
+    #[derive(Serialize, Deserialize, Clone)]
+    pub struct Part {
+        pub text: String,
+    }
 
-#[derive(Serialize, Deserialize, Clone)]
-struct Content {
-    role: String,
-    parts: Vec<Part>,
-}
+    #[derive(Serialize, Deserialize, Clone)]
+    pub struct Content {
+        pub role: String,
+        pub parts: Vec<Part>,
+    }
 
-#[derive(Serialize, Deserialize, Clone)]
-struct Candidate {
-    content: Content,
-}
+    #[derive(Serialize, Deserialize, Clone)]
+    pub struct Candidate {
+        pub content: Content,
+    }
 
-#[derive(Serialize, Deserialize, Clone)]
-struct Body {
-    contents: Vec<Content>,
-}
+    #[derive(Serialize, Deserialize, Clone)]
+    pub struct Body {
+        pub contents: Vec<Content>,
+    }
 
-#[derive(Serialize, Deserialize, Clone)]
-struct Response {
-    candidates: Vec<Candidate>,
-}
+    #[derive(Serialize, Deserialize, Clone)]
+    pub struct Response {
+        pub candidates: Vec<Candidate>,
+    }
 
-async fn ask_gemini(text: String) -> Result<Response, reqwest::Error> {
-    dotenv().ok();
-    let api_key = std::env::var("API_KEY").expect("pls check your env file");
-    let api_url = format!("{URL}{api_key}");
-    let body = Body {
-        contents: vec![Content {
-            role: "user".to_owned(),
-            parts: vec![Part { text }],
-        }],
-    };
-    let response = reqwest::Client::new()
-        .post(api_url)
-        .json(&body)
-        .send()
-        .await?;
+    pub async fn ask_gemini(text: String) -> Result<Response, reqwest::Error> {
+        dotenv().ok();
+        let api_key = std::env::var("API_KEY").expect("pls check your env file");
+        let api_url = format!("{URL}{api_key}");
+        let body = Body {
+            contents: vec![Content {
+                role: "user".to_owned(),
+                parts: vec![Part { text }],
+            }],
+        };
+        let response = reqwest::Client::new()
+            .post(api_url)
+            .json(&body)
+            .send()
+            .await?;
 
-    match response.json().await {
-        Ok(response) => Ok(response),
-        Err(err) => panic!("{err:?}"),
+        match response.json().await {
+            Ok(response) => Ok(response),
+            Err(err) => panic!("{err:?}"),
+        }
     }
 }
 
 #[action]
-async fn Main(res: Res, req: Req) {
+async fn index(res: Res, req: Req) -> Result<()> {
     res.send(GetStartedButtonModel::new(Payload::default()))
         .await?;
     res.send(PersistentMenuModel::new(
         &req.user,
         vec![Button::Postback {
             title: "AskGemini".into(),
-            payload: Payload::new(HelloWorld, None),
+            payload: Payload::new("/hello_world", None),
         }],
     ))
     .await?;
@@ -72,18 +74,18 @@ async fn Main(res: Res, req: Req) {
 }
 
 #[action]
-async fn HelloWorld(res: Res, req: Req) {
+async fn hello_world(res: Res, req: Req) -> Result<()> {
     let text = "Hello, I'm Gemini";
     res.send(TextModel::new(&req.user, text)).await?;
-    req.query.set_action(&req.user, AskGemini).await;
+    res.redirect("/ask_gemini").await?;
 
     Ok(())
 }
 
 #[action]
-async fn AskGemini(res: Res, req: Req) {
+async fn ask_gemini(res: Res, req: Req) -> Result<()> {
     let text: String = req.data.get_value();
-    match ask_gemini(text).await {
+    match gemini::ask_gemini(text).await {
         Ok(response) => {
             for part in response.candidates[0].content.parts.clone() {
                 res.send(TextModel::new(&req.user, &part.text)).await?;
@@ -99,9 +101,14 @@ async fn AskGemini(res: Res, req: Req) {
 }
 
 #[russenger::main]
-async fn main() {
-    let conn = Database::new().await.conn;
+async fn main() -> Result<()> {
+    let conn = Database::new().await?.conn;
     migrate!([RussengerUser], &conn);
-    russenger::actions![Main, HelloWorld, AskGemini];
-    russenger::launch().await.ok();
+
+    let mut app = App::init().await?;
+    app.add("/", index).await;
+    app.add("/ask_gemini", ask_gemini).await;
+    launch(app).await?;
+
+    Ok(())
 }

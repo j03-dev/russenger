@@ -3,6 +3,6 @@ resolver = "2"
 members = ["hello", "geminibot", "choosecolor", "next"]
 
 [workspace.dependencies]
-russenger = { path = ".." }
+russenger = { path = "../russenger" }
 actix-web = "^4"
 sqlx = "0.8.0"

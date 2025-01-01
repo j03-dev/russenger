@@ -282,9 +282,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.89"
+version = "1.0.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86fdf8605db99b54d3cd748a44c6d04df638eb5dafb219b135d0149bd0db01f6"
+checksum = "34ac096ce696dc2fcabef30516bb13c0a68a11d30131d3df6f04711467681b04"
 
 [[package]]
 name = "async-trait"
@@ -1957,10 +1957,11 @@ dependencies = [
 
 [[package]]
 name = "rusql-alchemy"
-version = "0.3.0"
+version = "0.4.1-rc"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b17d3ee8809bc8f849ab25d09c16c1a8b9b0bb62300b3b0505b02254e3ad7216"
+checksum = "5f2cf08cc93646eef47ec50ec6a7c500559df05378fcc5d9512e549122039e8c"
 dependencies = [
+ "anyhow",
  "async-trait",
  "dotenv",
  "lazy_static",
@@ -1973,9 +1974,9 @@ dependencies = [
 
 [[package]]
 name = "rusql-alchemy-macro"
-version = "0.3.0"
+version = "0.4.1-rc"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba00f08bb60676bf05837c649903749978a05b5e4de7fbd374d120ab5a55a931"
+checksum = "e8b7507161d1778cc718d4122804137e63e2d98df3806505f0c19db8e34d1a03"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1984,14 +1985,13 @@ dependencies = [
 
 [[package]]
 name = "russenger"
-version = "0.3.3-rc"
+version = "0.3.4-rc"
 dependencies = [
  "actix-files",
  "actix-web",
  "anyhow",
  "async-trait",
  "dotenv",
- "lazy_static",
  "reqwest",
  "rusql-alchemy",
  "russenger_macro",
@@ -2005,8 +2005,6 @@ dependencies = [
 [[package]]
 name = "russenger_macro"
 version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef9a71fe414c639123afcdf0dcbad49640837ac312ab6943baa48b677c50d847"
 dependencies = [
  "proc-macro2",
  "quote",

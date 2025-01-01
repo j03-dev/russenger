@@ -18,7 +18,7 @@ postgres = ["rusql-alchemy/postgres"]
 mysql = ["rusql-alchemy/mysql"]
 
 [dependencies.rusql-alchemy]
-version = "0.4.1-rc"
+workspace = true
 default-features = false
 
 [dependencies]
@@ -44,6 +44,5 @@ dotenv.workspace = true
 
 # Error handling
 anyhow.workspace = true
-
 
 russenger_macro.workspace = true

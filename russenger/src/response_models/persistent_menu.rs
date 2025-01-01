@@ -21,13 +21,13 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
-//!     // Need Getstart First Before Send PersistenceMenu
-//!     res.send(GetStartedModel::new(Payload::default())).await?;
+//! async fn index(res: Res, req: Req) -> Result<()> {
+//!     // Need GetStart First Before Send PersistenceMenu
+//!     res.send(GetStartedButtonModel::new(Payload::default())).await?;
 //!     let buttons = vec![
 //!         Button::Postback {
 //!             title: "Option 1".to_owned(),
-//!             payload: Payload::new(Option1, None),
+//!             payload: Payload::new("/option_1", None),
 //!         },
 //!         // More buttons
 //!     ];
@@ -39,7 +39,7 @@
 //! }
 //!
 //! #[action]
-//! async fn Option1(res: Res, req: Req) {
+//! async fn option_1(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "Option_1")).await?;
 //!
 //!     Ok(())
@@ -87,13 +87,13 @@ struct Menu<'m> {
 /// use russenger::prelude::*;
 ///
 /// #[action]
-/// async fn Main(res: Res, req: Req) {
-///     // Need Getstart Frist Before Send PersistenceMenu
-///     res.send(GetStartedModel::new(Payload::default())).await?;
+/// async fn index(res: Res, req: Req) -> Result<()> {
+///     // Need GetStart First Before Send PersistenceMenu
+///     res.send(GetStartedButtonModel::new(Payload::default())).await?;
 ///     let buttons = vec![
 ///         Button::Postback {
 ///             title: "Option 1".to_owned(),
-///             payload: Payload::new(Option1, None),
+///             payload: Payload::new("/option_1", None),
 ///         },
 ///         // More buttons
 ///     ];
@@ -106,7 +106,7 @@ struct Menu<'m> {
 ///
 ///
 /// #[action]
-/// async fn Option1(res: Res, req: Req) {
+/// async fn option_1(res: Res, req: Req) -> Result<()> {
 ///     res.send(TextModel::new(&req.user, "Option_1")).await?;
 ///
 ///     Ok(())
@@ -142,7 +142,7 @@ impl<'p> PersistentMenuModel<'p> {
     /// let buttons = vec![
     ///     Button::Postback {
     ///         title: "Option 1".to_owned(),
-    ///         payload: Payload::new(Option1, None),
+    ///         payload: Payload::new("/option_1", None),
     ///     },
     ///     // More buttons
     /// ];
@@ -150,7 +150,7 @@ impl<'p> PersistentMenuModel<'p> {
     /// let menu = PersistentMenuModel::new("sender_id", buttons);
     ///
     /// #[action]
-    /// async fn Option1(res: Res, req: Req) {
+    /// async fn option_1(res: Res, req: Req) -> Result<()> {
     ///     res.send(TextModel::new(&req.user, "Option_1")).await?;
     ///
     ///     Ok(())

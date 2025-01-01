@@ -38,7 +38,7 @@
 //! }
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     // Send a greeting message to the user
 //!     res.send(TextModel::new(&req.user, "Hello!")).await?;
 //!
@@ -52,18 +52,18 @@
 //!         res.send(TextModel::new(&req.user, "What is your name: "))
 //!             .await?;
 //!         // Set the next action to SignUp
-//!         req.query.set_action(&req.user, SignUp).await;
+//!         res.redirect("/signup").await?;
 //!         return Ok(());
 //!     }
 //!
 //!     // If the user is registered, set the next action to GetUserInput
-//!     req.query.set_action(&req.user, GetUserInput).await;
+//!     res.redirect("/get_user_input").await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[action]
-//! async fn SignUp(res: Res, req: Req) {
+//! async fn signup(res: Res, req: Req) -> Result<()> {
 //!     // Get the username from the user input
 //!     let username: String = req.data.get_value();
 //!
@@ -77,21 +77,21 @@
 //!     // Send a message to the user indicating whether the registration was successful
 //!     res.send(TextModel::new(&req.user, message)).await?;
 //!
-//!     // Go back to the Main action
-//!     Main.execute(res, req).await?;
+//!     // Go back to the index action
+//!     index(res, req).await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[action]
-//! async fn GetUserInput(res: Res, req: Req) {
+//! async fn get_user_input(res: Res, req: Req) -> Result<()> {
 //!     // Define a closure that creates a new Payload for a given value
-//!     let payload = |value: &str| Payload::new(NextAction, Some(Data::new(value, None)));
+//!     let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value, None)));
 //!
 //!     // Create a QuickReplyModel with two options: "blue" and "red"
 //!     let quick_replies: Vec<QuickReply> = vec![
-//!         QuickReply::new("blue", "", payload("blue")),
-//!         QuickReply::new("red", "", payload("red")),
+//!         QuickReply::new("blue", None, payload("blue")),
+//!         QuickReply::new("red", None, payload("red")),
 //!     ];
 //!     let quick_reply_model = QuickReplyModel::new(&req.user, "choose one color", quick_replies);
 //!
@@ -102,32 +102,37 @@
 //! }
 //!
 //! #[action]
-//! async fn NextAction(res: Res, req: Req) {
+//! async fn next_action(res: Res, req: Req) -> Result<()> {
 //!     // Get the color chosen by the user
 //!     let color: String = req.data.get_value();
 //!
 //!     // Send a message to the user confirming their choice
 //!     res.send(TextModel::new(&req.user, &color)).await?;
 //!
-//!     // Go back to the Main action
-//!     Main.execute(res, req).await?;
+//!     // Go back to the index action
+//!     index(res, req).await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[russenger::main]
-//! async fn main() {
+//! async fn main() -> Result<()> {
 //!     // Connect to the database
-//!     let conn = Database::new().await.conn;
+//!     let conn = Database::new().await?.conn;
 //!
 //!     // Migrate the database schema
 //!     migrate!([RussengerUser], &conn);
 //!
 //!     // Register the actions for the main application
-//!     russenger::actions![Main, SignUp, GetUserInput, NextAction];
+//!     let mut app = App::init().await?;
+//!     app.add("/", index).await;
+//!     app.add("/signup", signup).await;
+//!     app.add("/get_user_input", get_user_input).await;
+//!     app.add("/next_action", next_action).await;
 //!
 //!     // Launch the main application
-//!     russenger::launch().await.ok();
+//!     launch(app).await?;
+//!     Ok(())
 //! }
 //! ```
 //!

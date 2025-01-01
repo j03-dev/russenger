@@ -10,7 +10,7 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "Hello World")).await?;
 //!
 //!     Ok(())
@@ -33,13 +33,15 @@ use crate::{query::Query, response_models::ResponseModel};
 /// Sending a response to a user:
 ///
 /// ```rust
-/// use russenger::response_models::text::TextModel;
-/// use russenger::core::response::Res;
+/// use russenger::prelude::*;
 ///
-/// let res = Res;
-/// let response_model = TextModel::new("sender_id", "Hello, user1!");
+/// #[action]
+/// async fn index(res: Res, req: Req) -> Result<()> {
+///     let response_model = TextModel::new("sender_id", "Hello, user1!");
+///     let send_result = res.send(response_model).await?;
+///     Ok(())
+/// }
 ///
-/// let send_result = res.send(response_model).await?;
 /// ```
 ///
 /// # Methods
@@ -78,7 +80,7 @@ impl Res {
                 if response.status().is_client_error() {
                     Err(anyhow::anyhow!(response.text().await?))
                 } else {
-                    Ok(response.text().await.unwrap())
+                    Ok(response.text().await?)
                 }
             }
             Err(err) => Err(anyhow::anyhow!(err)),

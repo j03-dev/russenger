@@ -23,16 +23,16 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index (res: Res, req: Req) -> Result<()> {
 //!     let data = Data::new("HelloWorld", None);
-//!     let payload = Payload::new(HelloWorld, Some(data));
-//!     res.send(GetStartedModel::new(payload)).await?;
+//!     let payload = Payload::new("/hello_world", Some(data));
+//!     res.send(GetStartedButtonModel::new(payload)).await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[action]
-//! async fn HelloWorld(res: Res, req: Req) {
+//! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!    let value: String = req.data.get_value();
 //!    res.send(TextModel::new(&req.user, &value)).await?;
 //!
@@ -40,11 +40,14 @@
 //! }
 //!
 //! #[russenger::main]
-//! async fn main() {
-//!     let conn = Database::new().await.conn;
+//! async fn main() -> Result<()> {
+//!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!     russenger::actions![Main, HelloWorld];
-//!     russenger::launch().await.ok();
+//!     let mut app = App::init().await?;
+//!     app.add("/", index).await;
+//!     app.add("/hello_world", hello_world).await;
+//!     launch(app).await?;
+//!     Ok(())
 //! }
 //! ```
 //!
@@ -81,10 +84,10 @@ use super::data::Data;
 /// use russenger::prelude::*;
 ///
 /// let data = Data::new("HelloWorld", None);
-/// let payload = Payload::new(HelloWorld, Some(data));
+/// let payload = Payload::new("/hello_world", Some(data));
 ///
 /// #[action]
-/// async fn HelloWorld(res: Res, req: Req) {
+/// async fn hello_world(res: Res, req: Req) -> Result<()> {
 ///    let value: String = req.data.get_value();
 ///    res.send(TextModel::new(&req.user, &value)).await?;
 ///
@@ -120,10 +123,10 @@ impl Payload {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// let payload = Payload::new(SomeAction, None);
+    /// let payload = Payload::new("/some_action", None);
     ///
     /// #[action]
-    /// async fn SomeAction(res: Res, req: Req) {
+    /// async fn some_action(res: Res, req: Req) -> Result<()> {
     ///    res.send(TextModel::new(&req.user, "SomeAction")).await?;
     ///
     ///    Ok(())

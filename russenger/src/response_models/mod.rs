@@ -37,7 +37,7 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     let text_model = TextModel::new(&req.user, "Hello, user1!");
 //!     res.send(text_model).await?;
 //!
@@ -68,7 +68,7 @@ pub trait ResponseModel: Serialize {
 pub mod data {
     use serde::{Deserialize, Serialize};
 
-    const MAX_VALUE_AUTORIZED: usize = 500;
+    const MAX_VALUE_AUTHORIZED: usize = 500;
     const MIN_PAGE: usize = 0;
     pub const MAX_PAGE: usize = 10;
 
@@ -88,14 +88,14 @@ pub mod data {
         }
     }
 
-    trait Verify: ToString {
+    trait Verify {
         fn verify(&self) -> String;
     }
 
     impl Verify for String {
         fn verify(&self) -> String {
-            if self.len() >= MAX_VALUE_AUTORIZED {
-                self[..MAX_VALUE_AUTORIZED].to_string()
+            if self.len() >= MAX_VALUE_AUTHORIZED {
+                self[..MAX_VALUE_AUTHORIZED].to_string()
             } else {
                 self.clone()
             }

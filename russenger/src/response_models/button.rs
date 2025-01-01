@@ -9,11 +9,10 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
-//!     let payload = Payload::new(HelloWorld, Some(Data::new("HelloWorld", None)));
+//! async fn index(res: Res, req: Req) -> Result<()> {
+//!     let payload = Payload::new("/hello_world", Some(Data::new("HelloWorld", None)));
 //!     let buttons = vec![
-//!         Button::Postback { title: "Click me".to_owned(), payload: payload },
-//!         // Add more buttons here
+//!         Button::Postback { title: "Click me".to_owned(), payload },
 //!     ];
 //!     let button_model = ButtonModel::new("sender_id", "Hello, user1!", buttons);
 //!     res.send(button_model).await?;
@@ -21,7 +20,7 @@
 //!     Ok(())
 //! }
 //! #[action]
-//! async fn HelloWorld(res: Res, req: Req) {
+//! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!     let value: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &value)).await?;
 //!
@@ -29,11 +28,14 @@
 //! }
 //!
 //! #[russenger::main]
-//! async fn main() {
-//!     let conn = Database::new().await.conn;
+//! async fn main() -> Result<()> {
+//!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!     russenger::actions![Main, HelloWorld];
-//!     russenger::launch().await.ok();
+//!     let mut app = App::init().await?;
+//!     app.add("/", index).await;
+//!     app.add("/hello_world", hello_world).await;
+//!     launch(app).await?;
+//!     Ok(())
 //! }
 //! ```
 use serde::Serialize;
@@ -47,10 +49,10 @@ use super::{payload::Payload, recipient::Recipient, ResponseModel};
 /// # Variants
 ///
 /// * `AccountUnlink` - Represents an account unlink button.
-/// * `AccountLink { url: Stirng }` - Represents an account link button. The `url` field is the URL to be opened when the button is clicked.
-/// * `WebUrl { title: Stirng, url: Stirng }` - Represents a web URL button. The `title` field is the title of the button, and the `url` field is the URL to be opened when the button is clicked.
-/// * `Postback { title: Stirng, payload: Payload }` - Represents a postback button. The `title` field is the title of the button, and the `payload` field is the payload to be sent back to the server when the button is clicked.
-/// * `PhoneNumber { title: Stirng, payload: Payload }` - Represents a phone number button. The `title` field is the title of the button, and the `payload` field is the phone number to be dialed when the button is clicked.
+/// * `AccountLink { url: String }` - Represents an account link button. The `url` field is the URL to be opened when the button is clicked.
+/// * `WebUrl { title: String, url: String }` - Represents a web URL button. The `title` field is the title of the button, and the `url` field is the URL to be opened when the button is clicked.
+/// * `Postback { title: String, payload: Payload }` - Represents a postback button. The `title` field is the title of the button, and the `payload` field is the payload to be sent back to the server when the button is clicked.
+/// * `PhoneNumber { title: String, payload: Payload }` - Represents a phone number button. The `title` field is the title of the button, and the `payload` field is the phone number to be dialed when the button is clicked.
 ///
 /// # Examples
 ///
@@ -89,7 +91,7 @@ use super::{payload::Payload, recipient::Recipient, ResponseModel};
 /// use russenger::prelude::*;
 ///
 /// #[action]
-/// async fn HelloWorld(res: Res, req: Req) {
+/// async fn hello_world(res: Res, req: Req) -> Result<()> {
 ///     let payload: String = req.data.get_value();
 ///     res.send(TextModel::new(&req.user, &payload)).await?;
 ///
@@ -136,7 +138,7 @@ struct ButtonPayload<'p> {
 }
 
 #[derive(Serialize)]
-struct ButtonAttachement<'a> {
+struct ButtonAttachment<'a> {
     #[serde(rename = "type")]
     r#type: &'a str,
     payload: ButtonPayload<'a>,
@@ -162,7 +164,7 @@ struct ButtonAttachement<'a> {
 /// use russenger::prelude::*;
 ///
 /// #[action]
-/// async fn Main(res: Res, req: Req) {
+/// async fn index(res: Res, req: Req) {
 ///     let buttons = vec![
 ///         Button::WebUrl {title: "Click Me".to_owned(), url: "https://link.test.com".to_owned()},
 ///         // More Button ...
@@ -209,7 +211,7 @@ impl<'b> ButtonModel<'b> {
         Self {
             recipient: Recipient { id: sender },
             message: json!({
-                "attachment": ButtonAttachement {
+                "attachment": ButtonAttachment {
                     r#type: "template",
                     payload: ButtonPayload {
                         template_type: "button",

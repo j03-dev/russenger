@@ -30,7 +30,7 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "Hello World!")).await?;
 //!
 //!     Ok(())
@@ -73,7 +73,7 @@ struct Text {
 /// use russenger::prelude::*;
 ///
 /// #[action]
-/// async fn Main(res: Res, req: Req) {
+/// async fn index(res: Res, req: Req) -> Result<()> {
 ///     res.send(TextModel::new(&req.user, "Hello World!")).await?;
 ///
 ///     Ok(())

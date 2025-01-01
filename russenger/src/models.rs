@@ -29,28 +29,31 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "What is your name: ")).await?;
-//!     req.query.set_action(&req.user, GetUserInput).await;
+//!     res.redirect("/get_user_input").await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[action]
-//! async fn GetUserInput(res: Res, req: Req) {
+//! async fn get_user_input(res: Res, req: Req) -> Result<()> {
 //!     let username: String = req.data.get_value();
-//!     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await;
-//!     Main.execute(res, req).await?; // go back to Main Action
+//!     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await?;
+//!     index(res, req).await?; // go back to index Action
 //!
 //!     Ok(())
 //! }
 //!
 //! #[russenger::main]
-//! async fn main() {
-//!     let conn = Database::new().await.conn;
+//! async fn main() -> Result<()> {
+//!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!     russenger::actions![Main, GetUserInput];
-//!     russenger::launch().await.ok();
+//!     let mut app = App::init().await?;
+//!     app.add("/", index).await;
+//!     app.add("/get_user_input", index).await;
+//!     launch(app).await.ok();
+//!     Ok(())
 //! }
 //! ```
 //!
@@ -73,9 +76,10 @@ use rusql_alchemy::prelude::*;
 ///
 /// #[derive(FromRow, Model, Clone, Default)]
 /// pub struct RussengerUser {
-///     #[model(primary_key = true, null = false)]
+///     #[model(primary_key = true)]
 ///     pub facebook_user_id: String,
-///     #[model(default = "Main")]
+///
+///     #[model(default = "/")]
 ///     pub action: String,
 /// }
 /// ```

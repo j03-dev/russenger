@@ -38,10 +38,10 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     let data = Data::new("HelloWorld", None);
-//!     let payload = Payload::new(HelloWorld, Some(data));
-//!     let quick_replies = vec![QuickReply::new("Button Title", Some("https://example.com/image.png"), payload)];
+//!     let payload = Payload::new("/hello_world", Some(data));
+//!     let quick_replies = vec![QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload)];
 //!     let quick_reply = QuickReplyModel::new(&req.user, "Choose an option:", quick_replies);
 //!     res.send(quick_reply).await?;
 //!
@@ -50,7 +50,7 @@
 //!
 //!
 //! #[action]
-//! async fn HelloWorld(res: Res, req: Req) {
+//! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!     let hello_world: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &hello_world)).await?;
 //!
@@ -58,11 +58,15 @@
 //! }
 //!
 //! #[russenger::main]
-//! async fn main() {
-//!     let conn = Database::new().await.conn;
+//! async fn main() -> Result<()> {
+//!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!     russenger::actions![Main, HelloWorld];
-//!     russenger::launch().await.ok();
+//!     let mut app = App::init().await?;
+//!
+//!     app.add("/", index).await;
+//!     app.add("/hello_world", hello_world).await;
+//!     launch(app).await?;
+//!     Ok(())
 //! }
 //! ```
 //!
@@ -102,10 +106,10 @@ use super::{payload::Payload, recipient::Recipient};
 ///
 /// let data = Data::new("HelloWorld", None);
 /// let payload = Payload::new("/hello_world", Some(data));
-/// let quick_reply = QuickReply::new("Button Title", Some("https://example.com/image.png"), payload);
+/// let quick_reply = QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload);
 ///
 /// #[action]
-/// async fn helloworld(res: Res, req: Req) -> Result<()> {
+/// async fn hello_world(res: Res, req: Req) -> Result<()> {
 ///     let hello_world: String = req.data.get_value();
 ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
 ///
@@ -138,7 +142,7 @@ impl QuickReply {
     /// ```rust
     /// use russenger::prelude::*;
     /// let payload = Payload::new("/some_action", None);
-    /// let quick_reply = QuickReply::new("Button Title", "https://example.com/image.png", payload);
+    /// let quick_reply = QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload);
     ///
     /// #[action]
     /// async fn some_action(res: Res, req: Req) -> Result<()> {
@@ -183,9 +187,9 @@ struct QuickMessage {
 /// use russenger::prelude::*;
 ///
 /// #[action]
-/// async fn SomeAction(res: Res, req: Req) -> Result<()> {
+/// async fn some_action(res: Res, req: Req) -> Result<()> {
 ///     let payload = Payload::new("/some_action", None);
-///     let quick_reply = QuickReply::new("Button Title", "https://example.com/image.png", payload);
+///     let quick_reply = QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload);
 ///     let quick_reply_model = QuickReplyModel::new(&req.user, "Message Text", vec![quick_reply]);
 ///     res.send(quick_reply_model).await?;
 ///
@@ -218,12 +222,12 @@ impl<'q> QuickReplyModel<'q> {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// let payload = Payload::new(SomeAction, None);
-    /// let quick_reply = QuickReply::new("Button Title", "https://example.com/image.png", payload);
+    /// let payload = Payload::new("/some_action", None);
+    /// let quick_reply = QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload);
     /// let quick_reply_model = QuickReplyModel::new("send_id", "Message Text", vec![quick_reply]);
     ///
     /// #[action]
-    /// async fn SomeAction(res: Res, req: Req) {
+    /// async fn some_action(res: Res, req: Req) -> Result<()> {
     ///     res.send(TextModel::new(&req.user, "SomeAction")).await?;
     ///
     ///     Ok(())

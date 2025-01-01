@@ -24,28 +24,33 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "What is your name: ")).await?;
-//!     req.query.set_action(&req.user, GetUserInput).await;
+//!     res.redirect("/get_user_input").await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[action]
-//! async fn GetUserInput(res: Res, req: Req) {
+//! async fn get_user_input(res: Res, req: Req) -> Result<()> {
 //!     let username: String = req.data.get_value();
-//!     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await;
-//!     Main.execute(res, req).await?; // go back to Main Action
+//!     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await?;
+//!     index(res, req).await?; // go back to index Action
 //!
 //!     Ok(())
 //! }
 //!
 //! #[russenger::main]
-//! async fn main() {
-//!     let conn = Database::new().await.conn;
+//! async fn main() -> Result<()> {
+//!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!     russenger::actions![Main, GetUserInput];
-//!     russenger::launch().await.ok();
+//!
+//!     let mut app = App::init().await?;
+//!     app.add("/", index).await;
+//!     app.add("/get_user_input", index).await;
+//!     launch(app).await?;
+//!
+//!     Ok(())
 //! }
 //! ```
 use crate::models::RussengerUser;
@@ -107,7 +112,7 @@ impl Query {
     ///
     /// Returns `true` if the record is successfully created, `false` otherwise.
     pub async fn create(&self, user_id: &str) -> bool {
-        if (RussengerUser::get(kwargs!(facebook_user == user_id), &self.conn).await).is_none() {
+        if RussengerUser::get(kwargs!(facebook_user == user_id), &self.conn).await.is_none() {
             return RussengerUser::create(kwargs!(facebook_user_id = user_id), &self.conn).await;
         }
         true
@@ -131,15 +136,15 @@ impl Query {
     /// use russenger::prelude::*;
     ///
     /// #[action]
-    /// async fn Main(res: Res, req: Req) {
+    /// async fn index(res: Res, req: Req) -> Result<()> {
     ///     res.send(TextModel::new(&req.user, "What is your name: ")).await?;
-    ///     req.query.set_action(&req.user, GetUserInput).await;
+    ///     res.redirect("/get_user_input").await?;
     ///
     ///     Ok(())
     /// }
     ///
     /// #[action]
-    /// async fn GetUserInput(res: Res, req: Req) {
+    /// async fn get_user_input(res: Res, req: Req) -> Result<()> {
     ///     let username: String = req.data.get_value();
     ///     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await?;
     ///
@@ -147,11 +152,14 @@ impl Query {
     /// }
     ///
     /// #[russenger::main]
-    /// async fn main() {
-    ///     let conn = Database::new().await.conn;
+    /// async fn main() -> Result<()> {
+    ///     let conn = Database::new().await?.conn;
     ///     migrate!([RussengerUser], &conn);
-    ///     russenger::actions![Main, GetUserInput];
-    ///     russenger::launch().await.ok();
+    ///     let mut app = App::init().await?;
+    ///     app.add("/", index).await;
+    ///     app.add("/get_user_input", get_user_input).await;
+    ///     launch(app).await?;
+    ///     Ok(())
     /// }
     /// ```
     pub(crate) async fn set_path(&self, user_id: &str, path: &str) -> bool {

@@ -18,7 +18,7 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     let elements = vec![
 //!         GenericElement::new(
 //!             "Title",
@@ -26,7 +26,7 @@
 //!             "Subtitle",
 //!             vec![Button::Postback {
 //!                 title: "Hello World".to_owned(),
-//!                 payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
+//!                 payload: Payload::new("/hello_world", Some(Data::new("Hello World!", None))),
 //!             }],
 //!         ),
 //!         // More elements ....
@@ -39,7 +39,7 @@
 //! }
 //!
 //! #[action]
-//! async fn HelloWorld(res: Res, req: Req) {
+//! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!     let hello_world: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &hello_world)).await?;
 //!
@@ -88,13 +88,13 @@ use super::{
 ///     "Subtitle",
 ///     vec![Button::Postback {
 ///         title: "Hello World".to_owned(),
-///         payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
+///         payload: Payload::new("/hello_world", Some(Data::new("Hello World!", None))),
 ///     }],
 /// );
 ///
 ///
 /// #[action]
-/// async fn HelloWorld(res: Res, req: Req) {
+/// async fn hello_world(res: Res, req: Req) -> Result<()> {
 ///     let hello_world: String = req.data.get_value();
 ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
 ///
@@ -140,12 +140,12 @@ impl GenericElement {
     ///     "Subtitle",
     ///     vec![Button::Postback {
     ///         title: "Hello World".to_owned(),
-    ///         payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
+    ///         payload: Payload::new("/hello_world", Some(Data::new("Hello World!", None))),
     ///     }],
     /// );
     ///
     /// #[action]
-    /// async fn HelloWorld(res: Res, req: Req) {
+    /// async fn hello_world(res: Res, req: Req) -> Result<()> {
     ///     let hello_world: String = req.data.get_value();
     ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
     ///
@@ -216,7 +216,7 @@ struct GenericMessage {
 /// use russenger::prelude::*; // if you use this import other imports are not needed;
 ///
 /// #[action]
-/// async fn Main(res: Res, req: Req) {
+/// async fn index(res: Res, req: Req) -> Result<()> {
 ///     let elements = vec![
 ///         GenericElement::new(
 ///             "Title",
@@ -224,7 +224,7 @@ struct GenericMessage {
 ///             "Subtitle",
 ///             vec![Button::Postback {
 ///                 title: "Hello World".to_owned(),
-///                 payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
+///                 payload: Payload::new("/hello_world", Some(Data::new("Hello World!", None))),
 ///             }],
 ///         ),
 ///         // More elements ....
@@ -237,7 +237,7 @@ struct GenericMessage {
 /// }
 ///
 /// #[action]
-/// async fn HelloWorld(res: Res, req: Req) {
+/// async fn hello_world(res: Res, req: Req) -> Result<()> {
 ///     let hello_world: String = req.data.get_value();
 ///    res.send(TextModel::new(&req.user, &hello_world)).await?;
 ///
@@ -280,7 +280,7 @@ impl<'g> GenericModel<'g> {
     ///         "Subtitle",
     ///         vec![Button::Postback {
     ///             title: "Hello World".to_owned(),
-    ///             payload: Payload::new(HelloWorld, Some(Data::new("Hello World!", None))),
+    ///             payload: Payload::new("/hello_world", Some(Data::new("Hello World!", None))),
     ///         }],
     ///     ),
     ///     // More elements ....
@@ -289,7 +289,7 @@ impl<'g> GenericModel<'g> {
     /// let message = GenericModel::new("sender_id", elements, None);
     ///
     /// #[action]
-    /// async fn HelloWorld(res: Res, req: Req) {
+    /// async fn hello_world(res: Res, req: Req) -> Result<()> {
     ///     let hello_world: String = req.data.get_value();
     ///    res.send(TextModel::new(&req.user, &hello_world)).await?;
     ///

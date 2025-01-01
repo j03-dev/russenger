@@ -15,7 +15,7 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn HelloWorld(res: Res, req: Req) {
+//! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!     let user: String = req.user;
 //!     let message: String  = req.data.get_value();
 //!     res.send(TextModel::new(&user, "Hello, world!")).await?;
@@ -30,15 +30,15 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "What is your name")).await?;
-//!     req.query.set_action(&req.user, Name).await;
+//!     res.redirect("/name").await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[action]
-//! async fn Name(res: Res, req: Req) {
+//! async fn name(res: Res, req: Req)  -> Result<()> {
 //!     let name: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &format!("Hello, {}!", name))).await?;
 //!
@@ -46,11 +46,14 @@
 //! }
 //!
 //! #[russenger::main]
-//! async fn main() {
-//!     let conn = Database::new().await.conn;
+//! async fn main() -> Result<()> {
+//!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!     russenger::actions![Main, Name];
-//!     russenger::launch().await.ok();
+//!     let mut app = App::init().await?;
+//!     app.add("/", index).await;
+//!     app.add("/name", name).await;
+//!     launch(app).await?;
+//!     Ok(())
 //! }
 //! ```
 use crate::query::Query;
@@ -75,7 +78,7 @@ pub struct Req {
     /// use russenger::prelude::*;
     ///
     /// #[action]
-    /// async fn HelloWorld(res: Res, req: Req) {
+    /// async fn hello_world(res: Res, req: Req) -> Result<()> {
     ///     let user: String = req.user;
     ///     res.send(TextModel::new(&user, "Hello, world!")).await?;
     ///
@@ -107,14 +110,14 @@ pub struct Req {
     /// use russenger::prelude::*;
     ///
     /// #[action]
-    /// async fn Main(res: Res, req: Req) {
-    ///     req.query.set_action(&req.user, NextAction).await; // goto NextAction
+    /// async fn index(res: Res, req: Req) -> Result<()> {
+    ///     res.redirect("/next_action").await?; // goto NextAction
     ///
     ///     Ok(())
     /// }
     ///
     /// #[action]
-    /// async fn NextAction(res: Res, req: Req) {
+    /// async fn next_action(res: Res, req: Req) -> Result<()> {
     ///     Ok(())
     /// }
     /// ```
@@ -160,7 +163,7 @@ pub struct Req {
     /// use russenger::prelude::*;
     ///
     /// #[action]
-    /// async fn Main(res: Res, req: Req) {
+    /// async fn index(res: Res, req: Req) -> Result<()> {
     ///     let image_url = &format!("{host}/static/image.jpg", host = req.host);
     ///     let media = MediaModel::new(&req.user, "image", image_url);
     ///     res.send(media).await?;

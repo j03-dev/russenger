@@ -38,6 +38,7 @@ pub use crate::core::{
     action::{Action, Add},
     request::Req,
     response::Res,
+    app::App,
 };
 pub use crate::error::{self, Result};
 pub use crate::launch;

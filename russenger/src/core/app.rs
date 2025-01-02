@@ -42,7 +42,6 @@ impl ActionLock {
 /// * `query`: A `Query` that represents the query made by the user.
 #[derive(Clone)]
 pub struct App {
-    pub(crate) templates: tera::Tera,
     pub(crate) query: Query,
     pub(crate) router: Arc<Mutex<Router>>,
     pub(crate) action_lock: ActionLock,
@@ -51,11 +50,8 @@ pub struct App {
 impl App {
     pub async fn init() -> Result<Self> {
         let query: Query = Query::new().await?;
-        let template_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*");
-        let templates = tera::Tera::new(template_dir)?;
         Ok(Self {
             query,
-            templates,
             router: Arc::new(Mutex::new(Router::new())),
             action_lock: ActionLock {
                 locked_users: Arc::new(Mutex::new(HashSet::new())),

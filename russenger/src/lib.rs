@@ -149,7 +149,7 @@ pub mod response_models;
 pub use core::{
     action::Add,
     app::App,
-    services::{index, webhook_core, webhook_verify}, // core services
+    services::{webhook_core, webhook_verify}, // core services
 };
 pub mod error {
     pub use anyhow::*;
@@ -167,7 +167,6 @@ use actix_web::{web, App as ActixApp, HttpServer};
 fn print_info(host: &str, port: u16) {
     let url = format!("http://{}:{}", host, port);
     println!("Endpoints:");
-    println!("  GET: {}/ - Root endpoint", url);
     println!("  GET: {}/webhook - Webhook verification endpoint", url);
     println!("  POST: {}/webhook - Webhook core endpoint", url);
 }
@@ -182,7 +181,6 @@ async fn run_server(app: App) -> Result<()> {
     HttpServer::new(move || {
         ActixApp::new()
             .app_data(web::Data::new(app.clone()))
-            .service(index)
             .service(webhook_verify)
             .service(webhook_core)
             .service(fs::Files::new("/static", "static").show_files_listing())

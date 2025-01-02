@@ -25,16 +25,6 @@ use crate::{
     response_models::{data::Data, payload::Payload},
 };
 
-#[get("/")]
-async fn index(data: web::Data<App>) -> Result<HttpResponse, actix_web::Error> {
-    let template = &data.templates;
-    let ctx = tera::Context::new();
-    let body = template
-        .render("index.html.tera", &ctx)
-        .map_err(|_| actix_web::error::ErrorInternalServerError("Template error"))?;
-    Ok(HttpResponse::Ok().content_type("text/html").body(body))
-}
-
 #[get("/webhook")]
 pub async fn webhook_verify(web_query: web::Query<WebQuery>) -> HttpResponse {
     web_query.get_hub_challenge()

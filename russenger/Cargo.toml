@@ -36,7 +36,6 @@ sqlx.workspace = true # Consider specifying database features (e.g., ["runtime-t
 # Serialization and Templating
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
-tera.workspace = true
 
 # Environment and Configuration
 dotenv.workspace = true

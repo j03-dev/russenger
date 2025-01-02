@@ -19,7 +19,6 @@ mysql = ["rusql-alchemy/mysql"]
 
 [dependencies.rusql-alchemy]
 workspace = true
-default-features = false
 
 [dependencies]
 # Web framework and HTTP handling

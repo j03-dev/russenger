@@ -22,6 +22,10 @@ use anyhow::Result;
 use reqwest::Response;
 use serde::Serialize;
 
+use super::request::Req;
+use crate::response_models::data::Data;
+use crate::response_models::payload::Payload;
+use crate::response_models::quick_replies::{QuickReply, QuickReplyModel};
 use crate::{query::Query, response_models::ResponseModel};
 
 /// The `Res` struct represents a response that can be sent to a user.
@@ -98,6 +102,28 @@ impl Res {
         self.query.set_path(&self.sender_id, path).await;
         Ok(())
     }
+}
+
+pub async fn send_next(path: &str, res: Res, req: Req) -> Result<()> {
+    let mut page = req.data.get_page().unwrap_or_default();
+    page.next();
+
+    let quick_reply = QuickReplyModel::new(
+        &req.user,
+        "Navigation",
+        vec![QuickReply::new(
+            "Next",
+            None,
+            Payload::new(
+                path,
+                Some(Data::new(req.data.get_value::<String>(), Some(page))),
+            ),
+        )],
+    );
+
+    res.send(quick_reply).await?;
+
+    Ok(())
 }
 
 async fn fetch_post<T: Serialize>(url: &str, body: T) -> Result<Response> {

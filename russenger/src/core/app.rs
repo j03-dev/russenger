@@ -42,10 +42,10 @@ impl ActionLock {
 /// * `query`: A `Query` that represents the query made by the user.
 #[derive(Clone)]
 pub struct App {
-    pub templates: tera::Tera,
-    pub query: Query,
-    pub router: Arc<Mutex<Router>>,
-    pub action_lock: ActionLock,
+    pub(crate) templates: tera::Tera,
+    pub(crate) query: Query,
+    pub(crate) router: Arc<Mutex<Router>>,
+    pub(crate) action_lock: ActionLock,
 }
 
 impl App {

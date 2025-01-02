@@ -194,7 +194,7 @@ async fn run_server(app: App) -> Result<()> {
 }
 
 pub async fn launch(app_state: App) -> Result<()> {
-    dotenv()?;
+    dotenv().ok();
     run_server(app_state).await?;
     Ok(())
 }

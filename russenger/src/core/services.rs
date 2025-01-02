@@ -66,7 +66,7 @@ async fn handle(message: Message<'_>, router: Arc<Mutex<Router>>) -> Result<()> 
         Message::TextMessage(user, text_message, host, query) => {
             let path = query.get_path(user).await.unwrap_or("/".to_string());
             let res = Res::new(user, query.clone());
-            let req = Req::new(user, query, Data::new(text_message, None), host);
+            let req = Req::new(user, query, Data::new(text_message), host);
             match router.lock().await.get(&path) {
                 Some(action) => action(res, req).await?,
                 None => {

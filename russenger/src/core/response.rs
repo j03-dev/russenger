@@ -116,7 +116,10 @@ pub async fn send_next(path: &str, res: Res, req: Req) -> Result<()> {
             None,
             Payload::new(
                 path,
-                Some(Data::new(req.data.get_value::<String>(), Some(page))),
+                Some(Data::new_with_page(
+                    req.data.get_value::<String>(),
+                    Some(page),
+                )),
             ),
         )],
     );

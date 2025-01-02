@@ -145,7 +145,7 @@ pub struct Req {
     /// ```rust
     /// use russenger::response_models::data::{Data, Page};
     ///
-    /// let data = Data::new("value", Some(Page::default()));
+    /// let data = Data::new_with_page("value", Some(Page::default()));
     /// let value: String = data.get_value();
     /// let page = data.get_page();
     /// ```

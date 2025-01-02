@@ -86,7 +86,7 @@
 //! #[action]
 //! async fn get_user_input(res: Res, req: Req) -> Result<()> {
 //!     // Define a closure that creates a new Payload for a given value
-//!     let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value, None)));
+//!     let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value)));
 //!
 //!     // Create a QuickReplyModel with two options: "blue" and "red"
 //!     let quick_replies: Vec<QuickReply> = vec![

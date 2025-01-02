@@ -10,7 +10,7 @@
 //!
 //! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
-//!     let payload = Payload::new("/hello_world", Some(Data::new("HelloWorld", None)));
+//!     let payload = Payload::new("/hello_world", Some(Data::new("HelloWorld")));
 //!     let buttons = vec![
 //!         Button::Postback { title: "Click me".to_owned(), payload },
 //!     ];

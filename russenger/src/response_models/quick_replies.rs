@@ -39,7 +39,7 @@
 //!
 //! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
-//!     let data = Data::new("HelloWorld", None);
+//!     let data = Data::new("HelloWorld");
 //!     let payload = Payload::new("/hello_world", Some(data));
 //!     let quick_replies = vec![QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload)];
 //!     let quick_reply = QuickReplyModel::new(&req.user, "Choose an option:", quick_replies);
@@ -104,7 +104,7 @@ use super::{payload::Payload, recipient::Recipient};
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// let data = Data::new("HelloWorld", None);
+/// let data = Data::new("HelloWorld");
 /// let payload = Payload::new("/hello_world", Some(data));
 /// let quick_reply = QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload);
 ///

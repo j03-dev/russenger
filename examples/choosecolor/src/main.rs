@@ -58,7 +58,7 @@ async fn signup(res: Res, req: Req) -> Result<()> {
 
 #[action]
 async fn get_user_input(res: Res, req: Req) -> Result<()> {
-    let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value, None)));
+    let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value)));
 
     // QuickReply
     let quick_replies: Vec<QuickReply> = vec![

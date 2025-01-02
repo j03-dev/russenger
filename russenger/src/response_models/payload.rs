@@ -24,7 +24,7 @@
 //!
 //! #[action]
 //! async fn index (res: Res, req: Req) -> Result<()> {
-//!     let data = Data::new("HelloWorld", None);
+//!     let data = Data::new("HelloWorld");
 //!     let payload = Payload::new("/hello_world", Some(data));
 //!     res.send(GetStartedButtonModel::new(payload)).await?;
 //!
@@ -83,7 +83,7 @@ use super::data::Data;
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// let data = Data::new("HelloWorld", None);
+/// let data = Data::new("HelloWorld");
 /// let payload = Payload::new("/hello_world", Some(data));
 ///
 /// #[action]

@@ -173,7 +173,7 @@ pub mod data {
         /// ```rust
         /// use russenger::response_models::data::{Data, Page};
         ///
-        /// let data = Data::new("value", Some(Page::default()));
+        /// let data = Data::new("value"());
         /// let value: String = data.get_value();
         /// ```
         pub fn get_value<T: for<'a> Deserialize<'a> + Default>(&self) -> T {
@@ -193,7 +193,7 @@ pub mod data {
         /// ```rust
         /// use russenger::response_models::data::{Data, Page};
         ///
-        /// let data = Data::new("value", Some(Page::default()));
+        /// let data = Data::new_with_page("value", Some(Page::default()));
         /// let page = data.get_page();
         /// ```
         pub fn get_page(&self) -> Option<Page> {

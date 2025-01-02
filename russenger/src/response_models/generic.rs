@@ -26,7 +26,7 @@
 //!             "Subtitle",
 //!             vec![Button::Postback {
 //!                 title: "Hello World".to_owned(),
-//!                 payload: Payload::new("/hello_world", Some(Data::new("Hello World!", None))),
+//!                 payload: Payload::new("/hello_world", Some(Data::new("Hello World!"))),
 //!             }],
 //!         ),
 //!         // More elements ....
@@ -88,7 +88,7 @@ use super::{
 ///     "Subtitle",
 ///     vec![Button::Postback {
 ///         title: "Hello World".to_owned(),
-///         payload: Payload::new("/hello_world", Some(Data::new("Hello World!", None))),
+///         payload: Payload::new("/hello_world", Some(Data::new("Hello World!"))),
 ///     }],
 /// );
 ///
@@ -140,7 +140,7 @@ impl GenericElement {
     ///     "Subtitle",
     ///     vec![Button::Postback {
     ///         title: "Hello World".to_owned(),
-    ///         payload: Payload::new("/hello_world", Some(Data::new("Hello World!", None))),
+    ///         payload: Payload::new("/hello_world", Some(Data::new("Hello World!"))),
     ///     }],
     /// );
     ///
@@ -224,7 +224,7 @@ struct GenericMessage {
 ///             "Subtitle",
 ///             vec![Button::Postback {
 ///                 title: "Hello World".to_owned(),
-///                 payload: Payload::new("/hello_world", Some(Data::new("Hello World!", None))),
+///                 payload: Payload::new("/hello_world", Some(Data::new("Hello World!"))),
 ///             }],
 ///         ),
 ///         // More elements ....
@@ -280,7 +280,7 @@ impl<'g> GenericModel<'g> {
     ///         "Subtitle",
     ///         vec![Button::Postback {
     ///             title: "Hello World".to_owned(),
-    ///             payload: Payload::new("/hello_world", Some(Data::new("Hello World!", None))),
+    ///             payload: Payload::new("/hello_world", Some(Data::new("Hello World!"))),
     ///         }],
     ///     ),
     ///     // More elements ....

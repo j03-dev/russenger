@@ -83,7 +83,7 @@ async fn index(res: Res, req: Req) -> Result<()> {
     } else {
         res.send(TextModel::new(&req.user, "What is your name: "))
             .await?;
-        req.query.set_path(&req.user, "/signup").await;
+        res.redirect("/signup").await?;
         return Ok(());
     }
     get_user_input(res, req).await?;

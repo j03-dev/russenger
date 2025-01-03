@@ -36,7 +36,7 @@
 //! ```
 pub use crate::action;
 pub use crate::core::{
-    action::{Action, Add},
+    action::Action,
     app::App,
     request::Req,
     response::{send_next, Res},

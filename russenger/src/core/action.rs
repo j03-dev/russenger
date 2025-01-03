@@ -8,13 +8,3 @@ type FutureResult = Pin<Box<dyn Future<Output = Result<()>>>>;
 pub type Action = fn(res: Res, req: Req) -> FutureResult;
 
 pub type Router = HashMap<String, Action>;
-
-pub trait Add {
-    fn add(&mut self, path: &str, handler: Action);
-}
-
-impl Add for Router {
-    fn add(&mut self, path: &str, handler: Action) {
-        self.insert(path.to_string(), handler);
-    }
-}

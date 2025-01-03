@@ -48,6 +48,7 @@ pub struct App {
 }
 
 impl App {
+    /// `init` is method to create new `App` instance. in russenger
     pub async fn init() -> Result<Self> {
         let query: Query = Query::new().await?;
         Ok(Self {
@@ -59,6 +60,41 @@ impl App {
         })
     }
 
+    /// `add` is method to add action(handler) to router
+    ///
+    /// # Parameters
+    /// * `path: &str` - The key of the action
+    /// * `action: Action` - The action handler
+    ///
+    /// Examples
+    ///
+    /// add new action on app
+    ///
+    /// ```rust
+    /// use russenger::prelude::*;
+    /// #[action]
+    /// async fn get_user_input(res: Res, req: Req) -> Result<()> {
+    ///     let name: String = req.data.get_value();
+    ///     let message = format!("Hello {name}");
+    ///     res.send(TextModel::new(&req.user, &message)).await?;
+    ///     Ok(())
+    /// }
+    ///
+    /// #[russenger::main]
+    /// async fn main() -> Result<()> {
+    ///     let mut app = App::init().await?;
+    ///     app.add("/", |res: Res, req: Req| {
+    ///         Box::pin(async move {
+    ///             res.send(GetStartedButtonModel::new(Payload::default())).await?;
+    ///             res.send(TextModel::new(&req.user, "Hello World")).await?;
+    ///             res.redirect("/get_user_input").await?;
+    ///             Ok(())
+    ///         })
+    ///     }).await;
+    ///     app.add("/get_user_input", get_user_input).await;
+    ///     Ok(())
+    /// }
+    /// ````
     pub async fn add(&mut self, path: &str, action: Action) {
         self.router.lock().await.insert(path.to_owned(), action);
     }

@@ -163,7 +163,7 @@ use russenger::{prelude::*, App};
 
 #[action]
 async fn index(res: Res, req: Req) {
-    let payload = |value: &str| Payload::new("/next", Some(Data::new(value, None)));
+    let payload = |value: &str| Payload::new("/next", Some(Data::new(value)));
 
     // QuickReply
     let quick_replies: Vec<QuickReply> = vec![

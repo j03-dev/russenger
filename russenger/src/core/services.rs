@@ -39,17 +39,15 @@ async fn handle(message: Message<'_>, router: Arc<Mutex<Router>>) -> Result<()> 
     match message {
         Message::Payload(user, payload, host, query) => {
             let payload = Payload::from_str(payload).unwrap_or_default();
-            {
-                let data = payload.get_data();
-                let res = Res::new(user, query.clone());
-                let req = Req::new(user, query, data, host);
-                let path = payload.get_path();
+            let data = payload.get_data();
+            let res = Res::new(user, query.clone());
+            let req = Req::new(user, query, data, host);
+            let path = payload.get_path();
 
-                match router.lock().await.get(&path) {
-                    Some(action) => action(res, req).await?,
-                    None => {
-                        eprintln!("Error 404: Action {:?} not found", path);
-                    }
+            match router.lock().await.get(&path) {
+                Some(action) => action(res, req).await?,
+                None => {
+                    eprintln!("Error 404: Action {:?} not found", path);
                 }
             }
         }

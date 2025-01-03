@@ -11,12 +11,13 @@ pub struct Register {
         null = false
     )]
     pub user_id: String,
-    #[model(size = 30, unique = true, null = false)]
+
+    #[model(size = 30, unique = true)]
     pub username: String,
 }
 
 #[action]
-async fn Main(res: Res, req: Req) {
+async fn index(res: Res, req: Req) -> Result<()> {
     res.send(TextModel::new(&req.user, "Hello!")).await?;
     if let Some(user_register) = Register::get(kwargs!(user_id == req.user), &req.query.conn).await
     {
@@ -28,16 +29,16 @@ async fn Main(res: Res, req: Req) {
     } else {
         res.send(TextModel::new(&req.user, "What is your name: "))
             .await?;
-        req.query.set_action(&req.user, SignUp).await;
+        res.redirect("/signup").await?;
         return Ok(());
     }
-    req.query.set_action(&req.user, GetUserInput).await;
+    res.redirect("/get_user_input").await?;
 
     Ok(())
 }
 
 #[action]
-async fn SignUp(res: Res, req: Req) {
+async fn signup(res: Res, req: Req) -> Result<()> {
     let username: String = req.data.get_value();
     let message = if Register::create(
         kwargs!(user_id = req.user, username = username),
@@ -50,14 +51,14 @@ async fn SignUp(res: Res, req: Req) {
         "Register failed"
     };
     res.send(TextModel::new(&req.user, message)).await?;
-    Main.execute(res, req).await?;
+    index(res, req).await?;
 
     Ok(())
 }
 
 #[action]
-async fn GetUserInput(res: Res, req: Req) {
-    let payload = |value: &str| Payload::new(NextAction, Some(Data::new(value, None)));
+async fn get_user_input(res: Res, req: Req) -> Result<()> {
+    let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value)));
 
     // QuickReply
     let quick_replies: Vec<QuickReply> = vec![
@@ -71,17 +72,24 @@ async fn GetUserInput(res: Res, req: Req) {
 }
 
 #[action]
-async fn NextAction(res: Res, req: Req) {
+async fn next_action(res: Res, req: Req) -> Result<()> {
     let color: String = req.data.get_value();
     res.send(TextModel::new(&req.user, &color)).await?;
-    Main.execute(res, req).await?; // goto Main action
+    index(res, req).await?; // goto index action
     Ok(())
 }
 
 #[russenger::main]
-async fn main() {
-    let conn = Database::new().await.conn;
+async fn main() -> Result<()> {
+    let conn = Database::new().await?.conn;
     migrate!([RussengerUser, Register], &conn);
-    russenger::actions![Main, GetUserInput, NextAction, SignUp];
-    russenger::launch().await.ok();
+
+    let mut app = App::init().await?;
+    app.add("/", index).await;
+    app.add("/signup", signup).await;
+    app.add("/get_user_input", get_user_input).await;
+    app.add("/next_action", next_action).await;
+    launch(app).await?;
+
+    Ok(())
 }

@@ -20,8 +20,8 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
-//!     res.send(GetStartedModel::new(Payload::default())).await?;
+//! async fn index(res: Res, req: Req) -> Result<()> {
+//!     res.send(GetStartedButtonModel::new(Payload::default())).await?;
 //!
 //!     Ok(())
 //! }
@@ -58,8 +58,8 @@ use super::{payload::Payload, ResponseModel};
 /// use russenger::prelude::*;
 ///
 /// #[action]
-/// async fn Main(res: Res, req: Req) {
-///     res.send(GetStartedModel::new(Payload::default())).await?;
+/// async fn index(res: Res, req: Req) -> Result<()>{
+///     res.send(GetStartedButtonModel::new(Payload::default())).await?;
 ///
 ///     Ok(())
 /// }
@@ -91,10 +91,10 @@ impl GetStartedButtonModel {
     /// # Example
     ///
     /// ```rust
-    /// use russenger::response_models::get_started::GetStartedModel;
+    /// use russenger::response_models::get_started::GetStartedButtonModel;
     /// use russenger::response_models::payload::Payload;
     ///
-    /// GetStartedModel::new(Payload::default());
+    /// GetStartedButtonModel::new(Payload::default());
     /// ```
     pub fn new(payload: Payload) -> Self {
         Self {

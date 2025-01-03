@@ -1,52 +1,31 @@
-[package]
-name = "russenger"
-version = "0.3.3-rc"
-edition = "2021"
-description = "A Rust library designed to simplify the handling of Facebook Messenger webhook responses."
-license = "Apache-2.0"
-documentation = "https://docs.rs/russenger/latest/russenger/"
-homepage = "https://github.com/j03-dev/russenger"
-repository = "https://github.com/j03-dev/russenger"
-authors = ["FITAHIANA Nomeniavo Joe <24nomeniavo@gmail.com>"]
-keywords = ["facebook", "bot", "messenger", "rust"]
-categories = ["web-programming", "api-bindings"]
+[workspace]
+resolver = "2"
+members = ["russenger", "russenger_macro"]
 
-
-[features]
-sqlite = ["rusql-alchemy/sqlite"]
-postgres = ["rusql-alchemy/postgres"]
-mysql = ["rusql-alchemy/mysql"]
-
-[dependencies.russenger_macro]
-version = "0.1.2"
-
-[dependencies.rusql-alchemy]
-version = "0.4.1-rc"
-default-features = false
-
-[dependencies]
+[workspace.dependencies]
 # Web framework and HTTP handling
 actix-web = "4"
 actix-files = "0.6.5"
-reqwest = { version = "0.12.4", features = ["json"] }
+reqwest = "0.12.4"
 
 # Async utilities
 async-trait = "0.1.77"
 tokio = "1.38.0"
 
 # Database
-sqlx = "0.8" # Consider specifying database features (e.g., ["runtime-tokio-rustls", "postgres"])
+sqlx = "0.8"
 
 # Serialization and Templating
-serde = { version = "1.0", features = ["derive"] }
+serde = "1.0"
 serde_json = "1.0.107"
-tera = "1.19.1"
 
 # Environment and Configuration
 dotenv = "0.15.0"
 
-# Utility libraries
-lazy_static = "1.4.0"
-
 # Error handling
 anyhow = "1.0.95"
+
+russenger_macro = { version = "0.1.2", path = "russenger_macro" }
+
+# Orm
+rusql-alchemy = { version = "0.4.1-rc", default-features = false }

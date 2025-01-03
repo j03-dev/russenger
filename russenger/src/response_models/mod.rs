@@ -37,7 +37,7 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     let text_model = TextModel::new(&req.user, "Hello, user1!");
 //!     res.send(text_model).await?;
 //!
@@ -68,7 +68,7 @@ pub trait ResponseModel: Serialize {
 pub mod data {
     use serde::{Deserialize, Serialize};
 
-    const MAX_VALUE_AUTORIZED: usize = 500;
+    const MAX_VALUE_AUTHORIZED: usize = 500;
     const MIN_PAGE: usize = 0;
     pub const MAX_PAGE: usize = 10;
 
@@ -88,14 +88,14 @@ pub mod data {
         }
     }
 
-    trait Verify: ToString {
+    trait Verify {
         fn verify(&self) -> String;
     }
 
     impl Verify for String {
         fn verify(&self) -> String {
-            if self.len() >= MAX_VALUE_AUTORIZED {
-                self[..MAX_VALUE_AUTORIZED].to_string()
+            if self.len() >= MAX_VALUE_AUTHORIZED {
+                self[..MAX_VALUE_AUTHORIZED].to_string()
             } else {
                 self.clone()
             }
@@ -148,7 +148,12 @@ pub mod data {
         ///
         /// * `Data`: The created `Data`.
         ///
-        pub fn new<T: Serialize>(value: T, page: Option<Page>) -> Self {
+        pub fn new<T: Serialize>(value: T) -> Self {
+            let value = serde_json::to_string(&value).unwrap_or_default().verify();
+            Self { value, page: None }
+        }
+
+        pub fn new_with_page<T: Serialize>(value: T, page: Option<Page>) -> Self {
             let value = serde_json::to_string(&value).unwrap_or_default().verify();
             Self { value, page }
         }
@@ -168,7 +173,7 @@ pub mod data {
         /// ```rust
         /// use russenger::response_models::data::{Data, Page};
         ///
-        /// let data = Data::new("value", Some(Page::default()));
+        /// let data = Data::new("value"());
         /// let value: String = data.get_value();
         /// ```
         pub fn get_value<T: for<'a> Deserialize<'a> + Default>(&self) -> T {
@@ -188,7 +193,7 @@ pub mod data {
         /// ```rust
         /// use russenger::response_models::data::{Data, Page};
         ///
-        /// let data = Data::new("value", Some(Page::default()));
+        /// let data = Data::new_with_page("value", Some(Page::default()));
         /// let page = data.get_page();
         /// ```
         pub fn get_page(&self) -> Option<Page> {

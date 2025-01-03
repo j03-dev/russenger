@@ -24,32 +24,36 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "What is your name: ")).await?;
-//!     req.query.set_action(&req.user, GetUserInput).await;
+//!     res.redirect("/get_user_input").await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[action]
-//! async fn GetUserInput(res: Res, req: Req) {
+//! async fn get_user_input(res: Res, req: Req) -> Result<()> {
 //!     let username: String = req.data.get_value();
-//!     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await;
-//!     Main.execute(res, req).await?; // go back to Main Action
+//!     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await?;
+//!     index(res, req).await?; // go back to index Action
 //!
 //!     Ok(())
 //! }
 //!
 //! #[russenger::main]
-//! async fn main() {
-//!     let conn = Database::new().await.conn;
+//! async fn main() -> Result<()> {
+//!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!     russenger::actions![Main, GetUserInput];
-//!     russenger::launch().await.ok();
+//!
+//!     let mut app = App::init().await?;
+//!     app.add("/", index).await;
+//!     app.add("/get_user_input", index).await;
+//!     launch(app).await?;
+//!
+//!     Ok(())
 //! }
 //! ```
 use crate::models::RussengerUser;
-use crate::Action;
 use anyhow::Result;
 
 use rusql_alchemy::prelude::*;
@@ -108,7 +112,7 @@ impl Query {
     ///
     /// Returns `true` if the record is successfully created, `false` otherwise.
     pub async fn create(&self, user_id: &str) -> bool {
-        if (RussengerUser::get(kwargs!(facebook_user == user_id), &self.conn).await).is_none() {
+        if RussengerUser::get(kwargs!(facebook_user == user_id), &self.conn).await.is_none() {
             return RussengerUser::create(kwargs!(facebook_user_id = user_id), &self.conn).await;
         }
         true
@@ -132,15 +136,15 @@ impl Query {
     /// use russenger::prelude::*;
     ///
     /// #[action]
-    /// async fn Main(res: Res, req: Req) {
+    /// async fn index(res: Res, req: Req) -> Result<()> {
     ///     res.send(TextModel::new(&req.user, "What is your name: ")).await?;
-    ///     req.query.set_action(&req.user, GetUserInput).await;
+    ///     res.redirect("/get_user_input").await?;
     ///
     ///     Ok(())
     /// }
     ///
     /// #[action]
-    /// async fn GetUserInput(res: Res, req: Req) {
+    /// async fn get_user_input(res: Res, req: Req) -> Result<()> {
     ///     let username: String = req.data.get_value();
     ///     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await?;
     ///
@@ -148,18 +152,21 @@ impl Query {
     /// }
     ///
     /// #[russenger::main]
-    /// async fn main() {
-    ///     let conn = Database::new().await.conn;
+    /// async fn main() -> Result<()> {
+    ///     let conn = Database::new().await?.conn;
     ///     migrate!([RussengerUser], &conn);
-    ///     russenger::actions![Main, GetUserInput];
-    ///     russenger::launch().await.ok();
+    ///     let mut app = App::init().await?;
+    ///     app.add("/", index).await;
+    ///     app.add("/get_user_input", get_user_input).await;
+    ///     launch(app).await?;
+    ///     Ok(())
     /// }
     /// ```
-    pub async fn set_action<A: Action>(&self, user_id: &str, action: A) -> bool {
+    pub(crate) async fn set_path(&self, user_id: &str, path: &str) -> bool {
         if let Some(mut user) =
             RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn).await
         {
-            user.action = action.path();
+            user.action_path = path.to_owned();
             user.update(&self.conn).await
         } else {
             false
@@ -175,9 +182,9 @@ impl Query {
     /// # Returns
     ///
     /// Returns the action as an `Option<String>`. Returns `None` if the user is not found.
-    pub async fn get_action(&self, user_id: &str) -> Option<String> {
+    pub async fn get_path(&self, user_id: &str) -> Option<String> {
         RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
             .await
-            .map(|user| user.action)
+            .map(|user| user.action_path)
     }
 }

@@ -22,9 +22,9 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn SendFileFromStaticDir(res: Res, req: Req) {
+//! async fn send_file_from_static_dir(res: Res, req: Req) -> Result<()> {
 //!     let text = TextModel::new(&req.user, "Sending file... Please wait!");
-//!     res.send(text).await;
+//!     res.send(text).await?;
 //!     let url = format!("{host}/static/video.mp4", host = req.host);
 //!     res.send(MediaModel::new(&req.user, "video", &url)).await?;
 //!
@@ -89,9 +89,9 @@ struct Attachment<'s> {
 /// use russenger::prelude::*;
 ///
 /// #[action]
-/// async fn SendFileFromStaticDir(res: Res, req: Req) {
+/// async fn send_file_from_static_dir(res: Res, req: Req) -> Result<()> {
 ///     let text = TextModel::new(&req.user, "Sending file... Please wait!");
-///     res.send(text).await;
+///     res.send(text).await?;
 ///     let url = format!("{host}/static/video.mp4", host = req.host);
 ///     res.send(MediaModel::new(&req.user, "video", &url)).await?;
 ///

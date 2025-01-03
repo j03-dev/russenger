@@ -15,7 +15,7 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main (res: Res, req: Req) {
+//! async fn index (res: Res, req: Req) -> Result<()> {
 //!     let message: String = req.data.get_value();
 //!     if message == "Hi" {
 //!         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await?;
@@ -25,17 +25,23 @@
 //! }
 //!
 //! #[russenger::main]
-//! async fn main() {
-//!     let conn = Database::new().await.conn;
+//! async fn main() -> Result<()> {
+//!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!
-//!     russenger::actions![Main];
-//!     russenger::launch().await.ok();
+//!     let mut app = App::init().await?;
+//!     app.add("/", index).await;
+//!     launch(app).await?;
+//!     Ok(())
 //! }
 //! ```
 pub use crate::action;
-pub use crate::core::{request::Req, response::Res};
-pub use crate::error;
+pub use crate::core::{
+    action::Action,
+    app::App,
+    request::Req,
+    response::{send_next, Res},
+};
+pub use crate::error::{self, Result};
 pub use crate::launch;
 pub use crate::response_models::{
     button::{Button, ButtonModel},

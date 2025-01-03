@@ -23,16 +23,16 @@
 //! use russenger::prelude::*;
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
-//!     let data = Data::new("HelloWorld", None);
-//!     let payload = Payload::new(HelloWorld, Some(data));
-//!     res.send(GetStartedModel::new(payload)).await?;
+//! async fn index (res: Res, req: Req) -> Result<()> {
+//!     let data = Data::new("HelloWorld");
+//!     let payload = Payload::new("/hello_world", Some(data));
+//!     res.send(GetStartedButtonModel::new(payload)).await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[action]
-//! async fn HelloWorld(res: Res, req: Req) {
+//! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!    let value: String = req.data.get_value();
 //!    res.send(TextModel::new(&req.user, &value)).await?;
 //!
@@ -40,11 +40,14 @@
 //! }
 //!
 //! #[russenger::main]
-//! async fn main() {
-//!     let conn = Database::new().await.conn;
+//! async fn main() -> Result<()> {
+//!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!     russenger::actions![Main, HelloWorld];
-//!     russenger::launch().await.ok();
+//!     let mut app = App::init().await?;
+//!     app.add("/", index).await;
+//!     app.add("/hello_world", hello_world).await;
+//!     launch(app).await?;
+//!     Ok(())
 //! }
 //! ```
 //!
@@ -58,8 +61,6 @@ use std::str::FromStr;
 use serde::{Deserialize, Serialize};
 
 use super::data::Data;
-use crate::Action;
-
 /// `Payload` is a struct that represents the payload of a request in a Messenger conversation.
 ///
 /// The payload contains the path of the action to be performed and optional data associated with the action.
@@ -82,11 +83,11 @@ use crate::Action;
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// let data = Data::new("HelloWorld", None);
-/// let payload = Payload::new(HelloWorld, Some(data));
+/// let data = Data::new("HelloWorld");
+/// let payload = Payload::new("/hello_world", Some(data));
 ///
 /// #[action]
-/// async fn HelloWorld(res: Res, req: Req) {
+/// async fn hello_world(res: Res, req: Req) -> Result<()> {
 ///    let value: String = req.data.get_value();
 ///    res.send(TextModel::new(&req.user, &value)).await?;
 ///
@@ -101,7 +102,7 @@ use crate::Action;
 /// * `Default`
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Payload {
-    path: String,
+    action_path: String,
     data: Option<Data>,
 }
 
@@ -122,44 +123,21 @@ impl Payload {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// let payload = Payload::new(SomeAction, None);
+    /// let payload = Payload::new("/some_action", None);
     ///
     /// #[action]
-    /// async fn SomeAction(res: Res, req: Req) {
+    /// async fn some_action(res: Res, req: Req) -> Result<()> {
     ///    res.send(TextModel::new(&req.user, "SomeAction")).await?;
     ///
     ///    Ok(())
     /// }
     ///
     /// ```
-    pub fn new<A: Action>(action: A, data: Option<Data>) -> Self {
+    pub fn new(action_path: &str, data: Option<Data>) -> Self {
         Self {
-            path: action.path(),
+            action_path: action_path.to_owned(),
             data,
         }
-    }
-
-    /// Creates a new `Payload` instance with a specified path and optional data.
-    ///
-    /// # Parameters
-    ///
-    /// * `path: String` - The path associated with the payload.
-    /// * `data: Option<Data>` - Optional data to be included in the payload.
-    ///
-    /// # Returns
-    ///
-    /// A new `Payload` instance with the specified path and data.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use russenger::prelude::*;
-    ///
-    /// let data = Some(Data::new("key", None));
-    /// let payload = Payload::new_with_path("Main".to_string(), data);
-    /// ```
-    pub fn new_with_path(path: String, data: Option<Data>) -> Self {
-        Self { path, data }
     }
 
     /// Returns the path associated with the payload.
@@ -168,7 +146,7 @@ impl Payload {
     ///
     /// The path associated with the payload.
     pub fn get_path(&self) -> String {
-        self.path.clone()
+        self.action_path.clone()
     }
 
     /// Returns the data associated with the payload.
@@ -201,7 +179,7 @@ impl std::fmt::Display for Payload {
 impl Default for Payload {
     fn default() -> Self {
         Payload {
-            path: "Main".to_owned(),
+            action_path: "/".to_owned(),
             data: None,
         }
     }

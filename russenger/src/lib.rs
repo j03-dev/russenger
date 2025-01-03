@@ -38,7 +38,7 @@
 //! }
 //!
 //! #[action]
-//! async fn Main(res: Res, req: Req) {
+//! async fn index(res: Res, req: Req) -> Result<()> {
 //!     // Send a greeting message to the user
 //!     res.send(TextModel::new(&req.user, "Hello!")).await?;
 //!
@@ -52,18 +52,18 @@
 //!         res.send(TextModel::new(&req.user, "What is your name: "))
 //!             .await?;
 //!         // Set the next action to SignUp
-//!         req.query.set_action(&req.user, SignUp).await;
+//!         res.redirect("/signup").await?;
 //!         return Ok(());
 //!     }
 //!
 //!     // If the user is registered, set the next action to GetUserInput
-//!     req.query.set_action(&req.user, GetUserInput).await;
+//!     res.redirect("/get_user_input").await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[action]
-//! async fn SignUp(res: Res, req: Req) {
+//! async fn signup(res: Res, req: Req) -> Result<()> {
 //!     // Get the username from the user input
 //!     let username: String = req.data.get_value();
 //!
@@ -77,21 +77,21 @@
 //!     // Send a message to the user indicating whether the registration was successful
 //!     res.send(TextModel::new(&req.user, message)).await?;
 //!
-//!     // Go back to the Main action
-//!     Main.execute(res, req).await?;
+//!     // Go back to the index action
+//!     index(res, req).await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[action]
-//! async fn GetUserInput(res: Res, req: Req) {
+//! async fn get_user_input(res: Res, req: Req) -> Result<()> {
 //!     // Define a closure that creates a new Payload for a given value
-//!     let payload = |value: &str| Payload::new(NextAction, Some(Data::new(value, None)));
+//!     let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value)));
 //!
 //!     // Create a QuickReplyModel with two options: "blue" and "red"
 //!     let quick_replies: Vec<QuickReply> = vec![
-//!         QuickReply::new("blue", "", payload("blue")),
-//!         QuickReply::new("red", "", payload("red")),
+//!         QuickReply::new("blue", None, payload("blue")),
+//!         QuickReply::new("red", None, payload("red")),
 //!     ];
 //!     let quick_reply_model = QuickReplyModel::new(&req.user, "choose one color", quick_replies);
 //!
@@ -102,32 +102,37 @@
 //! }
 //!
 //! #[action]
-//! async fn NextAction(res: Res, req: Req) {
+//! async fn next_action(res: Res, req: Req) -> Result<()> {
 //!     // Get the color chosen by the user
 //!     let color: String = req.data.get_value();
 //!
 //!     // Send a message to the user confirming their choice
 //!     res.send(TextModel::new(&req.user, &color)).await?;
 //!
-//!     // Go back to the Main action
-//!     Main.execute(res, req).await?;
+//!     // Go back to the index action
+//!     index(res, req).await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[russenger::main]
-//! async fn main() {
+//! async fn main() -> Result<()> {
 //!     // Connect to the database
-//!     let conn = Database::new().await.conn;
+//!     let conn = Database::new().await?.conn;
 //!
 //!     // Migrate the database schema
 //!     migrate!([RussengerUser], &conn);
 //!
 //!     // Register the actions for the main application
-//!     russenger::actions![Main, SignUp, GetUserInput, NextAction];
+//!     let mut app = App::init().await?;
+//!     app.add("/", index).await;
+//!     app.add("/signup", signup).await;
+//!     app.add("/get_user_input", get_user_input).await;
+//!     app.add("/next_action", next_action).await;
 //!
 //!     // Launch the main application
-//!     russenger::launch().await.ok();
+//!     launch(app).await?;
+//!     Ok(())
 //! }
 //! ```
 //!
@@ -142,9 +147,8 @@ pub mod query;
 pub mod response_models;
 
 pub use core::{
-    action::{Action, ACTION_REGISTRY},
-    app_state::AppState,
-    services::{index, webhook_core, webhook_verify}, // core services
+    app::App,
+    services::{webhook_core, webhook_verify}, // core services
 };
 pub mod error {
     pub use anyhow::*;
@@ -152,26 +156,21 @@ pub mod error {
 
 pub use anyhow;
 pub use dotenv::dotenv;
-use error::{bail, Context, Result};
+use error::{Context, Result};
 pub use rusql_alchemy;
 pub use russenger_macro::action;
 
 use actix_files as fs;
-use actix_web::{web, App, HttpServer};
+use actix_web::{web, App as ActixApp, HttpServer};
 
 fn print_info(host: &str, port: u16) {
     let url = format!("http://{}:{}", host, port);
     println!("Endpoints:");
-    println!("  GET: {}/ - Root endpoint", url);
     println!("  GET: {}/webhook - Webhook verification endpoint", url);
     println!("  POST: {}/webhook - Webhook core endpoint", url);
 }
 
-async fn run_server() -> Result<()> {
-    if !ACTION_REGISTRY.lock().await.contains_key("Main") {
-        bail!("'actions!' should contain `Main` action");
-    }
-    let app_state = AppState::init().await?;
+async fn run_server(app: App) -> Result<()> {
     let host = std::env::var("HOST").unwrap_or("0.0.0.0".into());
     let port = std::env::var("PORT")
         .unwrap_or("2453".into())
@@ -179,9 +178,8 @@ async fn run_server() -> Result<()> {
         .unwrap_or(2453);
     print_info(&host, port);
     HttpServer::new(move || {
-        App::new()
-            .app_data(web::Data::new(app_state.clone()))
-            .service(index)
+        ActixApp::new()
+            .app_data(web::Data::new(app.clone()))
             .service(webhook_verify)
             .service(webhook_core)
             .service(fs::Files::new("/static", "static").show_files_listing())
@@ -194,54 +192,8 @@ async fn run_server() -> Result<()> {
     Ok(())
 }
 
-pub async fn launch() -> Result<()> {
-    dotenv()?;
-    run_server().await?;
+pub async fn launch(app_state: App) -> Result<()> {
+    dotenv().ok();
+    run_server(app_state).await?;
     Ok(())
-}
-
-/// The `actions!` macro is used to register actions for the main application.
-///
-/// # Syntax
-///
-/// ```rust
-/// russenger::actions![Action1, Action2, ...];
-/// ```
-///
-/// # Arguments
-///
-/// * `Action1`, `Action2`, ...: The actions to register. These should be instances of a struct that implements the `Action` trait.
-///
-/// # Example
-///
-/// ```rust
-/// use russenger::models::RussengerUser;
-/// use russenger::prelude::*;
-///
-/// #[action]
-/// async fn Main(res: Res, req: Req) {
-///     // ...
-/// }
-///
-/// #[action]
-/// async fn GetUserInput(res: Res, req: Req) {
-///     // ...
-/// }
-///
-/// #[russenger::main]
-/// async fn main() {
-///     let conn = Database::new().await.conn;
-///     migrate!([RussengerUser], &conn);
-///     russenger::actions![Main, GetUserInput];
-///     russenger::launch().await;
-/// }
-/// ```
-///
-/// In this example, the `Main` and `GetUserInput` actions are registered using the `actions!` macro.
-#[macro_export]
-macro_rules! actions {
-    [$($action:expr),* $(,)?] => {
-        use russenger::{Action, ACTION_REGISTRY};
-        $(ACTION_REGISTRY.lock().await.insert($action.path(), Box::new($action));)*
-    };
 }

@@ -195,4 +195,8 @@ impl Req {
             host: host.to_owned(),
         }
     }
+
+    pub fn new_from(self, data: Data) -> Self {
+        Self { data, ..self }
+    }
 }

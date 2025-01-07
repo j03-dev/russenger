@@ -196,6 +196,49 @@ impl Req {
         }
     }
 
+    /// Create new data from data
+    /// this method create new update version of the actualy Req
+    ///
+    /// Example
+    ///
+    /// ```rust
+    /// use russenger::prelude::*;
+    ///
+    /// #[action]
+    /// async fn home(res: Res, req: Req) -> Result<()> {
+    ///     let user_input: String = req.data.get_value();
+    ///     res.send(TextMode::new(&req.user, &format!("get user input {}", user_input))).await?;
+    ///     let req = req.new_from(Data::new(user_input));
+    ///     next_action(res, req).await?; // send the user_input to next_action
+    ///     Ok(())
+    /// }
+    ///
+    ///
+    /// #[action]
+    /// async fn next_action(res: Res, req: Req) -> Result<()> {
+    ///     let user_input: String = req.data.get_value(); // get data from data: set by home action
+    ///     res.send(TextMode::new(&req.user, &format!("sended user input {}", user_input))).await?;
+    ///     Ok(())
+    /// }
+    ///
+    ///
+    /// #[russenger::main]
+    /// async fn main() -> Result<()> {
+    ///     let mut app = App::init().await?;
+    ///     app.add("/", |res: Res, req: Req| {
+    ///         Box::pin(async move {
+    ///              res.send(TextModel::new(&req.user, "Hello")).await?;
+    ///              res.redirect("/home").await;
+    ///              Ok(())
+    ///         })
+    ///     });
+    ///     app.add("/home", home).await;
+    ///     app.add("/next_action", next_action).await;
+    ///     launch(app).await?;
+    ///     Ok(())
+    /// }
+    ///
+    /// ```
     pub fn new_from(self, data: Data) -> Self {
         Self { data, ..self }
     }

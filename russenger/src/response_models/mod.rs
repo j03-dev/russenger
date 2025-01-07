@@ -48,6 +48,7 @@ pub mod button;
 pub mod generic;
 pub mod get_started;
 pub mod media;
+pub mod next;
 pub mod payload;
 pub mod persistent_menu;
 pub mod quick_replies;
@@ -156,6 +157,15 @@ pub mod data {
         pub fn new_with_page<T: Serialize>(value: T, page: Option<Page>) -> Self {
             let value = serde_json::to_string(&value).unwrap_or_default().verify();
             Self { value, page }
+        }
+
+        pub fn next(&self) -> Self {
+            let mut page = self.page.clone().unwrap_or_default();
+            page.next();
+            Self {
+                page: Some(page),
+                ..self.clone()
+            }
         }
 
         /// Deserializes the value of the data into a specified type.

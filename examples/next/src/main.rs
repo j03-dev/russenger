@@ -24,8 +24,8 @@ async fn index(res: Res, req: Req) -> Result<()> {
     }
 
     let generic = GenericModel::new(&req.user, elements, req.data.get_page());
-    res.send(generic).await?; // Send only 10 element
-    send_next("/", res, req).await?;
+    res.send(generic).await?; // Send only 10 elements
+    res.send(NextModel::new(&req.user, req.data, "/")).await?; // send next 10 elements
     Ok(())
 }
 

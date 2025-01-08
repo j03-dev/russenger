@@ -98,4 +98,8 @@ impl App {
     pub async fn add(&mut self, path: &str, action: Action) {
         self.router.lock().await.insert(path.to_owned(), action);
     }
+
+    pub async fn attach(&mut self, router: Router) {
+        self.router.lock().await.extend(router);
+    }
 }

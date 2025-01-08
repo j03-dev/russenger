@@ -35,7 +35,12 @@
 //! }
 //! ```
 pub use crate::action;
-pub use crate::core::{action::Action, app::App, request::Req, response::Res};
+pub use crate::core::{
+    action::{Action, Add, Router},
+    app::App,
+    request::Req,
+    response::Res,
+};
 pub use crate::error::{self, Result};
 pub use crate::launch;
 pub use crate::response_models::{

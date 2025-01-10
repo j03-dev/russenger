@@ -25,7 +25,7 @@
 //!
 //! # Constants
 //!
-//! * `MAX_VALUE_AUTORIZED`: The maximum value that is authorized.
+//! * `MAX_VALUE_AUTHORIZED`: The maximum value that is authorized.
 //! * `MIN_PAGE`: The minimum page number.
 //! * `MAX_PAGE`: The maximum page number.
 //!
@@ -125,7 +125,7 @@ pub mod data {
     /// ```rust
     /// use russenger::response_models::data::{Data, Page};
     ///
-    /// let data = Data::new("value", Some(Page::default()));
+    /// let data = Data::new_with_page("value", Some(Page::default()));
     /// let value: String = data.get_value();
     /// let page = data.get_page();
     /// ```

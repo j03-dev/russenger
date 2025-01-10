@@ -42,7 +42,7 @@ To create a new project using the Russenger library, you can use the `cargo-gene
 cargo install cargo-generate
 ```
 
-2. Generate a new project:
+1. Generate a new project:
 
 ```bash
 cargo generate --git https://github.com/j03-dev/russenger_template

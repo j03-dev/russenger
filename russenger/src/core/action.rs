@@ -52,14 +52,14 @@ pub type Action = fn(res: Res, req: Req) -> FutureResult;
 ///     res.send(TextModel::new(&req.user, "Welcome!")).await?;
 ///     Ok(())
 /// }
-/// 
+///
 /// async fn group_action() -> Router {
 ///     let mut router: Router = Router::new();
 ///     router.add("/greet", greet_user); // Map "/greet" to the greet_user action
 ///     router
 /// }
-/// 
-///#[russenger::main] 
+///
+///#[russenger::main]
 /// async fn main() -> Result<()> {
 ///     let mut app =  App::init().await?;
 ///     app.add("/", |res: Res ,req: Req| {
@@ -67,7 +67,7 @@ pub type Action = fn(res: Res, req: Req) -> FutureResult;
 ///             res.send(TextModel::new(&req.user, "Hello World")).await?;
 ///             res.redirect("/greet").await?;
 ///             Ok(())
-///         }) 
+///         })
 ///     }).await;
 ///     app.attach(group_action()).await;
 ///     launch(app).await?;
@@ -92,14 +92,14 @@ pub type Router = HashMap<String, Action>;
 ///     res.send(TextModel::new(&req.user, "Welcome!")).await?;
 ///     Ok(())
 /// }
-/// 
+///
 /// async fn group_action() -> Router {
 ///     let mut router: Router = Router::new();
 ///     router.add("/greet", greet_user); // Map "/greet" to the greet_user action
 ///     router
 /// }
-/// 
-///#[russenger::main] 
+///
+///#[russenger::main]
 /// async fn main() -> Result<()> {
 ///     let mut app =  App::init().await?;
 ///     app.add("/", |res: Res ,req: Req| {
@@ -107,7 +107,7 @@ pub type Router = HashMap<String, Action>;
 ///             res.send(TextModel::new(&req.user, "Hello World")).await?;
 ///             res.redirect("/greet").await?;
 ///             Ok(())
-///         }) 
+///         })
 ///     }).await;
 ///     app.attach(group_action()).await;
 ///     launch(app).await?;
@@ -125,13 +125,13 @@ pub trait Add {
     ///
     /// ```rust
     /// use russenger::prelude::*;
-    /// 
-    /// #[action] 
+    ///
+    /// #[action]
     /// async fn my_action(_res: Res, _req: Req) -> Result<()> {
     ///    Ok(())
     /// }
-    /// 
-    /// #[russenger::main] 
+    ///
+    /// #[russenger::main]
     /// async fn main() -> Result<()> {
     ///     let mut router: Router = Router::new();
     ///     router.add("/path", |_res: Res, _req: Req| {
@@ -145,7 +145,7 @@ pub trait Add {
     ///     launch(app).await?;
     ///     Ok(())
     /// }
-    ///  
+    ///
     /// ```
     fn add(&mut self, path: &str, action: Action);
 }

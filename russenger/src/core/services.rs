@@ -112,8 +112,8 @@ pub async fn webhook_core(
                 eprintln!("Error handling postback: {:?}", e);
             }
         }
+        app_state.action_lock.unlock(user).await;
     }
-    app_state.action_lock.unlock(user).await;
 
     HttpResponse::Ok().finish()
 }

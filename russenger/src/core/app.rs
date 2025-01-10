@@ -92,6 +92,7 @@ impl App {
     ///         })
     ///     }).await;
     ///     app.add("/get_user_input", get_user_input).await;
+    ///     launch(app).await?;
     ///     Ok(())
     /// }
     /// ````
@@ -99,6 +100,47 @@ impl App {
         self.router.lock().await.insert(path.to_owned(), action);
     }
 
+    /// `attach` method allows you to add a group of predefined routes (actions) to the application's router.
+    ///
+    /// # Parameters
+    /// - `router`: A `Router` instance containing a set of routes to be attached.
+    ///
+    /// #  Examples
+    ///
+    /// ```rust
+    /// use russenger::prelude::*;
+    ///
+    /// #[action]
+    /// async fn index(res: Res, req: Req) -> Result<()> {
+    ///     res.send(TextModel::new(&req.user, "hello world")).await?;
+    ///     res.redirect("/next_action").await?;
+    ///     Ok(())
+    /// }
+    ///
+    /// #[action]
+    /// async fn next_action(res: Res, req: Req) -> Result<()> {
+    ///     let message: String = req.data.get_value();
+    ///     res.send(TextModel::new(&req.user, &message)).await?; // send the message to the user
+    ///     Ok(())
+    /// }
+    ///
+    /// pub fn group_actions() -> Router {
+    ///     let mut router = Router::new();
+    ///     router.add("/", index);
+    ///     router.add("/next_action", next_action);
+    ///     router
+    /// }
+    ///
+    /// #[russenger::main]
+    /// async fn main() -> Result<()> {
+    ///     let mut app = App::init().await?;
+    ///     app.attach(group_actions()).await; // Attach group actions to the application's router
+    ///     launch(app).await?;
+    ///     Ok(())
+    /// }
+    /// ```
+    ///
+    /// This method is useful for organizing your application's routes into modular and reusable groups.
     pub async fn attach(&mut self, router: Router) {
         self.router.lock().await.extend(router);
     }

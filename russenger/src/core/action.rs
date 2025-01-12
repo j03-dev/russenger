@@ -136,7 +136,7 @@ pub trait Add {
     ///     let mut router: Router = Router::new();
     ///     router.add("/path", |_res: Res, _req: Req| {
     ///         Box::pin(async move {
-    ///         Ok(())
+    ///             Ok(())
     ///         })
     ///     });
     ///     router.add("/my_action", my_action).await;
@@ -158,4 +158,3 @@ impl Add for Router {
         self.insert(path.to_owned(), action);
     }
 }
-

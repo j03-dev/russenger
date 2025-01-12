@@ -14,7 +14,7 @@ To get started with the Russenger library, you'll need to install it as a depend
 
 ```toml
 [dependencies]
-russenger = { version = "0.3.4-rc", features = ["postgres"] } # features 'sqlite, postgres, mysql'
+russenger = { version = "0.3.5-rc", features = ["postgres"] } # features 'sqlite, postgres, mysql'
 actix-web = "4"
 sqlx = "^0.8.0"
 ```
@@ -135,7 +135,7 @@ async fn print_color(res: Res, req: Req) -> Result<()> {
 }
 
 #[russenger::main]
-async fn main() -> error::Result<()> {
+async fn main() -> Result<()> {
     let database = Database::new().await?;
     let conn = database.conn;
 
@@ -147,7 +147,7 @@ async fn main() -> error::Result<()> {
     app.add("/get_user_input", get_user_input).await;
     app.add("/print", print_color).await;
 
-    russenger::launch(app).await?;
+    launch(app).await?;
 
     Ok(())
 }
@@ -178,7 +178,7 @@ async fn index(res: Res, req: Req) {
 }
 
 #[action]
-async fn next(res: Res, req: Req) {
+async fn next(res: Res, req: Req) -> Result<()> {
     let option: String = req.data.get_value();
     res.send(TextModel::new(&req.user, &format!("You chose: {}", option)))
         .await?;
@@ -186,7 +186,7 @@ async fn next(res: Res, req: Req) {
 }
 
 #[russenger::main]
-async fn main() -> error::Result<()> {
+async fn main() -> Result<()> {
     let database = Database::new().await?;
     let conn = database.conn;
     migrate!([RussengerUser], &conn);
@@ -195,7 +195,7 @@ async fn main() -> error::Result<()> {
     app.add("/", index).await;
     app.add("/next", next).await;
 
-    russenger::launch(app).await?;
+    launch(app).await?;
     Ok(())
 }
 ```

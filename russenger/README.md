@@ -12,7 +12,7 @@
 
 - **ORM Integration:** Built-in support for [rusql-alchemy](https://github.com/j03-dev/rusql-alchemy).
 - **Facebook Verify Token Support:** Automatically handles token verification at the `/webhook` endpoint when you start the application.
-- Response Types Supported:
+- **Response Types Supported**:
   - Text Messages
   - GenericModel
   - QuickReply

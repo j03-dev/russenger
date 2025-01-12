@@ -25,7 +25,7 @@
 //!
 //! # Constants
 //!
-//! * `MAX_VALUE_AUTORIZED`: The maximum value that is authorized.
+//! * `MAX_VALUE_AUTHORIZED`: The maximum value that is authorized.
 //! * `MIN_PAGE`: The minimum page number.
 //! * `MAX_PAGE`: The maximum page number.
 //!
@@ -48,6 +48,7 @@ pub mod button;
 pub mod generic;
 pub mod get_started;
 pub mod media;
+pub mod next;
 pub mod payload;
 pub mod persistent_menu;
 pub mod quick_replies;
@@ -124,7 +125,7 @@ pub mod data {
     /// ```rust
     /// use russenger::response_models::data::{Data, Page};
     ///
-    /// let data = Data::new("value", Some(Page::default()));
+    /// let data = Data::new_with_page("value", Some(Page::default()));
     /// let value: String = data.get_value();
     /// let page = data.get_page();
     /// ```
@@ -156,6 +157,15 @@ pub mod data {
         pub fn new_with_page<T: Serialize>(value: T, page: Option<Page>) -> Self {
             let value = serde_json::to_string(&value).unwrap_or_default().verify();
             Self { value, page }
+        }
+
+        pub fn next(&self) -> Self {
+            let mut page = self.page.clone().unwrap_or_default();
+            page.next();
+            Self {
+                page: Some(page),
+                ..self.clone()
+            }
         }
 
         /// Deserializes the value of the data into a specified type.

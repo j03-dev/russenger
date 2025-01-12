@@ -18,6 +18,7 @@
   - QuickReply
   - Media
   - Actions (e.g., TypingOn/TypingOff)
+  - PersistentMenu
 
 ## Getting Started
 

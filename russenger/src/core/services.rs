@@ -85,20 +85,20 @@ pub async fn webhook_core(
     if app_state.action_lock.lock(user).await {
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {
-                let payload = quick_reply.get_payload();
-                let message_payload = Message::Payload(user, payload, host, query);
-                let result = handle(message_payload, &app_state.router).await;
+                let quick_reply_payload = quick_reply.get_payload();
+                let payload = Message::Payload(user, quick_reply_payload, host, query);
+                let result = handle(payload, &app_state.router).await;
                 result.unwrap_or_else(|err| eprintln!("Error handling payload: {:?}", err))
             } else {
                 let text = message.get_text();
-                let message_text_message = Message::TextMessage(user, &text, host, query);
-                let result = handle(message_text_message, &app_state.router).await;
+                let text_message = Message::TextMessage(user, &text, host, query);
+                let result = handle(text_message, &app_state.router).await;
                 result.unwrap_or_else(|err| eprintln!("Error handling text message: {err:?}"))
             }
         } else if let Some(postback) = data.get_postback() {
-            let payload = postback.get_payload();
-            let message_playlaod = Message::Payload(user, payload, host, query);
-            let result = handle(message_playlaod, &app_state.router).await;
+            let postback_playload = postback.get_payload();
+            let payload = Message::Payload(user, postback_playload, host, query);
+            let result = handle(payload, &app_state.router).await;
             result.unwrap_or_else(|err| eprintln!("Error handling postback: {err:?}"))
         }
         app_state.action_lock.unlock(user).await;

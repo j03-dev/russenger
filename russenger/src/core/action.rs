@@ -6,8 +6,8 @@
 
 use std::{collections::HashMap, future::Future, pin::Pin};
 
-pub use crate::core::{request::Req, response::Res};
-use anyhow::Result;
+use crate::core::{request::Req, response::Res};
+use crate::error::Result;
 
 /// A boxed Future representing the return type of asynchronous action.
 ///

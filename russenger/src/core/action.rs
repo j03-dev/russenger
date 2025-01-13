@@ -158,3 +158,14 @@ impl Add for Router {
         self.insert(path.to_owned(), action);
     }
 }
+
+#[macro_export]
+macro_rules! router {
+    ( $( $path:expr, $action:expr ),* $(,)? ) => {
+        let mut router = russenger::prelude::Router::new();
+        $(
+            router.add($path, $action);
+        )*
+        router
+    };
+}

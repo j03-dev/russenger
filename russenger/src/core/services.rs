@@ -51,7 +51,7 @@ async fn handle(
             let action = router
                 .get(&path)
                 .context("Action not found in the router")
-                .map_err(|err| format!("Error finding action: {err}, path: {path}"))?;
+                .map_err(|err| format!("{err}, path: {path}"))?;
             action(res, req).await?
         }
         Message::TextMessage(user, text_message, host, query) => {
@@ -62,7 +62,7 @@ async fn handle(
             let action = router
                 .get(&path)
                 .context("Action not found in the router")
-                .map_err(|err| format!("Error finding action: {err}, path: {path}"))?;
+                .map_err(|err| format!("{err}, path: {path}"))?;
             action(res, req).await?
         }
     }

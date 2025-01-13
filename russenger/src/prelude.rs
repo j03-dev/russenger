@@ -57,4 +57,5 @@ pub use crate::response_models::{
     text::TextModel,
     ResponseModel,
 };
+pub use crate::router;
 pub use crate::rusql_alchemy::{self, prelude::*};

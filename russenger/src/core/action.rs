@@ -162,10 +162,12 @@ impl Add for Router {
 #[macro_export]
 macro_rules! router {
     ( $( $path:expr, $action:expr ),* $(,)? ) => {
-        let mut router = russenger::prelude::Router::new();
-        $(
-            router.add($path, $action);
-        )*
-        router
+        {
+            let mut router = russenger::prelude::Router::new();
+            $(
+                router.add($path, $action);
+            )*
+            router
+        }
     };
 }

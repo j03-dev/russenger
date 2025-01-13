@@ -156,7 +156,7 @@ pub mod error {
 
 pub use anyhow;
 pub use dotenv::dotenv;
-use error::{Context, Result};
+use error::Result;
 pub use rusql_alchemy;
 pub use russenger_macro::action;
 
@@ -184,11 +184,9 @@ async fn run_server(app: App) -> Result<()> {
             .service(webhook_core)
             .service(fs::Files::new("/static", "static").show_files_listing())
     })
-    .bind((host, port))
-    .context("Failed to run this server: pls check the port if it's already used!")?
+    .bind((host, port))?
     .run()
-    .await
-    .context("sever is crashed")?;
+    .await?;
     Ok(())
 }
 

@@ -29,11 +29,11 @@
 //!
 //! #[derive(FromRow, Clone, Model)]
 //! pub struct Register {
-//!     #[model(primary_key = true, auto_increment = true, null = false)]
+//!     #[model(primary_key = true, auto_increment = true)]
 //!     pub id: Integer,
-//!     #[model(foreign_key = "RussengerUser.facebook_user_id", unique = true, null = false)]
+//!     #[model(foreign_key = "RussengerUser.facebook_user_id", unique = true)]
 //!     pub user_id: String,
-//!     #[model(size = 30, unique = true, null = false)]
+//!     #[model(size = 30, unique = true)]
 //!     pub username: String,
 //! }
 //!

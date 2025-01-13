@@ -7,8 +7,7 @@ pub struct Register {
     pub id: Serial,
     #[model(
         foreign_key = "RussengerUser.facebook_user_id",
-        unique = true,
-        null = false
+        unique = true
     )]
     pub user_id: String,
 

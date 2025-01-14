@@ -44,6 +44,7 @@ impl ActionLock {
 pub struct App {
     pub(crate) query: Query,
     pub(crate) router: Arc<Mutex<Router>>,
+    pub(crate) tmp_router: Router,
     pub(crate) action_lock: ActionLock,
 }
 
@@ -57,6 +58,7 @@ impl App {
             action_lock: ActionLock {
                 locked_users: Arc::new(Mutex::new(HashSet::new())),
             },
+            tmp_router: Router::new(),
         })
     }
 
@@ -102,7 +104,7 @@ impl App {
     ///
     /// This method is useful for organizing your application's routes into modular and reusable groups.
     pub async fn attach(&mut self, router: Router) -> &mut Self {
-        self.router.lock().await.extend(router);
+        self.tmp_router.extend(router);
         self
     }
 }

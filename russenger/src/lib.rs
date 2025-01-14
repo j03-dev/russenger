@@ -190,8 +190,13 @@ async fn run_server(app: App) -> Result<()> {
     Ok(())
 }
 
-pub async fn launch(app_state: App) -> Result<()> {
+pub async fn launch(app_state: &mut App) -> Result<()> {
     dotenv().ok();
-    run_server(app_state).await?;
+    app_state
+        .router
+        .lock()
+        .await
+        .extend(app_state.tmp_router.clone());
+    run_server(app_state.clone()).await?;
     Ok(())
 }

@@ -28,7 +28,6 @@
 //! ```
 
 pub mod action;
-pub mod app;
 pub mod request;
 pub mod request_handler;
 pub mod response;

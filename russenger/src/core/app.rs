@@ -9,7 +9,7 @@ use crate::query::Query;
 use anyhow::Result;
 use tokio::sync::Mutex;
 
-use super::action::{Action, Router};
+use super::action::Router;
 
 #[derive(Clone)]
 pub struct ActionLock {
@@ -60,46 +60,6 @@ impl App {
         })
     }
 
-    /// `add` is method to add action(handler) to router
-    ///
-    /// # Parameters
-    /// * `path: &str` - The key of the action
-    /// * `action: Action` - The action handler
-    ///
-    /// Examples
-    ///
-    /// add new action on app
-    ///
-    /// ```rust
-    /// use russenger::prelude::*;
-    /// #[action]
-    /// async fn get_user_input(res: Res, req: Req) -> Result<()> {
-    ///     let name: String = req.data.get_value();
-    ///     let message = format!("Hello {name}");
-    ///     res.send(TextModel::new(&req.user, &message)).await?;
-    ///     Ok(())
-    /// }
-    ///
-    /// #[russenger::main]
-    /// async fn main() -> Result<()> {
-    ///     let mut app = App::init().await?;
-    ///     app.add("/", |res: Res, req: Req| {
-    ///         Box::pin(async move {
-    ///             res.send(GetStartedButtonModel::new(Payload::default())).await?;
-    ///             res.send(TextModel::new(&req.user, "Hello World")).await?;
-    ///             res.redirect("/get_user_input").await?;
-    ///             Ok(())
-    ///         })
-    ///     }).await;
-    ///     app.add("/get_user_input", get_user_input).await;
-    ///     launch(app).await?;
-    ///     Ok(())
-    /// }
-    /// ````
-    pub async fn add(&mut self, path: &str, action: Action) {
-        self.router.lock().await.insert(path.to_owned(), action);
-    }
-
     /// `attach` method allows you to add a group of predefined routes (actions) to the application's router.
     ///
     /// # Parameters
@@ -141,7 +101,8 @@ impl App {
     /// ```
     ///
     /// This method is useful for organizing your application's routes into modular and reusable groups.
-    pub async fn attach(&mut self, router: Router) {
+    pub async fn attach(&mut self, router: Router) -> &mut Self {
         self.router.lock().await.extend(router);
+        self
     }
 }

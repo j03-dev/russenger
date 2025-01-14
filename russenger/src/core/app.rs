@@ -103,7 +103,7 @@ impl App {
     /// ```
     ///
     /// This method is useful for organizing your application's routes into modular and reusable groups.
-    pub async fn attach(&mut self, router: Router) -> &mut Self {
+    pub fn attach(&mut self, router: Router) -> &mut Self {
         self.tmp_router.extend(router);
         self
     }

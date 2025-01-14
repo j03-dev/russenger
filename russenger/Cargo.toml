@@ -27,7 +27,6 @@ actix-files.workspace = true
 reqwest = { workspace = true, features = ["json"] }
 
 # Async utilities
-async-trait.workspace = true
 tokio.workspace = true
 
 # Database

@@ -133,19 +133,19 @@ pub trait Add {
     ///
     /// #[russenger::main]
     /// async fn main() -> Result<()> {
-    ///     let mut router: Router = Router::new();
-    ///     router.add("/path", |_res: Res, _req: Req| {
-    ///         Box::pin(async move {
-    ///             Ok(())
-    ///         })
-    ///     });
-    ///     router.add("/my_action", my_action).await;
-    ///     let mut app = App::init().await?;
-    ///     app.attach(router).await;
-    ///     launch(app).await?;
+    ///     App::init().await?
+    ///         .attach(
+    ///             router![
+    ///                 ("/path", |res, req| {
+    ///                     Box::pin(async move {
+    ///                         Ok(())
+    ///                     })
+    ///                 }),
+    ///                 ("/my_action", my_action)
+    ///             ])
+    ///         .launch().await?;
     ///     Ok(())
     /// }
-    ///
     /// ```
     fn add(&mut self, path: &str, action: Action);
 }

@@ -1742,7 +1742,6 @@ dependencies = [
  "actix-files",
  "actix-web",
  "anyhow",
- "async-trait",
  "dotenv",
  "reqwest",
  "rusql-alchemy",

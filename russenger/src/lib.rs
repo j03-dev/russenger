@@ -138,35 +138,34 @@
 //!
 //! These examples demonstrate how to define an action, use custom models, and register actions for the main application.
 pub use actix_web::main;
-pub use async_trait::async_trait;
 
 pub mod core;
 pub mod models;
 pub mod prelude;
 pub mod query;
 pub mod response_models;
+pub mod error {
+    pub use anyhow::*;
+}
 
 pub use core::{
     action::Router,
     services::{webhook_core, webhook_verify}, // core services
 };
-pub mod error {
-    pub use anyhow::*;
-}
 
 pub use anyhow;
 pub use dotenv::dotenv;
-use error::Result;
 pub use rusql_alchemy;
 pub use russenger_macro::action;
 
+use error::Result;
+use query::Query;
+
 use actix_files as fs;
 use actix_web::{web, App as ActixApp, HttpServer};
+use tokio::sync::Mutex;
 
 use std::{collections::HashSet, sync::Arc};
-
-use crate::query::Query;
-use tokio::sync::Mutex;
 
 #[derive(Clone)]
 pub struct ActionLock {
@@ -244,17 +243,17 @@ impl App {
     /// }
     ///
     /// pub fn group_actions() -> Router {
-    ///     let mut router = Router::new();
-    ///     router.add("/", index);
-    ///     router.add("/next_action", next_action);
-    ///     router
+    ///     router![
+    ///        ("/", index),
+    ///        ("/next_action", next_action),
+    ///     ]
     /// }
     ///
     /// #[russenger::main]
     /// async fn main() -> Result<()> {
-    ///     let mut app = App::init().await?;
-    ///     app.attach(group_actions()).await; // Attach group actions to the application's router
-    ///     launch(app).await?;
+    ///     App::init().await?
+    ///         .attach(group_actions()).await; // Attach group actions to the application's router
+    ///         .launch().await?;
     ///     Ok(())
     /// }
     /// ```

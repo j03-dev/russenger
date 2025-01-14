@@ -124,14 +124,17 @@
 //!     migrate!([RussengerUser], &conn);
 //!
 //!     // Register the actions for the main application
-//!     let mut app = App::init().await?;
-//!     app.add("/", index).await;
-//!     app.add("/signup", signup).await;
-//!     app.add("/get_user_input", get_user_input).await;
-//!     app.add("/next_action", next_action).await;
-//!
-//!     // Launch the main application
-//!     launch(app).await?;
+//!     App::init().await?
+//!        .attach(
+//!             router![
+//!                 ("/", index),
+//!                 ("/signup", signup),
+//!                 ("/get_user_input", get_user_input),
+//!                 ("/next_action", next_action)
+//!             ]
+//!         )
+//!         .launch()
+//!         .await?;
 //!     Ok(())
 //! }
 //! ```

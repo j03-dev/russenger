@@ -45,11 +45,13 @@
 //!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
 //!
-//!     let mut app = App::init().await?;
-//!     app.add("/", index).await;
-//!     app.add("/get_user_input", index).await;
-//!     launch(app).await?;
-//!
+//!     App::init().await?
+//!         .attach(router![
+//!             ("/index", index),
+//!             ("/get_user_input", get_user_input)
+//!         ])
+//!         .launch()
+//!         .await?;
 //!     Ok(())
 //! }
 //! ```
@@ -158,10 +160,14 @@ impl Query {
     /// async fn main() -> Result<()> {
     ///     let conn = Database::new().await?.conn;
     ///     migrate!([RussengerUser], &conn);
-    ///     let mut app = App::init().await?;
-    ///     app.add("/", index).await;
-    ///     app.add("/get_user_input", get_user_input).await;
-    ///     launch(app).await?;
+    ///     App::init().await
+    ///         .attach(
+    ///             router![(
+    ///                 ("/", index),
+    ///                 ("/get_user_input", get_user_input),
+    ///             )])
+    ///         .launch()
+    ///         .await?;
     ///     Ok(())
     /// }
     /// ```

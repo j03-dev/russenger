@@ -46,31 +46,30 @@ pub type Action = fn(res: Res, req: Req) -> FutureResult;
 /// ```rust
 /// use russenger::prelude::*;
 ///
-///
 /// #[action]
 /// async fn greet_user(res: Res, req: Req) -> Result<()> {
 ///     res.send(TextModel::new(&req.user, "Welcome!")).await?;
 ///     Ok(())
 /// }
 ///
-/// async fn group_action() -> Router {
-///     let mut router: Router = Router::new();
-///     router.add("/greet", greet_user); // Map "/greet" to the greet_user action
-///     router
+/// fn group_action() -> Router {
+///     router![("/greet", greet_user)]
 /// }
 ///
-///#[russenger::main]
+/// #[russenger::main]
 /// async fn main() -> Result<()> {
-///     let mut app =  App::init().await?;
-///     app.add("/", |res: Res ,req: Req| {
-///         Box::pin(async move {
-///             res.send(TextModel::new(&req.user, "Hello World")).await?;
-///             res.redirect("/greet").await?;
-///             Ok(())
-///         })
-///     }).await;
-///     app.attach(group_action()).await;
-///     launch(app).await?;
+///     App::init()
+///         .await?
+///         .attach(router![("/", |res, req| {
+///                 Box::pin(async move {
+///                     res.send(TextModel::new(&req.user, "Hello World")).await?;
+///                     res.redirect("/greet").await?;
+///                     Ok(())
+///                 })
+///             })])
+///         .attach(group_action())
+///         .launch()
+///         .await?;
 ///     Ok(())
 /// }
 /// ```
@@ -94,25 +93,24 @@ pub type Router = HashMap<String, Action>;
 /// }
 ///
 /// async fn group_action() -> Router {
-///     let mut router: Router = Router::new();
-///     router.add("/greet", greet_user); // Map "/greet" to the greet_user action
-///     router
+///     router![("greet", greet_user)]
 /// }
 ///
 ///#[russenger::main]
 /// async fn main() -> Result<()> {
-///     let mut app =  App::init().await?;
-///     app.add("/", |res: Res ,req: Req| {
-///         Box::pin(async move {
-///             res.send(TextModel::new(&req.user, "Hello World")).await?;
-///             res.redirect("/greet").await?;
-///             Ok(())
-///         })
-///     }).await;
-///     app.attach(group_action()).await;
-///     launch(app).await?;
+///     App::init().await?
+///         .attach(router![("/", |res, req| {
+///             Box::pin(async move {
+///                 res.send(TextModel::new(&req.user, "Hello World")).await?;
+///                 res.redirect("/greet").await?;
+///                 Ok(())
+///             })
+///         })])
+///         .attach(group_action())
+///         .launch()
+///         .await?;
 ///     Ok(())
-/// }// router.add("/greet", greet_user); // Add the route "/greet" to the router
+/// }
 /// ```
 pub trait Add {
     /// Add a route to the router.
@@ -125,25 +123,21 @@ pub trait Add {
     ///
     /// ```rust
     /// use russenger::prelude::*;
-    ///
+    /// 
     /// #[action]
     /// async fn my_action(_res: Res, _req: Req) -> Result<()> {
-    ///    Ok(())
+    ///     Ok(())
     /// }
-    ///
     /// #[russenger::main]
     /// async fn main() -> Result<()> {
-    ///     App::init().await?
-    ///         .attach(
-    ///             router![
-    ///                 ("/path", |res, req| {
-    ///                     Box::pin(async move {
-    ///                         Ok(())
-    ///                     })
-    ///                 }),
-    ///                 ("/my_action", my_action)
-    ///             ])
-    ///         .launch().await?;
+    ///     App::init()
+    ///         .await?
+    ///         .attach(router![
+    ///             ("/path", |_res, _req| { Box::pin(async move { Ok(()) }) }),
+    ///             ("/my_action", my_action)
+    ///         ])
+    ///         .launch()
+    ///         .await?;
     ///     Ok(())
     /// }
     /// ```

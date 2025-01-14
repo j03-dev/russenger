@@ -68,7 +68,7 @@ async fn index(res: Res, req: Req) -> Result<()> {
             payload: Payload::new("/hello_world", None),
         }],
     ))
-    .await?;
+        .await?;
 
     Ok(())
 }
@@ -105,10 +105,11 @@ async fn main() -> Result<()> {
     let conn = Database::new().await?.conn;
     migrate!([RussengerUser], &conn);
 
-    let mut app = App::init().await?;
-    app.add("/", index).await;
-    app.add("/ask_gemini", ask_gemini).await;
-    launch(app).await?;
+    App::init()
+        .await?
+        .attach(router![("/", index), ("/ask_gemini", ask_gemini)])
+        .launch()
+        .await?;
 
     Ok(())
 }

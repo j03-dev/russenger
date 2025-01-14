@@ -190,7 +190,7 @@ async fn run_server(app: App) -> Result<()> {
     Ok(())
 }
 
-pub async fn launch(app_state: &mut App) -> Result<()> {
+pub async fn launch(app_state: App) -> Result<()> {
     dotenv().ok();
     app_state
         .router

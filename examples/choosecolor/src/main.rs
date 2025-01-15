@@ -5,10 +5,7 @@ use russenger::prelude::*;
 pub struct Register {
     #[model(primary_key = true)]
     pub id: Serial,
-    #[model(
-        foreign_key = "RussengerUser.facebook_user_id",
-        unique = true
-    )]
+    #[model(foreign_key = "RussengerUser.facebook_user_id", unique = true)]
     pub user_id: String,
 
     #[model(size = 30, unique = true)]
@@ -83,14 +80,16 @@ async fn main() -> Result<()> {
     let conn = Database::new().await?.conn;
     migrate!([RussengerUser, Register], &conn);
 
-    App::init().await?.attach(router![
-      
-    ("/", index),
-    ("/signup", signup),
-    ("/get_user_input", get_user_input),
-    ("/next_action", next_action),
-   ])
-        .launch().await?;
+    App::init()
+        .await?
+        .attach(router![
+            ("/", index),
+            ("/signup", signup),
+            ("/get_user_input", get_user_input),
+            ("/next_action", next_action),
+        ])
+        .launch()
+        .await?;
 
     Ok(())
 }

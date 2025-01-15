@@ -160,12 +160,12 @@ impl Query {
     /// async fn main() -> Result<()> {
     ///     let conn = Database::new().await?.conn;
     ///     migrate!([RussengerUser], &conn);
-    ///     App::init().await
+    ///     App::init().await?
     ///         .attach(
-    ///             router![(
-    ///                 ("/", index),
-    ///                 ("/get_user_input", get_user_input),
-    ///             )])
+    ///             router![
+    ///                  ("/",index),
+    ///                  ("/get_user_input", get_user_input) ]
+    ///          )
     ///         .launch()
     ///         .await?;
     ///     Ok(())

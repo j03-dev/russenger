@@ -255,7 +255,7 @@ impl App {
     /// #[russenger::main]
     /// async fn main() -> Result<()> {
     ///     App::init().await?
-    ///         .attach(group_actions()).await; // Attach group actions to the application's router
+    ///         .attach(group_actions()).await // Attach group actions to the application's router
     ///         .launch().await?;
     ///     Ok(())
     /// }

@@ -39,7 +39,7 @@ enum Message<'a> {
 async fn handle(
     message: Message<'_>,
     router: &Arc<Mutex<Router>>,
-) -> std::result::Result<(), Box<dyn std::error::Error>> {
+) -> Result<(), Box<dyn std::error::Error>> {
     match message {
         Message::Payload(user, payload, host, query) => {
             let payload = Payload::from_str(payload).unwrap_or_default();
@@ -99,8 +99,8 @@ pub async fn webhook_core(
                 result.unwrap_or_else(|err| eprintln!("Error handling text message: {:?}", err))
             }
         } else if let Some(postback) = data.get_postback() {
-            let postback_playload = postback.get_payload();
-            let payload = Message::Payload(user, postback_playload, host, query);
+            let postback_payload = postback.get_payload();
+            let payload = Message::Payload(user, postback_payload, host, query);
             let result = handle(payload, &app_state.router).await;
             result.unwrap_or_else(|err| eprintln!("Error handling postback payload: {:?}", err))
         }

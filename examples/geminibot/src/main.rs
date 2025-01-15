@@ -68,7 +68,7 @@ async fn index(res: Res, req: Req) -> Result<()> {
             payload: Payload::new("/hello_world", None),
         }],
     ))
-        .await?;
+    .await?;
 
     Ok(())
 }

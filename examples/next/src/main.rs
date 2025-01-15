@@ -33,8 +33,10 @@ async fn index(res: Res, req: Req) -> Result<()> {
 async fn main() -> Result<()> {
     let conn = Database::new().await?.conn;
     migrate!([RussengerUser], &conn);
-    let mut app = App::init().await?;
-    app.add("/", index).await;
-    launch(app).await.ok();
+    App::init()
+        .await?
+        .attach(router![("/", index)])
+        .launch()
+        .await?;
     Ok(())
 }

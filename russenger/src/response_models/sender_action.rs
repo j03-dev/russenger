@@ -51,8 +51,8 @@
 //!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
 //!     App::init().await?
-//!         attach(router![("/", index)])
-//!         launch().await?;
+//!         .attach(router![("/", index)])
+//!         .launch().await?;
 //!     Ok(())
 //! }
 //! ```

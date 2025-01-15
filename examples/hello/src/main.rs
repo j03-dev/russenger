@@ -23,7 +23,7 @@ async fn start(res: Res, req: Req) -> Result<()> {
             payload: Payload::new("/hello_world", None),
         }],
     ))
-        .await?;
+    .await?;
 
     Ok(())
 }
@@ -42,10 +42,10 @@ async fn main() -> Result<()> {
     App::init()
         .await?
         .attach(router![
-                ("/", index),
-                ("/start", start),
-                ("/hello_world", hello_world)
-            ])
+            ("/", index),
+            ("/start", start),
+            ("/hello_world", hello_world)
+        ])
         .launch()
         .await?;
     Ok(())

@@ -164,7 +164,8 @@ impl Query {
     ///         .attach(
     ///             router![
     ///                  ("/",index),
-    ///                  ("/get_user_input", get_user_input) ]
+    ///                  ("/get_user_input", get_user_input)
+    ///             ]
     ///          )
     ///         .launch()
     ///         .await?;

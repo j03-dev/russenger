@@ -105,8 +105,6 @@ pub async fn webhook_core(
             result.unwrap_or_else(|err| eprintln!("Error handling postback payload: {:?}", err))
         }
         app_state.action_lock.unlock(user).await;
-    } else {
-        return HttpResponse::TooManyRequests().finish();
     }
 
     HttpResponse::Ok().finish()

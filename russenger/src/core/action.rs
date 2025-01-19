@@ -123,7 +123,7 @@ pub trait Add {
     ///
     /// ```rust
     /// use russenger::prelude::*;
-    /// 
+    ///
     /// #[action]
     /// async fn my_action(_res: Res, _req: Req) -> Result<()> {
     ///     Ok(())
@@ -141,15 +141,16 @@ pub trait Add {
     ///     Ok(())
     /// }
     /// ```
-    fn add(&mut self, path: &str, action: Action);
+    fn add(&mut self, path: &str, action: Action) -> Self;
 }
 
 impl Add for Router {
     /// Implementation of the `Add` method for the [`Router`].
     ///
     /// This method inserts the provided path and action into the `HashMap`.
-    fn add(&mut self, path: &str, action: Action) {
+    fn add(&mut self, path: &str, action: Action) -> Self {
         self.insert(path.to_owned(), action);
+        self.clone()
     }
 }
 
@@ -157,11 +158,10 @@ impl Add for Router {
 macro_rules! router {
     ( $( ($path:expr, $action:expr) ),* $(,)? ) => {
         {
-            let mut router = russenger::prelude::Router::new();
+            russenger::prelude::Router::new()
             $(
-                router.add($path, $action);
+                .add($path, $action)
             )*
-            router
         }
     };
 }

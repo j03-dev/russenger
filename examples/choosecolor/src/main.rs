@@ -82,12 +82,13 @@ async fn main() -> Result<()> {
 
     App::init()
         .await?
-        .attach(router![
-            ("/", index),
-            ("/signup", signup),
-            ("/get_user_input", get_user_input),
-            ("/next_action", next_action),
-        ])
+        .attach(
+            Router::new()
+                .add("/", index)
+                .add("/signup", signup)
+                .add("/get_user_input", get_user_input)
+                .add("/next_action", next_action),
+        )
         .launch()
         .await?;
 

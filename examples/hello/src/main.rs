@@ -41,11 +41,12 @@ async fn main() -> Result<()> {
 
     App::init()
         .await?
-        .attach(router![
-            ("/", index),
-            ("/start", start),
-            ("/hello_world", hello_world)
-        ])
+        .attach(
+            Router::new()
+                .add("/", index)
+                .add("/start", start)
+                .add("/hello_world", hello_world),
+        )
         .launch()
         .await?;
     Ok(())

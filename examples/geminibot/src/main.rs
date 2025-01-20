@@ -107,7 +107,7 @@ async fn main() -> Result<()> {
 
     App::init()
         .await?
-        .attach(router![("/", index), ("/ask_gemini", ask_gemini)])
+        .attach(Router::new().add("/", index).add("/ask_gemini", ask_gemini))
         .launch()
         .await?;
 

@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["russenger", "russenger_macro"]
+members = ["russenger", "russenger_macro", "examples/*"]
 
 [workspace.dependencies]
 # Web framework and HTTP handling

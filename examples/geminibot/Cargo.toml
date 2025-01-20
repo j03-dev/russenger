@@ -8,7 +8,7 @@ publish = false
 
 
 [dependencies]
-russenger.workspace = true
+russenger.path = "../../russenger"
 actix-web.workspace = true
 sqlx.workspace = true
 

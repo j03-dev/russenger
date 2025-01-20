@@ -35,7 +35,7 @@ async fn main() -> Result<()> {
     migrate!([RussengerUser], &conn);
     App::init()
         .await?
-        .attach(router![("/", index)])
+        .attach(Router::new().add("/", index))
         .launch()
         .await?;
     Ok(())

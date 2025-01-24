@@ -29,11 +29,11 @@
 //!
 //! #[derive(FromRow, Clone, Model)]
 //! pub struct Register {
-//!     #[model(primary_key = true, auto_increment = true, null = false)]
+//!     #[model(primary_key = true, auto_increment = true)]
 //!     pub id: Integer,
-//!     #[model(foreign_key = "RussengerUser.facebook_user_id", unique = true, null = false)]
+//!     #[model(foreign_key = "RussengerUser.facebook_user_id", unique = true)]
 //!     pub user_id: String,
-//!     #[model(size = 30, unique = true, null = false)]
+//!     #[model(size = 30, unique = true)]
 //!     pub username: String,
 //! }
 //!
@@ -124,44 +124,155 @@
 //!     migrate!([RussengerUser], &conn);
 //!
 //!     // Register the actions for the main application
-//!     let mut app = App::init().await?;
-//!     app.add("/", index).await;
-//!     app.add("/signup", signup).await;
-//!     app.add("/get_user_input", get_user_input).await;
-//!     app.add("/next_action", next_action).await;
-//!
-//!     // Launch the main application
-//!     launch(app).await?;
+//!     App::init().await?
+//!        .attach(
+//!             router![
+//!                 ("/", index),
+//!                 ("/signup", signup),
+//!                 ("/get_user_input", get_user_input),
+//!                 ("/next_action", next_action)
+//!             ]
+//!         )
+//!         .launch()
+//!         .await?;
 //!     Ok(())
 //! }
 //! ```
 //!
 //! These examples demonstrate how to define an action, use custom models, and register actions for the main application.
 pub use actix_web::main;
-pub use async_trait::async_trait;
 
 pub mod core;
 pub mod models;
 pub mod prelude;
 pub mod query;
 pub mod response_models;
-
-pub use core::{
-    app::App,
-    services::{webhook_core, webhook_verify}, // core services
-};
 pub mod error {
     pub use anyhow::*;
 }
 
+pub use core::{
+    action::Router,
+    services::{webhook_core, webhook_verify}, // core services
+};
+
 pub use anyhow;
 pub use dotenv::dotenv;
-use error::{Context, Result};
 pub use rusql_alchemy;
 pub use russenger_macro::action;
 
+use error::Result;
+use query::Query;
+
 use actix_files as fs;
 use actix_web::{web, App as ActixApp, HttpServer};
+use tokio::sync::Mutex;
+
+use std::{collections::HashSet, sync::Arc};
+
+#[derive(Clone)]
+pub struct ActionLock {
+    pub locked_users: Arc<Mutex<HashSet<String>>>,
+}
+
+impl ActionLock {
+    pub async fn lock(&self, user: &str) -> bool {
+        let mut locked_user = self.locked_users.lock().await;
+        if !locked_user.contains(user) {
+            locked_user.insert(user.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub async fn unlock(&self, user: &str) {
+        let mut locked_users = self.locked_users.lock().await;
+        locked_users.remove(user);
+    }
+}
+
+/// # App State
+///
+/// This module contains the `AppState` struct which is used to store the state of the application.
+///
+/// # Fields
+///
+/// * `query`: A `Query` that represents the query made by the user.
+#[derive(Clone)]
+pub struct App {
+    pub(crate) query: Query,
+    pub(crate) router: Arc<Mutex<Router>>,
+    pub(crate) tmp_router: Router,
+    pub(crate) action_lock: ActionLock,
+}
+
+impl App {
+    /// `init` is method to create new `App` instance. in russenger
+    pub async fn init() -> Result<Self> {
+        let query: Query = Query::new().await?;
+        Ok(Self {
+            query,
+            router: Arc::new(Mutex::new(Router::new())),
+            action_lock: ActionLock {
+                locked_users: Arc::new(Mutex::new(HashSet::new())),
+            },
+            tmp_router: Router::new(),
+        })
+    }
+
+    /// `attach` method allows you to add a group of predefined routes (actions) to the application's router.
+    ///
+    /// # Parameters
+    /// - `router`: A `Router` instance containing a set of routes to be attached.
+    ///
+    /// #  Examples
+    ///
+    /// ```rust
+    /// use russenger::prelude::*;
+    ///
+    /// #[action]
+    /// async fn index(res: Res, req: Req) -> Result<()> {
+    ///     res.send(TextModel::new(&req.user, "hello world")).await?;
+    ///     res.redirect("/next_action").await?;
+    ///     Ok(())
+    /// }
+    ///
+    /// #[action]
+    /// async fn next_action(res: Res, req: Req) -> Result<()> {
+    ///     let message: String = req.data.get_value();
+    ///     res.send(TextModel::new(&req.user, &message)).await?; // send the message to the user
+    ///     Ok(())
+    /// }
+    ///
+    /// pub fn group_actions() -> Router {
+    ///     Router::new()
+    ///        .add("/", index)
+    ///        .add("/next_action", next_action)
+    /// }
+    ///
+    /// #[russenger::main]
+    /// async fn main() -> Result<()> {
+    ///     App::init().await?
+    ///         .attach(group_actions()).await // Attach group actions to the application's router
+    ///         .launch().await?;
+    ///     Ok(())
+    /// }
+    /// ```
+    ///
+    /// This method is useful for organizing your application's routes into modular and reusable groups.
+    pub fn attach(&mut self, router: Router) -> Self {
+        self.tmp_router.extend(router);
+        self.clone()
+    }
+
+    pub async fn launch(&self) -> Result<()> {
+        dotenv().ok();
+        self.router.lock().await.extend(self.tmp_router.clone());
+        run_server(self.clone()).await?;
+        Ok(())
+    }
+}
 
 fn print_info(host: &str, port: u16) {
     let url = format!("http://{}:{}", host, port);
@@ -184,16 +295,8 @@ async fn run_server(app: App) -> Result<()> {
             .service(webhook_core)
             .service(fs::Files::new("/static", "static").show_files_listing())
     })
-    .bind((host, port))
-    .context("Failed to run this server: pls check the port if it's already used!")?
+    .bind((host, port))?
     .run()
-    .await
-    .context("sever is crashed")?;
-    Ok(())
-}
-
-pub async fn launch(app_state: App) -> Result<()> {
-    dotenv().ok();
-    run_server(app_state).await?;
+    .await?;
     Ok(())
 }

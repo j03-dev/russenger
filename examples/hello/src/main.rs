@@ -39,11 +39,15 @@ async fn main() -> Result<()> {
     let conn = Database::new().await?.conn;
     migrate!([RussengerUser], &conn);
 
-    let mut app = App::init().await?;
-    app.add("/", index).await;
-    app.add("/start", start).await;
-    app.add("/hello_world", hello_world).await;
-
-    launch(app).await?;
+    App::init()
+        .await?
+        .attach(
+            Router::new()
+                .add("/", index)
+                .add("/start", start)
+                .add("/hello_world", hello_world),
+        )
+        .launch()
+        .await?;
     Ok(())
 }

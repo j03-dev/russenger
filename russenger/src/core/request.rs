@@ -49,10 +49,10 @@
 //! async fn main() -> Result<()> {
 //!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!     let mut app = App::init().await?;
-//!     app.add("/", index).await;
-//!     app.add("/name", name).await;
-//!     launch(app).await?;
+//!     App::init().await?
+//!        .attach(router![("/", index),("/name", name)])
+//!        .launch()
+//!        .await?;
 //!     Ok(())
 //! }
 //! ```
@@ -232,17 +232,19 @@ impl Req {
     ///
     /// #[russenger::main]
     /// async fn main() -> Result<()> {
-    ///     let mut app = App::init().await?;
-    ///     app.add("/", |res: Res, req: Req| {
-    ///         Box::pin(async move {
-    ///             res.send(TextModel::new(&req.user, "Welcome!")).await?;
-    ///             res.redirect("/home").await?;
-    ///             Ok(())
-    ///         })
-    ///     }).await;
-    ///     app.add("/home", home).await;
-    ///     app.add("/next_action", next_action).await;
-    ///     launch(app).await?;
+    ///     App::init().await?
+    ///         .attach(router![
+    ///             ("/", |res, req| {
+    ///                 Box::pin(async move {
+    ///                     res.send(TextModel::new(&req.user, "Welcome!")).await?;
+    ///                     res.redirect("/home").await?;
+    ///                     Ok(())
+    ///                 })
+    ///             })
+    ///         ])
+    ///         .attach(router![("/home", home), ("/next_action", next_action)])
+    ///         .launch()
+    ///         .await?;
     ///     Ok(())
     /// }
     /// ```

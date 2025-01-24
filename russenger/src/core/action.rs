@@ -6,8 +6,8 @@
 
 use std::{collections::HashMap, future::Future, pin::Pin};
 
-pub use crate::core::{request::Req, response::Res};
-use anyhow::Result;
+use crate::core::{request::Req, response::Res};
+use crate::error::Result;
 
 /// A boxed Future representing the return type of asynchronous action.
 ///
@@ -46,31 +46,30 @@ pub type Action = fn(res: Res, req: Req) -> FutureResult;
 /// ```rust
 /// use russenger::prelude::*;
 ///
-///
 /// #[action]
 /// async fn greet_user(res: Res, req: Req) -> Result<()> {
 ///     res.send(TextModel::new(&req.user, "Welcome!")).await?;
 ///     Ok(())
 /// }
 ///
-/// async fn group_action() -> Router {
-///     let mut router: Router = Router::new();
-///     router.add("/greet", greet_user); // Map "/greet" to the greet_user action
-///     router
+/// fn group_action() -> Router {
+///     Router::new().add("/greet", greet_user)
 /// }
 ///
-///#[russenger::main]
+/// #[russenger::main]
 /// async fn main() -> Result<()> {
-///     let mut app =  App::init().await?;
-///     app.add("/", |res: Res ,req: Req| {
-///         Box::pin(async move {
-///             res.send(TextModel::new(&req.user, "Hello World")).await?;
-///             res.redirect("/greet").await?;
-///             Ok(())
-///         })
-///     }).await;
-///     app.attach(group_action()).await;
-///     launch(app).await?;
+///     App::init()
+///         .await?
+///         .attach(router![("/", |res, req| {
+///                 Box::pin(async move {
+///                     res.send(TextModel::new(&req.user, "Hello World")).await?;
+///                     res.redirect("/greet").await?;
+///                     Ok(())
+///                 })
+///             })])
+///         .attach(group_action())
+///         .launch()
+///         .await?;
 ///     Ok(())
 /// }
 /// ```
@@ -94,25 +93,24 @@ pub type Router = HashMap<String, Action>;
 /// }
 ///
 /// async fn group_action() -> Router {
-///     let mut router: Router = Router::new();
-///     router.add("/greet", greet_user); // Map "/greet" to the greet_user action
-///     router
+///     router![("greet", greet_user)]
 /// }
 ///
 ///#[russenger::main]
 /// async fn main() -> Result<()> {
-///     let mut app =  App::init().await?;
-///     app.add("/", |res: Res ,req: Req| {
-///         Box::pin(async move {
-///             res.send(TextModel::new(&req.user, "Hello World")).await?;
-///             res.redirect("/greet").await?;
-///             Ok(())
-///         })
-///     }).await;
-///     app.attach(group_action()).await;
-///     launch(app).await?;
+///     App::init().await?
+///         .attach(router![("/", |res, req| {
+///             Box::pin(async move {
+///                 res.send(TextModel::new(&req.user, "Hello World")).await?;
+///                 res.redirect("/greet").await?;
+///                 Ok(())
+///             })
+///         })])
+///         .attach(group_action())
+///         .launch()
+///         .await?;
 ///     Ok(())
-/// }// router.add("/greet", greet_user); // Add the route "/greet" to the router
+/// }
 /// ```
 pub trait Add {
     /// Add a route to the router.
@@ -128,34 +126,42 @@ pub trait Add {
     ///
     /// #[action]
     /// async fn my_action(_res: Res, _req: Req) -> Result<()> {
-    ///    Ok(())
-    /// }
-    ///
-    /// #[russenger::main]
-    /// async fn main() -> Result<()> {
-    ///     let mut router: Router = Router::new();
-    ///     router.add("/path", |_res: Res, _req: Req| {
-    ///         Box::pin(async move {
-    ///         Ok(())
-    ///         })
-    ///     });
-    ///     router.add("/my_action", my_action).await;
-    ///     let mut app = App::init().await?;
-    ///     app.attach(router).await;
-    ///     launch(app).await?;
     ///     Ok(())
     /// }
-    ///
+    /// #[russenger::main]
+    /// async fn main() -> Result<()> {
+    ///     App::init()
+    ///         .await?
+    ///         .attach(router![
+    ///             ("/path", |_res, _req| { Box::pin(async move { Ok(()) }) }),
+    ///             ("/my_action", my_action)
+    ///         ])
+    ///         .launch()
+    ///         .await?;
+    ///     Ok(())
+    /// }
     /// ```
-    fn add(&mut self, path: &str, action: Action);
+    fn add(&mut self, path: &str, action: Action) -> Self;
 }
 
 impl Add for Router {
     /// Implementation of the `Add` method for the [`Router`].
     ///
     /// This method inserts the provided path and action into the `HashMap`.
-    fn add(&mut self, path: &str, action: Action) {
+    fn add(&mut self, path: &str, action: Action) -> Self {
         self.insert(path.to_owned(), action);
+        self.clone()
     }
 }
 
+#[macro_export]
+macro_rules! router {
+    ( $( ($path:expr, $action:expr) ),* $(,)? ) => {
+        {
+            russenger::prelude::Router::new()
+            $(
+                .add($path, $action)
+            )*
+        }
+    };
+}

@@ -49,10 +49,14 @@
 //! async fn main() -> Result<()> {
 //!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!     let mut app = App::init().await?;
-//!     app.add("/", index).await;
-//!     app.add("/get_user_input", index).await;
-//!     launch(app).await.ok();
+//!     App::init().await?
+//!         .attach(
+//!             router![
+//!                 ("/", index),
+//!                 ("/get_user_input", index)
+//!              ])
+//!         .launch()
+//!         .await?;
 //!     Ok(())
 //! }
 //! ```

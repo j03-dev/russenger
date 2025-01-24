@@ -45,11 +45,13 @@
 //!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
 //!
-//!     let mut app = App::init().await?;
-//!     app.add("/", index).await;
-//!     app.add("/get_user_input", index).await;
-//!     launch(app).await?;
-//!
+//!     App::init().await?
+//!         .attach(router![
+//!             ("/index", index),
+//!             ("/get_user_input", get_user_input)
+//!         ])
+//!         .launch()
+//!         .await?;
 //!     Ok(())
 //! }
 //! ```
@@ -112,7 +114,10 @@ impl Query {
     ///
     /// Returns `true` if the record is successfully created, `false` otherwise.
     pub async fn create(&self, user_id: &str) -> bool {
-        if RussengerUser::get(kwargs!(facebook_user == user_id), &self.conn).await.is_none() {
+        if RussengerUser::get(kwargs!(facebook_user == user_id), &self.conn)
+            .await
+            .is_none()
+        {
             return RussengerUser::create(kwargs!(facebook_user_id = user_id), &self.conn).await;
         }
         true
@@ -155,10 +160,15 @@ impl Query {
     /// async fn main() -> Result<()> {
     ///     let conn = Database::new().await?.conn;
     ///     migrate!([RussengerUser], &conn);
-    ///     let mut app = App::init().await?;
-    ///     app.add("/", index).await;
-    ///     app.add("/get_user_input", get_user_input).await;
-    ///     launch(app).await?;
+    ///     App::init().await?
+    ///         .attach(
+    ///             router![
+    ///                  ("/",index),
+    ///                  ("/get_user_input", get_user_input)
+    ///             ]
+    ///          )
+    ///         .launch()
+    ///         .await?;
     ///     Ok(())
     /// }
     /// ```

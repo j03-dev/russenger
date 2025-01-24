@@ -28,21 +28,18 @@
 //! async fn main() -> Result<()> {
 //!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
-//!     let mut app = App::init().await?;
-//!     app.add("/", index).await;
-//!     launch(app).await?;
+//!     App::init().await?
+//!         .attach(router![("/" index)])
+//!         .launch().await?;
 //!     Ok(())
 //! }
 //! ```
-pub use crate::action;
 pub use crate::core::{
     action::{Action, Add, Router},
-    app::App,
     request::Req,
     response::Res,
 };
 pub use crate::error::{self, Result};
-pub use crate::launch;
 pub use crate::response_models::{
     button::{Button, ButtonModel},
     data::Data,
@@ -57,4 +54,6 @@ pub use crate::response_models::{
     text::TextModel,
     ResponseModel,
 };
+pub use crate::router;
 pub use crate::rusql_alchemy::{self, prelude::*};
+pub use crate::{action, App};

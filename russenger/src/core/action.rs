@@ -53,7 +53,7 @@ pub type Action = fn(res: Res, req: Req) -> FutureResult;
 /// }
 ///
 /// fn group_action() -> Router {
-///     router![("/greet", greet_user)]
+///     Router::new().add("/greet", greet_user)
 /// }
 ///
 /// #[russenger::main]

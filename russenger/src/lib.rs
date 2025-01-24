@@ -246,10 +246,9 @@ impl App {
     /// }
     ///
     /// pub fn group_actions() -> Router {
-    ///     router![
-    ///        ("/", index),
-    ///        ("/next_action", next_action),
-    ///     ]
+    ///     Router::new()
+    ///        .add("/", index)
+    ///        .add("/next_action", next_action)
     /// }
     ///
     /// #[russenger::main]

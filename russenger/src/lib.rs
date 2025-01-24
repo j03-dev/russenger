@@ -266,7 +266,6 @@ impl App {
 
     pub async fn launch(&self) -> Result<()> {
         dotenv().ok();
-        // self.router.lock().await.extend(self.tmp_router.clone());
         run_server(self.clone()).await?;
         Ok(())
     }

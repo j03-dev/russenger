@@ -9,10 +9,9 @@
 //!
 //! * `GET /webhook`: This endpoint verifies the webhook.
 //! * `POST /webhook`: This endpoint handles the webhook core.
-use std::{str::FromStr, sync::Arc};
+use std::str::FromStr;
 
 use actix_web::{dev, get, post, web, HttpResponse};
-use tokio::sync::Mutex;
 
 use super::{
     action::Router, incoming_data::InComingData, request::Req, request_handler::WebQuery,
@@ -36,10 +35,7 @@ enum Message<'a> {
     TextMessage(&'a str, &'a str, &'a str, Query),
 }
 
-async fn handle(
-    message: Message<'_>,
-    router: &Arc<Mutex<Router>>,
-) -> Result<(), Box<dyn std::error::Error>> {
+async fn handle(message: Message<'_>, router: &Router) -> Result<(), Box<dyn std::error::Error>> {
     match message {
         Message::Payload(user, payload, host, query) => {
             let payload = Payload::from_str(payload).unwrap_or_default();
@@ -47,8 +43,6 @@ async fn handle(
             let res = Res::new(user, query.clone());
             let req = Req::new(user, query, data, host);
             let path = payload.get_path();
-
-            let router = router.lock().await;
             let action = router
                 .get(&path)
                 .context("Action not found in the router")
@@ -59,7 +53,6 @@ async fn handle(
             let path = query.get_path(user).await.unwrap_or("/".to_string());
             let res = Res::new(user, query.clone());
             let req = Req::new(user, query, Data::new(text_message), host);
-            let router = router.lock().await;
             let action = router
                 .get(&path)
                 .context("Action not found in the router")

@@ -165,7 +165,7 @@ use error::Result;
 use query::Query;
 
 use actix_files as fs;
-use actix_web::{web, App as ActixApp, HttpServer};
+use actix_web::{middleware::Logger, web, App as ActixApp, HttpServer};
 use tokio::sync::Mutex;
 
 use std::{collections::HashSet, sync::Arc};
@@ -202,7 +202,7 @@ impl ActionLock {
 #[derive(Clone)]
 pub struct App {
     pub(crate) query: Query,
-    pub(crate) router: Router,
+    pub(crate) router: Arc<Router>,
     pub(crate) action_lock: ActionLock,
 }
 
@@ -212,7 +212,7 @@ impl App {
         let query: Query = Query::new().await?;
         Ok(Self {
             query,
-            router: Router::new(),
+            router: Arc::new(Router::new()),
             action_lock: ActionLock {
                 locked_users: Arc::new(Mutex::new(HashSet::new())),
             },
@@ -259,9 +259,11 @@ impl App {
     /// ```
     ///
     /// This method is useful for organizing your application's routes into modular and reusable groups.
-    pub fn attach(&mut self, router: Router) -> Self {
-        self.router.extend(router);
-        self.clone()
+    pub fn attach(mut self, router: Router) -> Self {
+        Arc::get_mut(&mut self.router)
+            .expect("Router already shared")
+            .extend(router);
+        self
     }
 
     pub async fn launch(&self) -> Result<()> {
@@ -271,26 +273,19 @@ impl App {
     }
 }
 
-fn print_info(host: &str, port: u16) {
-    let url = format!("http://{}:{}", host, port);
-    println!("Endpoints:");
-    println!("  GET: {}/webhook - Webhook verification endpoint", url);
-    println!("  POST: {}/webhook - Webhook core endpoint", url);
-}
-
 async fn run_server(app: App) -> Result<()> {
-    let host = std::env::var("HOST").unwrap_or("0.0.0.0".into());
+    let host = std::env::var("HOST").unwrap_or_else(|_| "0.0.0.0".into());
     let port = std::env::var("PORT")
-        .unwrap_or("2453".into())
-        .parse()
+        .ok()
+        .and_then(|p| p.parse().ok())
         .unwrap_or(2453);
-    print_info(&host, port);
     HttpServer::new(move || {
         ActixApp::new()
             .app_data(web::Data::new(app.clone()))
             .service(webhook_verify)
             .service(webhook_core)
             .service(fs::Files::new("/static", "static").show_files_listing())
+            .wrap(Logger::default())
     })
     .bind((host, port))?
     .run()

@@ -9,7 +9,7 @@
 //!
 //! * `GET /webhook`: This endpoint verifies the webhook.
 //! * `POST /webhook`: This endpoint handles the webhook core.
-use std::str::FromStr;
+use std::{str::FromStr, sync::Arc};
 
 use actix_web::{dev, get, post, web, HttpResponse};
 
@@ -35,7 +35,10 @@ enum Message<'a> {
     TextMessage(&'a str, &'a str, &'a str, Query),
 }
 
-async fn handle(message: Message<'_>, router: &Router) -> Result<(), Box<dyn std::error::Error>> {
+async fn handle(
+    message: Message<'_>,
+    router: Arc<Router>,
+) -> Result<(), Box<dyn std::error::Error>> {
     match message {
         Message::Payload(user, payload, host, query) => {
             let payload = Payload::from_str(payload).unwrap_or_default();
@@ -45,8 +48,7 @@ async fn handle(message: Message<'_>, router: &Router) -> Result<(), Box<dyn std
             let path = payload.get_path();
             let action = router
                 .get(&path)
-                .context("Action not found in the router")
-                .map_err(|err| format!("{err}, path: {path}"))?;
+                .with_context(|| format!("Action not found for path: {}", path))?;
             action(res, req).await?
         }
         Message::TextMessage(user, text_message, host, query) => {
@@ -55,8 +57,7 @@ async fn handle(message: Message<'_>, router: &Router) -> Result<(), Box<dyn std
             let req = Req::new(user, query, Data::new(text_message), host);
             let action = router
                 .get(&path)
-                .context("Action not found in the router")
-                .map_err(|err| format!("{err}, path: {path}"))?;
+                .with_context(|| format!("Action not found for path: {}", path))?;
             action(res, req).await?
         }
     }
@@ -81,20 +82,20 @@ pub async fn webhook_core(
             if let Some(quick_reply) = message.get_quick_reply() {
                 let quick_reply_payload = quick_reply.get_payload();
                 let payload = Message::Payload(user, quick_reply_payload, host, query);
-                let result = handle(payload, &app_state.router).await;
+                let result = handle(payload, app_state.router.clone()).await;
                 result.unwrap_or_else(|err| {
                     eprintln!("Error handling quick reply payload: {:?}", err)
                 })
             } else {
                 let text = message.get_text();
                 let text_message = Message::TextMessage(user, &text, host, query);
-                let result = handle(text_message, &app_state.router).await;
+                let result = handle(text_message, app_state.router.clone()).await;
                 result.unwrap_or_else(|err| eprintln!("Error handling text message: {:?}", err))
             }
         } else if let Some(postback) = data.get_postback() {
             let postback_payload = postback.get_payload();
             let payload = Message::Payload(user, postback_payload, host, query);
-            let result = handle(payload, &app_state.router).await;
+            let result = handle(payload, app_state.router.clone()).await;
             result.unwrap_or_else(|err| eprintln!("Error handling postback payload: {:?}", err))
         }
         app_state.action_lock.unlock(user).await;

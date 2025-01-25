@@ -75,44 +75,11 @@ pub type Action = fn(res: Res, req: Req) -> FutureResult;
 /// ```
 pub type Router = HashMap<String, Action>;
 
-/// A trait for adding routes to the [`Router`].
-///
-/// This trait provides the `add` method, simplifying the process of associating paths
-/// with actions in the router.
-///
-/// # Example
-///
-/// ```rust
-/// use russenger::prelude::*;
-///
-///
-/// #[action]
-/// async fn greet_user(res: Res, req: Req) -> Result<()> {
-///     res.send(TextModel::new(&req.user, "Welcome!")).await?;
-///     Ok(())
-/// }
-///
-/// async fn group_action() -> Router {
-///     router![("greet", greet_user)]
-/// }
-///
-///#[russenger::main]
-/// async fn main() -> Result<()> {
-///     App::init().await?
-///         .attach(router![("/", |res, req| {
-///             Box::pin(async move {
-///                 res.send(TextModel::new(&req.user, "Hello World")).await?;
-///                 res.redirect("/greet").await?;
-///                 Ok(())
-///             })
-///         })])
-///         .attach(group_action())
-///         .launch()
-///         .await?;
-///     Ok(())
-/// }
-/// ```
 pub trait Add {
+    fn add(&mut self, path: &str, action: Action) -> Self;
+}
+
+impl Add for Router {
     /// Add a route to the router.
     ///
     /// # Parameters
@@ -132,22 +99,16 @@ pub trait Add {
     /// async fn main() -> Result<()> {
     ///     App::init()
     ///         .await?
-    ///         .attach(router![
-    ///             ("/path", |_res, _req| { Box::pin(async move { Ok(()) }) }),
-    ///             ("/my_action", my_action)
-    ///         ])
+    ///         .attach(
+    ///             Router:new()
+    ///                 .add("/path", |_res, _req| { Box::pin(async move { Ok(()) }) })
+    ///                 .add("/my_action", my_action)
+    ///         )
     ///         .launch()
     ///         .await?;
     ///     Ok(())
     /// }
     /// ```
-    fn add(&mut self, path: &str, action: Action) -> Self;
-}
-
-impl Add for Router {
-    /// Implementation of the `Add` method for the [`Router`].
-    ///
-    /// This method inserts the provided path and action into the `HashMap`.
     fn add(&mut self, path: &str, action: Action) -> Self {
         self.insert(path.to_owned(), action);
         self.clone()

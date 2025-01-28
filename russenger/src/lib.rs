@@ -126,12 +126,11 @@
 //!     // Register the actions for the main application
 //!     App::init().await?
 //!        .attach(
-//!             router![
-//!                 ("/", index),
-//!                 ("/signup", signup),
-//!                 ("/get_user_input", get_user_input),
-//!                 ("/next_action", next_action)
-//!             ]
+//!             Router::new()
+//!                 .add("/", index)
+//!                 .add("/signup", signup)
+//!                 .add("/get_user_input", get_user_input)
+//!                 .add("/next_action", next_action)
 //!         )
 //!         .launch()
 //!         .await?;

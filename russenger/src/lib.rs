@@ -158,7 +158,6 @@ pub use core::{
 pub use anyhow;
 pub use dotenv::dotenv;
 pub use rusql_alchemy;
-pub use russenger_macro::action;
 
 use error::Result;
 use query::Query;
@@ -261,7 +260,8 @@ impl App {
     pub fn attach(mut self, router: Router) -> Self {
         Arc::get_mut(&mut self.router)
             .expect("Router already shared")
-            .extend(router);
+            .routes
+            .extend(router.routes);
         self
     }
 

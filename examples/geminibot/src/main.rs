@@ -57,7 +57,6 @@ mod gemini {
     }
 }
 
-#[action]
 async fn index(res: Res, req: Req) -> Result<()> {
     res.send(GetStartedButtonModel::new(Payload::default()))
         .await?;
@@ -73,7 +72,6 @@ async fn index(res: Res, req: Req) -> Result<()> {
     Ok(())
 }
 
-#[action]
 async fn hello_world(res: Res, req: Req) -> Result<()> {
     let text = "Hello, I'm Gemini";
     res.send(TextModel::new(&req.user, text)).await?;
@@ -82,7 +80,6 @@ async fn hello_world(res: Res, req: Req) -> Result<()> {
     Ok(())
 }
 
-#[action]
 async fn ask_gemini(res: Res, req: Req) -> Result<()> {
     let text: String = req.data.get_value();
     match gemini::ask_gemini(text).await {
@@ -107,7 +104,12 @@ async fn main() -> Result<()> {
 
     App::init()
         .await?
-        .attach(Router::new().add("/", index).add("/ask_gemini", ask_gemini))
+        .attach(
+            Router::new()
+            .add("/", index)
+            .add("/hello_world", hello_world)
+            .add("/ask_gemini", ask_gemini)
+        )
         .launch()
         .await?;
 

@@ -47,6 +47,7 @@ async fn handle(
             let req = Req::new(user, query, data, host);
             let path = payload.get_path();
             let action = router
+                .routes
                 .get(&path)
                 .with_context(|| format!("Action not found for path: {}", path))?;
             action(res, req).await?
@@ -56,6 +57,7 @@ async fn handle(
             let res = Res::new(user, query.clone());
             let req = Req::new(user, query, Data::new(text_message), host);
             let action = router
+                .routes
                 .get(&path)
                 .with_context(|| format!("Action not found for path: {}", path))?;
             action(res, req).await?

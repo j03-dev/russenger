@@ -41,5 +41,3 @@ dotenv.workspace = true
 
 # Error handling
 anyhow.workspace = true
-
-russenger_macro.workspace = true

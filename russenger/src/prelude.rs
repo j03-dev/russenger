@@ -35,7 +35,7 @@
 //! }
 //! ```
 pub use crate::core::{
-    action::{Action, Add, Router},
+    action::Router,
     request::Req,
     response::Res,
 };
@@ -56,4 +56,4 @@ pub use crate::response_models::{
 };
 pub use crate::router;
 pub use crate::rusql_alchemy::{self, prelude::*};
-pub use crate::{action, App};
+pub use crate::App;

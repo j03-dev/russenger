@@ -21,16 +21,11 @@ impl Router {
         F: Fn(Res, Req) -> Fut + 'static + Send + Sync,
         Fut: Future<Output = Result<()>> + Send + 'static,
     {
-        let boxed = Box::new(move |res: Res, req: Req| -> FutureResult {
-            Box::pin(action(res, req))
-        });
+        let boxed =
+            Box::new(move |res: Res, req: Req| -> FutureResult { Box::pin(action(res, req)) });
 
         self.routes.insert(path.to_owned(), boxed);
         self
-    }
-
-    pub fn into_map(self) -> HashMap<String, Box<dyn Fn(Res, Req) -> FutureResult + Send + Sync>> {
-        self.routes
     }
 }
 

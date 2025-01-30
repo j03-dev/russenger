@@ -115,7 +115,7 @@ impl Query {
     ///
     /// Returns `true` if the record is successfully created, `false` otherwise.
     pub async fn create(&self, user_id: &str) -> Result<()> {
-        if RussengerUser::get(kwargs!(facebook_user == user_id), &self.conn)
+        if RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
             .await?
             .is_none()
         {

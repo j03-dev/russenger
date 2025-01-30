@@ -53,7 +53,7 @@ async fn handle(
             action(res, req).await?
         }
         Message::TextMessage(user, text_message, host, query) => {
-            let path = query.get_path(user).await.unwrap_or("/".to_string());
+            let path = query.get_path(user).await?.unwrap_or("/".to_string());
             let res = Res::new(user, query.clone());
             let req = Req::new(user, query, Data::new(text_message), host);
             let action = router
@@ -77,7 +77,7 @@ pub async fn webhook_core(
     let user = data.get_sender();
     let host = conn.host();
 
-    query.create(user).await;
+    let _ = query.create(user).await;
 
     if app_state.action_lock.lock(user).await {
         if let Some(message) = data.get_message() {

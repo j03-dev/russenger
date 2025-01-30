@@ -14,7 +14,8 @@ pub struct Register {
 
 async fn index(res: Res, req: Req) -> Result<()> {
     res.send(TextModel::new(&req.user, "Hello!")).await?;
-    if let Some(user_register) = Register::get(kwargs!(user_id == req.user), &req.query.conn).await
+    if let Some(user_register) =
+        Register::get(kwargs!(user_id == req.user), &req.query.conn).await?
     {
         res.send(TextModel::new(
             &req.user,
@@ -39,6 +40,7 @@ async fn signup(res: Res, req: Req) -> Result<()> {
         &req.query.conn,
     )
     .await
+    .is_ok()
     {
         "Register success"
     } else {

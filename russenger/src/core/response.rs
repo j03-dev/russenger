@@ -95,7 +95,7 @@ impl Res {
     }
 
     pub async fn redirect(&self, path: &str) -> Result<()> {
-        self.query.set_path(&self.sender_id, path).await;
+        self.query.set_path(&self.sender_id, path).await?;
         Ok(())
     }
 }

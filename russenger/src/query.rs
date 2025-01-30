@@ -100,8 +100,9 @@ impl Query {
     /// # Returns
     ///
     /// Returns `true` if the migrations are successful, `false` otherwise.
-    pub async fn migrate(&self) -> bool {
-        migrate!([RussengerUser], &self.conn)
+    pub async fn migrate(&self) -> Result<()> {
+        migrate!([RussengerUser], &self.conn);
+        Ok(())
     }
 
     /// Creates a new record in the database.
@@ -113,14 +114,16 @@ impl Query {
     /// # Returns
     ///
     /// Returns `true` if the record is successfully created, `false` otherwise.
-    pub async fn create(&self, user_id: &str) -> bool {
+    pub async fn create(&self, user_id: &str) -> Result<()> {
         if RussengerUser::get(kwargs!(facebook_user == user_id), &self.conn)
-            .await
+            .await?
             .is_none()
         {
-            return RussengerUser::create(kwargs!(facebook_user_id = user_id), &self.conn).await;
+            return Ok(
+                RussengerUser::create(kwargs!(facebook_user_id = user_id), &self.conn).await?,
+            );
         }
-        true
+        Ok(())
     }
 
     /// Sets the action for a user.
@@ -172,14 +175,14 @@ impl Query {
     ///     Ok(())
     /// }
     /// ```
-    pub(crate) async fn set_path(&self, user_id: &str, path: &str) -> bool {
+    pub(crate) async fn set_path(&self, user_id: &str, path: &str) -> Result<()> {
         if let Some(mut user) =
-            RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn).await
+            RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn).await?
         {
             user.action_path = path.to_owned();
-            user.update(&self.conn).await
+            Ok(user.update(&self.conn).await?)
         } else {
-            false
+            Err(anyhow::anyhow!("user not found"))
         }
     }
 
@@ -192,9 +195,11 @@ impl Query {
     /// # Returns
     ///
     /// Returns the action as an `Option<String>`. Returns `None` if the user is not found.
-    pub async fn get_path(&self, user_id: &str) -> Option<String> {
-        RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
-            .await
-            .map(|user| user.action_path)
+    pub async fn get_path(&self, user_id: &str) -> Result<Option<String>> {
+        Ok(
+            RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
+                .await?
+                .map(|user| user.action_path),
+        )
     }
 }

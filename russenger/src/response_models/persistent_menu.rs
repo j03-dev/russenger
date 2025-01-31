@@ -20,7 +20,6 @@
 //! ```rust
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     // Need GetStart First Before Send PersistenceMenu
 //!     res.send(GetStartedButtonModel::new(Payload::default())).await?;
@@ -38,7 +37,6 @@
 //!     Ok(())
 //! }
 //!
-//! #[action]
 //! async fn option_1(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "Option_1")).await?;
 //!
@@ -86,7 +84,6 @@ struct Menu<'m> {
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// #[action]
 /// async fn index(res: Res, req: Req) -> Result<()> {
 ///     // Need GetStart First Before Send PersistenceMenu
 ///     res.send(GetStartedButtonModel::new(Payload::default())).await?;
@@ -105,7 +102,6 @@ struct Menu<'m> {
 /// }
 ///
 ///
-/// #[action]
 /// async fn option_1(res: Res, req: Req) -> Result<()> {
 ///     res.send(TextModel::new(&req.user, "Option_1")).await?;
 ///
@@ -149,7 +145,6 @@ impl<'p> PersistentMenuModel<'p> {
     ///
     /// let menu = PersistentMenuModel::new("sender_id", buttons);
     ///
-    /// #[action]
     /// async fn option_1(res: Res, req: Req) -> Result<()> {
     ///     res.send(TextModel::new(&req.user, "Option_1")).await?;
     ///

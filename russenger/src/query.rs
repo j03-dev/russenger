@@ -23,7 +23,6 @@
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "What is your name: ")).await?;
 //!     res.redirect("/get_user_input").await?;
@@ -31,7 +30,6 @@
 //!     Ok(())
 //! }
 //!
-//! #[action]
 //! async fn get_user_input(res: Res, req: Req) -> Result<()> {
 //!     let username: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await?;
@@ -143,7 +141,6 @@ impl Query {
     /// use russenger::models::RussengerUser;
     /// use russenger::prelude::*;
     ///
-    /// #[action]
     /// async fn index(res: Res, req: Req) -> Result<()> {
     ///     res.send(TextModel::new(&req.user, "What is your name: ")).await?;
     ///     res.redirect("/get_user_input").await?;
@@ -151,7 +148,6 @@ impl Query {
     ///     Ok(())
     /// }
     ///
-    /// #[action]
     /// async fn get_user_input(res: Res, req: Req) -> Result<()> {
     ///     let username: String = req.data.get_value();
     ///     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await?;

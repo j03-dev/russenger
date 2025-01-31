@@ -37,7 +37,6 @@
 //!     pub username: String,
 //! }
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     // Send a greeting message to the user
 //!     res.send(TextModel::new(&req.user, "Hello!")).await?;
@@ -62,7 +61,6 @@
 //!     Ok(())
 //! }
 //!
-//! #[action]
 //! async fn signup(res: Res, req: Req) -> Result<()> {
 //!     // Get the username from the user input
 //!     let username: String = req.data.get_value();
@@ -83,7 +81,6 @@
 //!     Ok(())
 //! }
 //!
-//! #[action]
 //! async fn get_user_input(res: Res, req: Req) -> Result<()> {
 //!     // Define a closure that creates a new Payload for a given value
 //!     let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value)));
@@ -101,7 +98,6 @@
 //!     Ok(())
 //! }
 //!
-//! #[action]
 //! async fn next_action(res: Res, req: Req) -> Result<()> {
 //!     // Get the color chosen by the user
 //!     let color: String = req.data.get_value();
@@ -227,14 +223,12 @@ impl App {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// #[action]
     /// async fn index(res: Res, req: Req) -> Result<()> {
     ///     res.send(TextModel::new(&req.user, "hello world")).await?;
     ///     res.redirect("/next_action").await?;
     ///     Ok(())
     /// }
     ///
-    /// #[action]
     /// async fn next_action(res: Res, req: Req) -> Result<()> {
     ///     let message: String = req.data.get_value();
     ///     res.send(TextModel::new(&req.user, &message)).await?; // send the message to the user

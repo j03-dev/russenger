@@ -37,7 +37,6 @@
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     let data = Data::new("HelloWorld");
 //!     let payload = Payload::new("/hello_world", Some(data));
@@ -49,7 +48,6 @@
 //! }
 //!
 //!
-//! #[action]
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!     let hello_world: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &hello_world)).await?;
@@ -107,7 +105,6 @@ use super::{payload::Payload, recipient::Recipient};
 /// let payload = Payload::new("/hello_world", Some(data));
 /// let quick_reply = QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload);
 ///
-/// #[action]
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
 ///     let hello_world: String = req.data.get_value();
 ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
@@ -143,7 +140,6 @@ impl QuickReply {
     /// let payload = Payload::new("/some_action", None);
     /// let quick_reply = QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload);
     ///
-    /// #[action]
     /// async fn some_action(res: Res, req: Req) -> Result<()> {
     ///     res.send(TextModel::new(&req.user, "SomeAction")).await?;
     ///
@@ -185,7 +181,6 @@ struct QuickMessage {
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// #[action]
 /// async fn some_action(res: Res, req: Req) -> Result<()> {
 ///     let payload = Payload::new("/some_action", None);
 ///     let quick_reply = QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload);
@@ -225,7 +220,6 @@ impl<'q> QuickReplyModel<'q> {
     /// let quick_reply = QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload);
     /// let quick_reply_model = QuickReplyModel::new("send_id", "Message Text", vec![quick_reply]);
     ///
-    /// #[action]
     /// async fn some_action(res: Res, req: Req) -> Result<()> {
     ///     res.send(TextModel::new(&req.user, "SomeAction")).await?;
     ///

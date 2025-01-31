@@ -29,7 +29,6 @@
 //! ```rust
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "Hello World!")).await?;
 //!
@@ -72,7 +71,6 @@ struct Text {
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// #[action]
 /// async fn index(res: Res, req: Req) -> Result<()> {
 ///     res.send(TextModel::new(&req.user, "Hello World!")).await?;
 ///

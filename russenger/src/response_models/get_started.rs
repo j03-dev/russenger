@@ -19,7 +19,6 @@
 //! ```rust
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(GetStartedButtonModel::new(Payload::default())).await?;
 //!
@@ -57,7 +56,6 @@ use super::{payload::Payload, ResponseModel};
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// #[action]
 /// async fn index(res: Res, req: Req) -> Result<()>{
 ///     res.send(GetStartedButtonModel::new(Payload::default())).await?;
 ///

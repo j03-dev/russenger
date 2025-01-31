@@ -19,7 +19,6 @@
 //! ```rust
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn greet(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await?;
 //!

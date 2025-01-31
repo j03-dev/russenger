@@ -6,10 +6,12 @@ use crate::error::Result;
 type FutureResult = Pin<Box<dyn Future<Output = Result<()>> + Send>>;
 
 pub struct Router {
-    pub routes: HashMap<String, Box<dyn Fn(Res, Req) -> FutureResult + Send + Sync>>,
+    pub(crate) routes: HashMap<String, Box<dyn Fn(Res, Req) -> FutureResult + Send + Sync>>,
 }
 
+
 impl Router {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             routes: HashMap::new(),

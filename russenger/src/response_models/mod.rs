@@ -36,7 +36,6 @@
 //! ```rust
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     let text_model = TextModel::new(&req.user, "Hello, user1!");
 //!     res.send(text_model).await?;

@@ -17,7 +17,6 @@
 //! ```rust
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     let elements = vec![
 //!         GenericElement::new(
@@ -38,7 +37,6 @@
 //!     Ok(())
 //! }
 //!
-//! #[action]
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!     let hello_world: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &hello_world)).await?;
@@ -93,7 +91,6 @@ use super::{
 /// );
 ///
 ///
-/// #[action]
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
 ///     let hello_world: String = req.data.get_value();
 ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
@@ -144,7 +141,6 @@ impl GenericElement {
     ///     }],
     /// );
     ///
-    /// #[action]
     /// async fn hello_world(res: Res, req: Req) -> Result<()> {
     ///     let hello_world: String = req.data.get_value();
     ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
@@ -215,7 +211,6 @@ struct GenericMessage {
 ///
 /// use russenger::prelude::*; // if you use this import other imports are not needed;
 ///
-/// #[action]
 /// async fn index(res: Res, req: Req) -> Result<()> {
 ///     let elements = vec![
 ///         GenericElement::new(
@@ -236,7 +231,6 @@ struct GenericMessage {
 ///     Ok(())
 /// }
 ///
-/// #[action]
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
 ///     let hello_world: String = req.data.get_value();
 ///    res.send(TextModel::new(&req.user, &hello_world)).await?;
@@ -288,7 +282,6 @@ impl<'g> GenericModel<'g> {
     ///
     /// let message = GenericModel::new("sender_id", elements, None);
     ///
-    /// #[action]
     /// async fn hello_world(res: Res, req: Req) -> Result<()> {
     ///     let hello_world: String = req.data.get_value();
     ///    res.send(TextModel::new(&req.user, &hello_world)).await?;

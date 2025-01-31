@@ -14,7 +14,6 @@
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index (res: Res, req: Req) -> Result<()> {
 //!     let message: String = req.data.get_value();
 //!     if message == "Hi" {
@@ -29,7 +28,7 @@
 //!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
 //!     App::init().await?
-//!         .attach(router![("/" index)])
+//!         .attach(Router::new().add("/", index))
 //!         .launch().await?;
 //!     Ok(())
 //! }

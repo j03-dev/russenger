@@ -9,7 +9,6 @@ pub struct Router {
     pub(crate) routes: HashMap<String, Box<dyn Fn(Res, Req) -> FutureResult + Send + Sync>>,
 }
 
-
 impl Router {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {

@@ -33,11 +33,7 @@
 //!     Ok(())
 //! }
 //! ```
-pub use crate::core::{
-    action::Router,
-    request::Req,
-    response::Res,
-};
+pub use crate::core::{request::Req, response::Res, router::Router};
 pub use crate::error::{self, Result};
 pub use crate::response_models::{
     button::{Button, ButtonModel},

@@ -14,8 +14,8 @@ use std::{str::FromStr, sync::Arc};
 use actix_web::{dev, get, post, web, HttpResponse};
 
 use super::{
-    action::Router, incoming_data::InComingData, request::Req, request_handler::WebQuery,
-    response::Res,
+    incoming_data::InComingData, request::Req, request_handler::WebQuery, response::Res,
+    router::Router,
 };
 
 use crate::{

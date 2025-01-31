@@ -37,7 +37,6 @@
 //!     pub username: String,
 //! }
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     // Send a greeting message to the user
 //!     res.send(TextModel::new(&req.user, "Hello!")).await?;
@@ -62,7 +61,6 @@
 //!     Ok(())
 //! }
 //!
-//! #[action]
 //! async fn signup(res: Res, req: Req) -> Result<()> {
 //!     // Get the username from the user input
 //!     let username: String = req.data.get_value();
@@ -83,7 +81,6 @@
 //!     Ok(())
 //! }
 //!
-//! #[action]
 //! async fn get_user_input(res: Res, req: Req) -> Result<()> {
 //!     // Define a closure that creates a new Payload for a given value
 //!     let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value)));
@@ -101,7 +98,6 @@
 //!     Ok(())
 //! }
 //!
-//! #[action]
 //! async fn next_action(res: Res, req: Req) -> Result<()> {
 //!     // Get the color chosen by the user
 //!     let color: String = req.data.get_value();
@@ -126,12 +122,11 @@
 //!     // Register the actions for the main application
 //!     App::init().await?
 //!        .attach(
-//!             router![
-//!                 ("/", index),
-//!                 ("/signup", signup),
-//!                 ("/get_user_input", get_user_input),
-//!                 ("/next_action", next_action)
-//!             ]
+//!             Router::new()
+//!                 .add("/", index)
+//!                 .add("/signup", signup)
+//!                 .add("/get_user_input", get_user_input)
+//!                 .add("/next_action", next_action)
 //!         )
 //!         .launch()
 //!         .await?;
@@ -152,14 +147,13 @@ pub mod error {
 }
 
 pub use core::{
-    action::Router,
+    router::Router,
     services::{webhook_core, webhook_verify}, // core services
 };
 
 pub use anyhow;
 pub use dotenv::dotenv;
 pub use rusql_alchemy;
-pub use russenger_macro::action;
 
 use error::Result;
 use query::Query;
@@ -202,8 +196,7 @@ impl ActionLock {
 #[derive(Clone)]
 pub struct App {
     pub(crate) query: Query,
-    pub(crate) router: Arc<Mutex<Router>>,
-    pub(crate) tmp_router: Router,
+    pub(crate) router: Arc<Router>,
     pub(crate) action_lock: ActionLock,
 }
 
@@ -213,11 +206,10 @@ impl App {
         let query: Query = Query::new().await?;
         Ok(Self {
             query,
-            router: Arc::new(Mutex::new(Router::new())),
+            router: Arc::new(Router::new()),
             action_lock: ActionLock {
                 locked_users: Arc::new(Mutex::new(HashSet::new())),
             },
-            tmp_router: Router::new(),
         })
     }
 
@@ -231,14 +223,12 @@ impl App {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// #[action]
     /// async fn index(res: Res, req: Req) -> Result<()> {
     ///     res.send(TextModel::new(&req.user, "hello world")).await?;
     ///     res.redirect("/next_action").await?;
     ///     Ok(())
     /// }
     ///
-    /// #[action]
     /// async fn next_action(res: Res, req: Req) -> Result<()> {
     ///     let message: String = req.data.get_value();
     ///     res.send(TextModel::new(&req.user, &message)).await?; // send the message to the user
@@ -261,14 +251,16 @@ impl App {
     /// ```
     ///
     /// This method is useful for organizing your application's routes into modular and reusable groups.
-    pub fn attach(&mut self, router: Router) -> Self {
-        self.tmp_router.extend(router);
-        self.clone()
+    pub fn attach(mut self, router: Router) -> Self {
+        Arc::get_mut(&mut self.router)
+            .expect("Router already shared")
+            .routes
+            .extend(router.routes);
+        self
     }
 
     pub async fn launch(&self) -> Result<()> {
         dotenv().ok();
-        self.router.lock().await.extend(self.tmp_router.clone());
         run_server(self.clone()).await?;
         Ok(())
     }
@@ -282,10 +274,10 @@ fn print_info(host: &str, port: u16) {
 }
 
 async fn run_server(app: App) -> Result<()> {
-    let host = std::env::var("HOST").unwrap_or("0.0.0.0".into());
+    let host = std::env::var("HOST").unwrap_or_else(|_| "0.0.0.0".into());
     let port = std::env::var("PORT")
-        .unwrap_or("2453".into())
-        .parse()
+        .ok()
+        .and_then(|p| p.parse().ok())
         .unwrap_or(2453);
     print_info(&host, port);
     HttpServer::new(move || {

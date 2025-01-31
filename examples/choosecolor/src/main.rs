@@ -12,10 +12,10 @@ pub struct Register {
     pub username: String,
 }
 
-#[action]
 async fn index(res: Res, req: Req) -> Result<()> {
     res.send(TextModel::new(&req.user, "Hello!")).await?;
-    if let Some(user_register) = Register::get(kwargs!(user_id == req.user), &req.query.conn).await
+    if let Some(user_register) =
+        Register::get(kwargs!(user_id == req.user), &req.query.conn).await?
     {
         res.send(TextModel::new(
             &req.user,
@@ -33,7 +33,6 @@ async fn index(res: Res, req: Req) -> Result<()> {
     Ok(())
 }
 
-#[action]
 async fn signup(res: Res, req: Req) -> Result<()> {
     let username: String = req.data.get_value();
     let message = if Register::create(
@@ -41,6 +40,7 @@ async fn signup(res: Res, req: Req) -> Result<()> {
         &req.query.conn,
     )
     .await
+    .is_ok()
     {
         "Register success"
     } else {
@@ -52,7 +52,6 @@ async fn signup(res: Res, req: Req) -> Result<()> {
     Ok(())
 }
 
-#[action]
 async fn get_user_input(res: Res, req: Req) -> Result<()> {
     let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value)));
 
@@ -67,7 +66,6 @@ async fn get_user_input(res: Res, req: Req) -> Result<()> {
     Ok(())
 }
 
-#[action]
 async fn next_action(res: Res, req: Req) -> Result<()> {
     let color: String = req.data.get_value();
     res.send(TextModel::new(&req.user, &color)).await?;

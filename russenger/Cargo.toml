@@ -1,6 +1,6 @@
 [package]
 name = "russenger"
-version = "0.3.5-rc"
+version = "0.3.6-rc"
 edition = "2021"
 description = "A Rust library designed to simplify the handling of Facebook Messenger webhook responses."
 license = "Apache-2.0"
@@ -41,5 +41,3 @@ dotenv.workspace = true
 
 # Error handling
 anyhow.workspace = true
-
-russenger_macro.workspace = true

@@ -21,7 +21,6 @@
 //! ```rust
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn send_file_from_static_dir(res: Res, req: Req) -> Result<()> {
 //!     let text = TextModel::new(&req.user, "Sending file... Please wait!");
 //!     res.send(text).await?;
@@ -88,7 +87,6 @@ struct Attachment<'s> {
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// #[action]
 /// async fn send_file_from_static_dir(res: Res, req: Req) -> Result<()> {
 ///     let text = TextModel::new(&req.user, "Sending file... Please wait!");
 ///     res.send(text).await?;

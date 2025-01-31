@@ -9,7 +9,6 @@
 //! ```rust
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "Hello World")).await?;
 //!
@@ -35,7 +34,6 @@ use crate::{query::Query, response_models::ResponseModel};
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// #[action]
 /// async fn index(res: Res, req: Req) -> Result<()> {
 ///     let response_model = TextModel::new("sender_id", "Hello, user1!");
 ///     let send_result = res.send(response_model).await?;
@@ -95,7 +93,7 @@ impl Res {
     }
 
     pub async fn redirect(&self, path: &str) -> Result<()> {
-        self.query.set_path(&self.sender_id, path).await;
+        self.query.set_path(&self.sender_id, path).await?;
         Ok(())
     }
 }

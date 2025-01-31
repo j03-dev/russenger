@@ -22,7 +22,6 @@
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index (res: Res, req: Req) -> Result<()> {
 //!     let data = Data::new("HelloWorld");
 //!     let payload = Payload::new("/hello_world", Some(data));
@@ -31,7 +30,6 @@
 //!     Ok(())
 //! }
 //!
-//! #[action]
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!    let value: String = req.data.get_value();
 //!    res.send(TextModel::new(&req.user, &value)).await?;
@@ -86,7 +84,6 @@ use super::data::Data;
 /// let data = Data::new("HelloWorld");
 /// let payload = Payload::new("/hello_world", Some(data));
 ///
-/// #[action]
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
 ///    let value: String = req.data.get_value();
 ///    res.send(TextModel::new(&req.user, &value)).await?;
@@ -125,7 +122,6 @@ impl Payload {
     ///
     /// let payload = Payload::new("/some_action", None);
     ///
-    /// #[action]
     /// async fn some_action(res: Res, req: Req) -> Result<()> {
     ///    res.send(TextModel::new(&req.user, "SomeAction")).await?;
     ///

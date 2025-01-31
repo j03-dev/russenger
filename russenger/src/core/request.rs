@@ -14,7 +14,6 @@
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!     let user: String = req.user;
 //!     let message: String  = req.data.get_value();
@@ -29,7 +28,6 @@
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(TextModel::new(&req.user, "What is your name")).await?;
 //!     res.redirect("/name").await?;
@@ -37,7 +35,6 @@
 //!     Ok(())
 //! }
 //!
-//! #[action]
 //! async fn name(res: Res, req: Req)  -> Result<()> {
 //!     let name: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &format!("Hello, {}!", name))).await?;
@@ -77,7 +74,6 @@ pub struct Req {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// #[action]
     /// async fn hello_world(res: Res, req: Req) -> Result<()> {
     ///     let user: String = req.user;
     ///     res.send(TextModel::new(&user, "Hello, world!")).await?;
@@ -109,14 +105,12 @@ pub struct Req {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// #[action]
     /// async fn index(res: Res, req: Req) -> Result<()> {
     ///     res.redirect("/next_action").await?; // goto NextAction
     ///
     ///     Ok(())
     /// }
     ///
-    /// #[action]
     /// async fn next_action(res: Res, req: Req) -> Result<()> {
     ///     Ok(())
     /// }
@@ -162,7 +156,6 @@ pub struct Req {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// #[action]
     /// async fn index(res: Res, req: Req) -> Result<()> {
     ///     let image_url = &format!("{host}/static/image.jpg", host = req.host);
     ///     let media = MediaModel::new(&req.user, "image", image_url);
@@ -208,7 +201,6 @@ impl Req {
     /// ```rust
     /// use russenger::prelude::*;
     ///
-    /// #[action]
     /// async fn home(res: Res, req: Req) -> Result<()> {
     ///     let user_input: String = req.data.get_value(); // Extract the current data
     ///     res.send(TextModel::new(&req.user, &format!("User input received: {}", user_input)))
@@ -222,7 +214,6 @@ impl Req {
     ///     Ok(())
     /// }
     ///
-    /// #[action]
     /// async fn next_action(res: Res, req: Req) -> Result<()> {
     ///     let user_input: String = req.data.get_value(); // Retrieve the updated data
     ///     res.send(TextModel::new(&req.user, &format!("Processed user input: {}", user_input)))
@@ -234,13 +225,12 @@ impl Req {
     /// async fn main() -> Result<()> {
     ///     App::init().await?
     ///         .attach(router![
-    ///             ("/", |res, req| {
-    ///                 Box::pin(async move {
+    ///             ("/", |res, req| async move {
     ///                     res.send(TextModel::new(&req.user, "Welcome!")).await?;
     ///                     res.redirect("/home").await?;
     ///                     Ok(())
-    ///                 })
-    ///             })
+    ///                 }
+    ///             )
     ///         ])
     ///         .attach(router![("/home", home), ("/next_action", next_action)])
     ///         .launch()

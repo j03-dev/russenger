@@ -8,7 +8,6 @@
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     let payload = Payload::new("/hello_world", Some(Data::new("HelloWorld")));
 //!     let buttons = vec![
@@ -19,7 +18,7 @@
 //!
 //!     Ok(())
 //! }
-//! #[action]
+//! 
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!     let value: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &value)).await?;
@@ -92,7 +91,6 @@ use super::{payload::Payload, recipient::Recipient, ResponseModel};
 ///
 /// use russenger::prelude::*;
 ///
-/// #[action]
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
 ///     let payload: String = req.data.get_value();
 ///     res.send(TextModel::new(&req.user, &payload)).await?;
@@ -165,7 +163,6 @@ struct ButtonAttachment<'a> {
 /// ```rust
 /// use russenger::prelude::*;
 ///
-/// #[action]
 /// async fn index(res: Res, req: Req) {
 ///     let buttons = vec![
 ///         Button::WebUrl {title: "Click Me".to_owned(), url: "https://link.test.com".to_owned()},

@@ -3,7 +3,6 @@ use russenger::{models::RussengerUser, prelude::*};
 
 mod const_data;
 
-#[action]
 async fn index(res: Res, req: Req) -> Result<()> {
     let mut elements = Vec::new();
 

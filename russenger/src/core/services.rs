@@ -12,11 +12,10 @@
 use std::{str::FromStr, sync::Arc};
 
 use actix_web::{dev, get, post, web, HttpResponse};
-use tokio::sync::Mutex;
 
 use super::{
-    action::Router, incoming_data::InComingData, request::Req, request_handler::WebQuery,
-    response::Res,
+    incoming_data::InComingData, request::Req, request_handler::WebQuery, response::Res,
+    router::Router,
 };
 
 use crate::{
@@ -38,7 +37,7 @@ enum Message<'a> {
 
 async fn handle(
     message: Message<'_>,
-    router: &Arc<Mutex<Router>>,
+    router: Arc<Router>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     match message {
         Message::Payload(user, payload, host, query) => {
@@ -47,23 +46,20 @@ async fn handle(
             let res = Res::new(user, query.clone());
             let req = Req::new(user, query, data, host);
             let path = payload.get_path();
-
-            let router = router.lock().await;
             let action = router
+                .routes
                 .get(&path)
-                .context("Action not found in the router")
-                .map_err(|err| format!("{err}, path: {path}"))?;
+                .with_context(|| format!("Action not found for path: {}", path))?;
             action(res, req).await?
         }
         Message::TextMessage(user, text_message, host, query) => {
-            let path = query.get_path(user).await.unwrap_or("/".to_string());
+            let path = query.get_path(user).await?.unwrap_or("/".to_string());
             let res = Res::new(user, query.clone());
             let req = Req::new(user, query, Data::new(text_message), host);
-            let router = router.lock().await;
             let action = router
+                .routes
                 .get(&path)
-                .context("Action not found in the router")
-                .map_err(|err| format!("{err}, path: {path}"))?;
+                .with_context(|| format!("Action not found for path: {}", path))?;
             action(res, req).await?
         }
     }
@@ -81,27 +77,27 @@ pub async fn webhook_core(
     let user = data.get_sender();
     let host = conn.host();
 
-    query.create(user).await;
+    query.create(user).await.unwrap();
 
     if app_state.action_lock.lock(user).await {
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {
                 let quick_reply_payload = quick_reply.get_payload();
                 let payload = Message::Payload(user, quick_reply_payload, host, query);
-                let result = handle(payload, &app_state.router).await;
+                let result = handle(payload, app_state.router.clone()).await;
                 result.unwrap_or_else(|err| {
                     eprintln!("Error handling quick reply payload: {:?}", err)
                 })
             } else {
                 let text = message.get_text();
                 let text_message = Message::TextMessage(user, &text, host, query);
-                let result = handle(text_message, &app_state.router).await;
+                let result = handle(text_message, app_state.router.clone()).await;
                 result.unwrap_or_else(|err| eprintln!("Error handling text message: {:?}", err))
             }
         } else if let Some(postback) = data.get_postback() {
             let postback_payload = postback.get_payload();
             let payload = Message::Payload(user, postback_payload, host, query);
-            let result = handle(payload, &app_state.router).await;
+            let result = handle(payload, app_state.router.clone()).await;
             result.unwrap_or_else(|err| eprintln!("Error handling postback payload: {:?}", err))
         }
         app_state.action_lock.unlock(user).await;

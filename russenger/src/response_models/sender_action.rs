@@ -38,7 +38,6 @@
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     res.send(SenderActionModel::new(&req.user, MarkSeen)).await?;
 //!     res.send(TextModel::new(&req.user, "Hello, world!")).await?;
@@ -119,7 +118,6 @@ pub enum Actions {
 /// ``` rust
 /// use russenger::prelude::*;
 ///
-/// #[action]
 /// async fn index(res: Res, req: Req) -> Result<()> {
 ///     let action = SenderActionModel::new(&req.user, MarkSeen);
 ///     res.send(action).await?;

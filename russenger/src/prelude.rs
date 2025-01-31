@@ -14,7 +14,6 @@
 //! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
-//! #[action]
 //! async fn index (res: Res, req: Req) -> Result<()> {
 //!     let message: String = req.data.get_value();
 //!     if message == "Hi" {
@@ -29,16 +28,12 @@
 //!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);
 //!     App::init().await?
-//!         .attach(router![("/" index)])
+//!         .attach(Router::new().add("/", index))
 //!         .launch().await?;
 //!     Ok(())
 //! }
 //! ```
-pub use crate::core::{
-    action::{Action, Add, Router},
-    request::Req,
-    response::Res,
-};
+pub use crate::core::{request::Req, response::Res, router::Router};
 pub use crate::error::{self, Result};
 pub use crate::response_models::{
     button::{Button, ButtonModel},
@@ -56,4 +51,4 @@ pub use crate::response_models::{
 };
 pub use crate::router;
 pub use crate::rusql_alchemy::{self, prelude::*};
-pub use crate::{action, App};
+pub use crate::App;

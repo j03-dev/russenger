@@ -1,7 +1,6 @@
 use russenger::models::RussengerUser;
 use russenger::prelude::*;
 
-#[action]
 async fn index(res: Res, req: Req) -> Result<()> {
     let message: String = req.data.get_value();
     if message.to_lowercase() == "hello" {
@@ -14,7 +13,6 @@ async fn index(res: Res, req: Req) -> Result<()> {
     Ok(())
 }
 
-#[action]
 async fn start(res: Res, req: Req) -> Result<()> {
     res.send(PersistentMenuModel::new(
         &req.user,
@@ -28,7 +26,6 @@ async fn start(res: Res, req: Req) -> Result<()> {
     Ok(())
 }
 
-#[action]
 async fn hello_world(res: Res, req: Req) -> Result<()> {
     res.send(TextModel::new(&req.user, "Hello World")).await?; // End
     Ok(())

@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["russenger", "russenger_macro", "examples/*"]
+members = ["russenger", "examples/*"]
 
 [workspace.dependencies]
 # Web framework and HTTP handling
@@ -24,7 +24,5 @@ dotenv = "0.15.0"
 # Error handling
 anyhow = "1.0.95"
 
-russenger_macro = { version = "0.1.2", path = "russenger_macro" }
-
 # Orm
-rusql-alchemy = { version = "0.4.1-rc", default-features = false }
+rusql-alchemy = { version = "0.4.2-rc", default-features = false }

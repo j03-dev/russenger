@@ -1,4 +1,4 @@
-use const_data::DATA;
+use const_data::DATAS;
 use russenger::{models::RussengerUser, prelude::*};
 
 mod const_data;
@@ -6,7 +6,7 @@ mod const_data;
 async fn index(res: Res, req: Req) -> Result<()> {
     let mut elements = Vec::new();
 
-    for (i, d) in DATA.iter().enumerate() {
+    for (i, d) in DATAS.iter().enumerate() {
         let element = GenericElement::new(
             d.title,    // Title
             d.subtitle, // Subtitle

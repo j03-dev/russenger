@@ -53,7 +53,7 @@ If you prefer a manual setup, add the following dependencies to your `Cargo.toml
 
 ```toml
 [dependencies]
-russenger = { version = "0.3.5-rc", features = ["postgres"] } # supports 'sqlite, postgres, mysql'
+russenger = { version = "0.3.6-rc", features = ["postgres"] } # supports 'sqlite, postgres, mysql'
 actix-web = "4"
 sqlx = "^0.8.0"
 ```

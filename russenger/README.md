@@ -6,7 +6,7 @@
 
 - [ankamantatra-bot](https://github.com/j03-dev/ankamantatra-bot)
 - [gemini-bot](https://github.com/j03-dev/gemini-bot)
-- [examples](https://github.com/j03-dev/russenger/examples)
+- [examples](https://github.com/j03-dev/russenger/tree/main/examples)
 
 ## Features
 

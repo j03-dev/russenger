@@ -54,7 +54,7 @@ If you prefer a manual setup, add the following dependencies to your `Cargo.toml
 ```toml
 [dependencies]
 russenger = { version = "0.3.6-rc", features = ["postgres"] } # supports 'sqlite, postgres, mysql'
-tokio = { version = "1.43.0", feature = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread"] }
 sqlx = "0.8.0"
 ```
 

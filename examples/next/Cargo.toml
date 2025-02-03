@@ -9,4 +9,4 @@ publish = false
 [dependencies]
 russenger.path = "../../russenger"
 sqlx.workspace = true
-tokio = { workspace = true, feature = ["macros", "rt-multi-thread"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

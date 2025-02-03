@@ -162,13 +162,13 @@ use tokio::sync::Mutex;
 
 use std::{collections::HashSet, sync::Arc};
 
-#[derive(Clone)]
-pub struct ActionLock {
-    pub locked_users: Arc<Mutex<HashSet<String>>>,
+#[derive(Clone, Default)]
+struct ActionLock {
+    locked_users: Arc<Mutex<HashSet<String>>>,
 }
 
 impl ActionLock {
-    pub async fn lock(&self, user: &str) -> bool {
+    async fn lock(&self, user: &str) -> bool {
         let mut locked_user = self.locked_users.lock().await;
         if !locked_user.contains(user) {
             locked_user.insert(user.to_string());
@@ -178,7 +178,7 @@ impl ActionLock {
         }
     }
 
-    pub async fn unlock(&self, user: &str) {
+    async fn unlock(&self, user: &str) {
         let mut locked_users = self.locked_users.lock().await;
         locked_users.remove(user);
     }
@@ -193,21 +193,18 @@ impl ActionLock {
 /// * `query`: A `Query` that represents the query made by the user.
 #[derive(Clone)]
 pub struct App {
-    pub(crate) query: Query,
-    pub(crate) router: Arc<Router>,
-    pub(crate) action_lock: ActionLock,
+    query: Arc<Query>,
+    router: Arc<Router>,
+    action_lock: ActionLock,
 }
 
 impl App {
     /// `init` is method to create new `App` instance. in russenger
     pub async fn init() -> Result<Self> {
-        let query: Query = Query::new().await?;
         Ok(Self {
-            query,
+            query: Arc::new(Query::new().await?),
             router: Arc::new(Router::new()),
-            action_lock: ActionLock {
-                locked_users: Arc::new(Mutex::new(HashSet::new())),
-            },
+            action_lock: ActionLock::default(),
         })
     }
 

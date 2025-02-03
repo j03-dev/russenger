@@ -31,8 +31,8 @@ pub async fn webhook_verify(web_query: web::Query<WebQuery>) -> HttpResponse {
 }
 
 enum Message<'a> {
-    Payload(&'a str, &'a str, &'a str, Query),
-    TextMessage(&'a str, &'a str, &'a str, Query),
+    Payload(&'a str, &'a str, &'a str, Arc<Query>),
+    TextMessage(&'a str, &'a str, &'a str, Arc<Query>),
 }
 
 async fn handle(
@@ -74,6 +74,8 @@ pub async fn webhook_core(
     conn: dev::ConnectionInfo,
 ) -> HttpResponse {
     let query = app_state.query.clone();
+    let router = app_state.router.clone();
+
     let user = data.get_sender();
     let host = conn.host();
 
@@ -84,20 +86,20 @@ pub async fn webhook_core(
             if let Some(quick_reply) = message.get_quick_reply() {
                 let quick_reply_payload = quick_reply.get_payload();
                 let payload = Message::Payload(user, quick_reply_payload, host, query);
-                let result = handle(payload, app_state.router.clone()).await;
+                let result = handle(payload, router).await;
                 result.unwrap_or_else(|err| {
                     eprintln!("Error handling quick reply payload: {:?}", err)
                 })
             } else {
                 let text = message.get_text();
                 let text_message = Message::TextMessage(user, &text, host, query);
-                let result = handle(text_message, app_state.router.clone()).await;
+                let result = handle(text_message, router).await;
                 result.unwrap_or_else(|err| eprintln!("Error handling text message: {:?}", err))
             }
         } else if let Some(postback) = data.get_postback() {
             let postback_payload = postback.get_payload();
             let payload = Message::Payload(user, postback_payload, host, query);
-            let result = handle(payload, app_state.router.clone()).await;
+            let result = handle(payload, router).await;
             result.unwrap_or_else(|err| eprintln!("Error handling postback payload: {:?}", err))
         }
         app_state.action_lock.unlock(user).await;

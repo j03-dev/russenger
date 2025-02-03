@@ -53,6 +53,8 @@
 //!     Ok(())
 //! }
 //! ```
+use std::sync::Arc;
+
 use crate::query::Query;
 use crate::response_models::data::Data;
 
@@ -115,7 +117,7 @@ pub struct Req {
     ///     Ok(())
     /// }
     /// ```
-    pub query: Query,
+    pub query: Arc<Query>,
 
     /// The `Data` struct represents a data object with a value and an optional page.
     ///
@@ -180,7 +182,7 @@ impl Req {
     /// # Returns
     ///
     /// A `Req` that contains the provided user, query, data, and host.
-    pub fn new(user: &str, query: Query, data: Data, host: &str) -> Self {
+    pub fn new(user: &str, query: Arc<Query>, data: Data, host: &str) -> Self {
         Self {
             user: user.to_owned(),
             query,

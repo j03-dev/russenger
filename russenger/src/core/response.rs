@@ -15,7 +15,7 @@
 //!     Ok(())
 //! }
 //! ```
-use std::env;
+use std::{env, sync::Arc};
 
 use anyhow::Result;
 use reqwest::Response;
@@ -46,7 +46,7 @@ use crate::{query::Query, response_models::ResponseModel};
 ///
 /// * `send`: Sends a response to a user. It takes a `ResponseModel` as an argument and returns a `SendResult`.
 pub struct Res {
-    query: Query,
+    query: Arc<Query>,
     sender_id: String,
 }
 
@@ -85,7 +85,7 @@ impl Res {
         }
     }
 
-    pub fn new(sender_id: &str, query: Query) -> Self {
+    pub fn new(sender_id: &str, query: Arc<Query>) -> Self {
         Self {
             query,
             sender_id: sender_id.to_owned(),

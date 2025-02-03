@@ -97,7 +97,7 @@ async fn ask_gemini(res: Res, req: Req) -> Result<()> {
     Ok(())
 }
 
-#[russenger::main]
+#[tokio::main]
 async fn main() -> Result<()> {
     let conn = Database::new().await?.conn;
     migrate!([RussengerUser], &conn);
@@ -106,9 +106,9 @@ async fn main() -> Result<()> {
         .await?
         .attach(
             Router::new()
-            .add("/", index)
-            .add("/hello_world", hello_world)
-            .add("/ask_gemini", ask_gemini)
+                .add("/", index)
+                .add("/hello_world", hello_world)
+                .add("/ask_gemini", ask_gemini),
         )
         .launch()
         .await?;

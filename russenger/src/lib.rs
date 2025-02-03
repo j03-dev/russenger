@@ -135,8 +135,6 @@
 //! ```
 //!
 //! These examples demonstrate how to define an action, use custom models, and register actions for the main application.
-pub use actix_web::main;
-
 pub mod core;
 pub mod models;
 pub mod prelude;

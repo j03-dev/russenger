@@ -73,7 +73,7 @@ async fn next_action(res: Res, req: Req) -> Result<()> {
     Ok(())
 }
 
-#[russenger::main]
+#[tokio::main]
 async fn main() -> Result<()> {
     let conn = Database::new().await?.conn;
     migrate!([RussengerUser, Register], &conn);

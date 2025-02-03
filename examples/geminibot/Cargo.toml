@@ -9,8 +9,8 @@ publish = false
 
 [dependencies]
 russenger.path = "../../russenger"
-actix-web.workspace = true
 sqlx.workspace = true
 
+tokio = { workspace = true, feature = ["macros", "rt-multi-thread"] }
 reqwest = { version = "0.12.4", features = ["json"] }
 serde = { version = "1.0.198", features = ["derive"] }

@@ -55,7 +55,7 @@
 //!     Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
 //!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);

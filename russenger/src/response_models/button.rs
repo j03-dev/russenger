@@ -18,7 +18,7 @@
 //!
 //!     Ok(())
 //! }
-//! 
+//!
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!     let value: String = req.data.get_value();
 //!     res.send(TextModel::new(&req.user, &value)).await?;
@@ -26,7 +26,7 @@
 //!     Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
 //!     let conn = Database::new().await?.conn;
 //!     migrate!([RussengerUser], &conn);

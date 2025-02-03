@@ -111,7 +111,7 @@
 //!     Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
 //!     // Connect to the database
 //!     let conn = Database::new().await?.conn;
@@ -239,7 +239,7 @@ impl App {
     ///        .add("/next_action", next_action)
     /// }
     ///
-    /// #[russenger::main]
+    /// #[tokio::main]
     /// async fn main() -> Result<()> {
     ///     App::init().await?
     ///         .attach(group_actions()).await // Attach group actions to the application's router

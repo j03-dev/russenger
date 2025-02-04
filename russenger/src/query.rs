@@ -54,7 +54,7 @@
 //! }
 //! ```
 use crate::models::RussengerUser;
-use anyhow::Result;
+use anyhow::{Context, Result};
 
 use rusql_alchemy::prelude::*;
 
@@ -172,14 +172,11 @@ impl Query {
     /// }
     /// ```
     pub(crate) async fn set_path(&self, user_id: &str, path: &str) -> Result<()> {
-        if let Some(mut user) =
-            RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn).await?
-        {
-            user.action_path = path.to_owned();
-            Ok(user.update(&self.conn).await?)
-        } else {
-            Err(anyhow::anyhow!("user not found"))
-        }
+        let mut user = RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
+            .await?
+            .context("user not found")?;
+        user.action_path = path.to_owned();
+        Ok(user.update(&self.conn).await?)
     }
 
     /// Retrieves the action for a user.

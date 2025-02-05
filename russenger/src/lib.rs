@@ -285,11 +285,10 @@ fn print_info(host: &str, port: u16) {
 
 async fn run_server(app: Arc<App>) -> Result<()> {
     let addr = app.addr.clone();
-    let data = web::Data::new(app);
     print_info(&addr.0, addr.1);
     HttpServer::new(move || {
         ActixApp::new()
-            .app_data(data.clone())
+            .app_data(web::Data::new(app.clone()))
             .service(webhook_verify)
             .service(webhook_core)
             .service(fs::Files::new("/static", "static").show_files_listing())

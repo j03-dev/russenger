@@ -148,12 +148,12 @@ pub mod data {
         ///
         /// * `Data`: The created `Data`.
         ///
-        pub fn new<T: Serialize>(value: T) -> Self {
+        pub fn new(value: impl Serialize) -> Self {
             let value = serde_json::to_string(&value).unwrap_or_default().verify();
             Self { value, page: None }
         }
 
-        pub fn new_with_page<T: Serialize>(value: T, page: Option<Page>) -> Self {
+        pub fn new_with_page(value: impl Serialize, page: Option<Page>) -> Self {
             let value = serde_json::to_string(&value).unwrap_or_default().verify();
             Self { value, page }
         }

@@ -150,7 +150,10 @@ impl GenericElement {
     /// ```
     ///
     /// This example shows how to create a new `GenericElement`.
-    pub fn new(title: &str, image_url: &str, subtitle: &str, buttons: Vec<Button>) -> Self {
+    pub fn new<T>(title: T, image_url: T, subtitle: T, buttons: Vec<Button>) -> Self
+    where
+        T: Into<String>,
+    {
         if buttons.len() > 3 {
             panic!("Buttons must be three maximum")
         }

@@ -146,10 +146,10 @@ impl QuickReply {
     ///     Ok(())
     /// }
     /// ```
-    pub fn new(title: &str, image_url: Option<&String>, payload: Payload) -> Self {
+    pub fn new(title: impl Into<String>, image_url: Option<&String>, payload: Payload) -> Self {
         Self {
             content_type: "text".to_owned(),
-            title: title.to_owned(),
+            title: title.into(),
             payload: payload.to_string(),
             image_url: image_url.cloned(),
         }
@@ -226,7 +226,11 @@ impl<'q> QuickReplyModel<'q> {
     ///     Ok(())
     /// }
     /// ```
-    pub fn new(sender: &'q str, message: &str, quick_replies: Vec<QuickReply>) -> Self {
+    pub fn new(
+        sender: &'q str,
+        message: impl Into<String>,
+        quick_replies: Vec<QuickReply>,
+    ) -> Self {
         Self {
             recipient: Recipient { id: sender },
             messaging_type: "RESPONSE",

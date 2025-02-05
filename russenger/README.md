@@ -60,26 +60,26 @@ sqlx = "0.8.0"
 use russenger::prelude::*;
 
 
-fn get_name(res: Res, req: Req) -> Result<()> {
-  let name: String = req.data.get_value();
-  res.send(TextModel(&req.user, format!("Hello {name}"))).await;
-  Ok(())
+async fn get_name(res: Res, req: Req) -> Result<()> {
+    let name: String = req.data.get_value();
+    res.send(TextModel(&req.user, format!("Hello {name}"))).await;
+    Ok(())
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
   App::init()
-    .await?
-    .attach(Router::new()
-      .add("/", |res, req| async move {
-        res.send(TextModel::new(&req.user, "Enter your name")).await?;
-        res.redirect("/get_name").await?;
-        Ok(())
-      }
-      .add("/get_name", get_name)
-   ))
-  .launch()
-  .await?;
+      .await?
+      .attach(Router::new()
+          .add("/", |res, req| async move {
+              res.send(TextModel::new(&req.user, "Enter your name")).await?;
+              res.redirect("/get_name").await?;
+              Ok(())
+          }
+          .add("/get_name", get_name)
+     ))
+    .launch()
+    .await?;
   Ok(())
 }
 

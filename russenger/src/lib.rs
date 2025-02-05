@@ -150,6 +150,7 @@ pub use core::{
 };
 
 pub use anyhow;
+use anyhow::Context;
 pub use dotenv::dotenv;
 pub use rusql_alchemy;
 
@@ -191,20 +192,34 @@ impl ActionLock {
 /// # Fields
 ///
 /// * `query`: A `Query` that represents the query made by the user.
-#[derive(Clone)]
 pub struct App {
     query: Arc<Query>,
     router: Arc<Router>,
     action_lock: ActionLock,
+    facebook_api_version: String,
+    page_access_token: String,
+    addr: (String, u16),
 }
 
 impl App {
     /// `init` is method to create new `App` instance. in russenger
     pub async fn init() -> Result<Self> {
+        let facebook_api_version = std::env::var("FACEBOOK_API_VESION").unwrap_or("v19".into());
+        let page_access_token = std::env::var("PAGE_ACCESS_TOKEN")
+            .context("env variable `PAGE_ACCESS_TOKEN` should be set")?;
+
+        let host = std::env::var("HOST").unwrap_or_else(|_| "0.0.0.0".into());
+        let port = std::env::var("PORT")
+            .ok()
+            .and_then(|p| p.parse().ok())
+            .unwrap_or(2453);
         Ok(Self {
             query: Arc::new(Query::new().await?),
             router: Arc::new(Router::new()),
             action_lock: ActionLock::default(),
+            facebook_api_version,
+            page_access_token,
+            addr: (host, port),
         })
     }
 
@@ -254,9 +269,9 @@ impl App {
         self
     }
 
-    pub async fn launch(&self) -> Result<()> {
+    pub async fn launch(self) -> Result<()> {
         dotenv().ok();
-        run_server(self.clone()).await?;
+        run_server(Arc::new(self)).await?;
         Ok(())
     }
 }
@@ -268,21 +283,18 @@ fn print_info(host: &str, port: u16) {
     println!("  POST: {}/webhook - Webhook core endpoint", url);
 }
 
-async fn run_server(app: App) -> Result<()> {
-    let host = std::env::var("HOST").unwrap_or_else(|_| "0.0.0.0".into());
-    let port = std::env::var("PORT")
-        .ok()
-        .and_then(|p| p.parse().ok())
-        .unwrap_or(2453);
-    print_info(&host, port);
+async fn run_server(app: Arc<App>) -> Result<()> {
+    let addr = app.addr.clone();
+    let data = web::Data::new(app);
+    print_info(&addr.0, addr.1);
     HttpServer::new(move || {
         ActixApp::new()
-            .app_data(web::Data::new(app.clone()))
+            .app_data(data.clone())
             .service(webhook_verify)
             .service(webhook_core)
             .service(fs::Files::new("/static", "static").show_files_listing())
     })
-    .bind((host, port))?
+    .bind(addr)?
     .run()
     .await?;
     Ok(())

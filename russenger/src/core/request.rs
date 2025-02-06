@@ -11,7 +11,6 @@
 //! Use the `Req` to get the user and data from a request:
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
@@ -25,7 +24,6 @@
 //! Use the `Req` to get the user and query from a request:
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn index(res: Res, req: Req) -> Result<()> {
@@ -44,8 +42,6 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     let conn = Database::new().await?.conn;
-//!     migrate!([RussengerUser], &conn);
 //!     App::init().await?
 //!        .attach(router![("/", index),("/name", name)])
 //!        .launch()

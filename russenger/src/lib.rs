@@ -183,6 +183,7 @@ impl ActionLock {
 /// # Fields
 ///
 /// * `query`: A `Query` that represents the query made by the user.
+#[derive(Clone)]
 pub struct App {
     query: Arc<Query>,
     router: Arc<Router>,
@@ -264,7 +265,7 @@ impl App {
     }
 
     pub async fn launch(self) -> Result<()> {
-        run_server(Arc::new(self)).await?;
+        run_server(self).await?;
         Ok(())
     }
 }
@@ -276,7 +277,7 @@ fn print_info(host: &str, port: u16) {
     println!("  POST: {}/webhook - Webhook core endpoint", url);
 }
 
-async fn run_server(app: Arc<App>) -> Result<()> {
+async fn run_server(app: App) -> Result<()> {
     let addr = app.addr.clone();
     print_info(&addr.0, addr.1);
     HttpServer::new(move || {

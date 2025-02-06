@@ -25,4 +25,4 @@ dotenv = "0.15.0"
 anyhow = "1.0.95"
 
 # Orm
-rusql-alchemy = { git = "https://github.com/j03-dev/rusql-alchemy", branch = "add-auto-migration", version = "0.4.3-rc", default-features = false }
+rusql-alchemy = { version = "0.4.3-rc", default-features = false }

@@ -151,7 +151,6 @@ pub use core::{
 
 pub use anyhow;
 use anyhow::Context;
-pub use dotenv::dotenv;
 pub use rusql_alchemy;
 
 use error::Result;
@@ -204,7 +203,9 @@ pub struct App {
 impl App {
     /// `init` is method to create new `App` instance. in russenger
     pub async fn init() -> Result<Self> {
-        dotenv().ok();
+        let query = Arc::new(Query::new().await?);
+        query.migrate().await?;
+
         let facebook_api_version = std::env::var("FACEBOOK_API_VESION").unwrap_or("v19".into());
         let page_access_token = std::env::var("PAGE_ACCESS_TOKEN")
             .context("env variable `PAGE_ACCESS_TOKEN` should be set")?;
@@ -214,9 +215,6 @@ impl App {
             .ok()
             .and_then(|p| p.parse().ok())
             .unwrap_or(2453);
-
-        let query = Arc::new(Query::new().await?);
-        query.migrate().await?;
 
         Ok(Self {
             query,

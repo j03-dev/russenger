@@ -59,28 +59,26 @@ sqlx = "0.8.0"
 ```rust
 use russenger::prelude::*;
 
-
 async fn get_name(res: Res, req: Req) -> Result<()> {
     let name: String = req.data.get_value();
-    res.send(TextModel::new(&req.user, format!("Hello {name}"))).await;
+    res.send(TextModel::new(&req.user, format!("Hello {name}")))
+        .await;
     Ok(())
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
-  App::init()
-      .await?
-      .attach(Router::new()
-          .add("/", |res, req| async move {
-              res.send(TextModel::new(&req.user, "Enter your name")).await?;
-              res.redirect("/get_name").await?;
-              Ok(())
-          }
-          .add("/get_name", get_name)
-     ))
-    .launch()
-    .await?;
-  Ok(())
+    App::init().await?.attach(
+        Router::new()
+            .add("/", |res, req| async move {
+                res.send(TextModel::new(&req.user, "Enter your name: "))
+                    .await?;
+                res.redirect("/get_name").await?;
+                Ok(())
+            })
+            .add("/get_name", get_name),
+    );
+    Ok(())
 }
 
 ```

@@ -198,7 +198,7 @@ impl App {
     pub async fn init() -> Result<Self> {
         let query = Arc::new(Query::new().await?);
 
-        let facebook_api_version = std::env::var("FACEBOOK_API_VESION").unwrap_or("v19.0".into());
+        let facebook_api_version = std::env::var("FACEBOOK_API_VERSION").unwrap_or("v19.0".into());
         let page_access_token = std::env::var("PAGE_ACCESS_TOKEN")
             .context("env variable `PAGE_ACCESS_TOKEN` should be set")?;
 

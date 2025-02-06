@@ -1,8 +1,6 @@
-use russenger::models::RussengerUser;
 use russenger::prelude::*;
 
 mod gemini {
-    use russenger::dotenv;
     use serde::Deserialize;
     use serde::Serialize;
     const URL: &str =
@@ -35,7 +33,6 @@ mod gemini {
     }
 
     pub async fn ask_gemini(text: String) -> Result<Response, reqwest::Error> {
-        dotenv().ok();
         let api_key = std::env::var("API_KEY").expect("pls check your env file");
         let api_url = format!("{URL}{api_key}");
         let body = Body {
@@ -99,9 +96,6 @@ async fn ask_gemini(res: Res, req: Req) -> Result<()> {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let conn = Database::new().await?.conn;
-    migrate!([RussengerUser], &conn);
-
     App::init()
         .await?
         .attach(

@@ -20,7 +20,6 @@
 //! ## Examples
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn index(res: Res, req: Req) -> Result<()> {
@@ -40,9 +39,6 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     let conn = Database::new().await?.conn;
-//!     migrate!([RussengerUser], &conn);
-//!
 //!     App::init().await?
 //!         .attach(router![
 //!             ("/index", index),
@@ -89,18 +85,11 @@ impl Query {
     ///
     /// Panics if the connection cannot be established.
     pub(crate) async fn new() -> Result<Self> {
-        let conn = Database::new().await?.conn;
-        Ok(Self { conn })
-    }
-
-    /// Runs database migrations.
-    ///
-    /// # Returns
-    ///
-    /// Returns `true` if the migrations are successful, `false` otherwise.
-    pub async fn migrate(&self) -> Result<()> {
-        migrate!([RussengerUser], &self.conn);
-        Ok(())
+        let database = Database::new().await?;
+        database.migrate().await?;
+        Ok(Self {
+            conn: database.conn.clone(),
+        })
     }
 
     /// Creates a new record in the database.
@@ -138,7 +127,6 @@ impl Query {
     /// # Examples
     ///
     /// ```rust
-    /// use russenger::models::RussengerUser;
     /// use russenger::prelude::*;
     ///
     /// async fn index(res: Res, req: Req) -> Result<()> {
@@ -157,8 +145,6 @@ impl Query {
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<()> {
-    ///     let conn = Database::new().await?.conn;
-    ///     migrate!([RussengerUser], &conn);
     ///     App::init().await?
     ///         .attach(
     ///             router![

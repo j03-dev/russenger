@@ -24,7 +24,6 @@
 //! Creating a new action that sends a greeting message when the user input is "Hello":
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! #[derive(FromRow, Clone, Model)]
@@ -113,13 +112,6 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     // Connect to the database
-//!     let conn = Database::new().await?.conn;
-//!
-//!     // Migrate the database schema
-//!     migrate!([RussengerUser], &conn);
-//!
-//!     // Register the actions for the main application
 //!     App::init().await?
 //!        .attach(
 //!             Router::new()
@@ -151,7 +143,6 @@ pub use core::{
 
 pub use anyhow;
 use anyhow::Context;
-pub use dotenv::dotenv;
 pub use rusql_alchemy;
 
 use error::Result;
@@ -204,6 +195,8 @@ pub struct App {
 impl App {
     /// `init` is method to create new `App` instance. in russenger
     pub async fn init() -> Result<Self> {
+        let query = Arc::new(Query::new().await?);
+
         let facebook_api_version = std::env::var("FACEBOOK_API_VESION").unwrap_or("v19".into());
         let page_access_token = std::env::var("PAGE_ACCESS_TOKEN")
             .context("env variable `PAGE_ACCESS_TOKEN` should be set")?;
@@ -213,8 +206,9 @@ impl App {
             .ok()
             .and_then(|p| p.parse().ok())
             .unwrap_or(2453);
+
         Ok(Self {
-            query: Arc::new(Query::new().await?),
+            query,
             router: Arc::new(Router::new()),
             action_lock: ActionLock::default(),
             facebook_api_version,
@@ -270,7 +264,6 @@ impl App {
     }
 
     pub async fn launch(self) -> Result<()> {
-        dotenv().ok();
         run_server(Arc::new(self)).await?;
         Ok(())
     }

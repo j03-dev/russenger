@@ -53,7 +53,7 @@ PAGE_ACCESS_TOKEN=your_page_access_token_from_facebook_developer
 [dependencies]
 russenger = { version = "0.3.0", features = ["postgres"] } # supports 'sqlite, postgres, mysql'
 tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread"] }
-sqlx = "0.8.0"
+sqlx = "0.8.0" # optional if you not add custom model
 ```
 
 ```rust

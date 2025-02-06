@@ -11,7 +11,6 @@
 //! Use the `Req` to get the user and data from a request:
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
@@ -25,7 +24,6 @@
 //! Use the `Req` to get the user and query from a request:
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn index(res: Res, req: Req) -> Result<()> {
@@ -42,10 +40,8 @@
 //!     Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     let conn = Database::new().await?.conn;
-//!     migrate!([RussengerUser], &conn);
 //!     App::init().await?
 //!        .attach(router![("/", index),("/name", name)])
 //!        .launch()
@@ -53,6 +49,8 @@
 //!     Ok(())
 //! }
 //! ```
+use std::sync::Arc;
+
 use crate::query::Query;
 use crate::response_models::data::Data;
 
@@ -115,7 +113,7 @@ pub struct Req {
     ///     Ok(())
     /// }
     /// ```
-    pub query: Query,
+    pub query: Arc<Query>,
 
     /// The `Data` struct represents a data object with a value and an optional page.
     ///
@@ -180,7 +178,7 @@ impl Req {
     /// # Returns
     ///
     /// A `Req` that contains the provided user, query, data, and host.
-    pub fn new(user: &str, query: Query, data: Data, host: &str) -> Self {
+    pub fn new(user: &str, query: Arc<Query>, data: Data, host: &str) -> Self {
         Self {
             user: user.to_owned(),
             query,
@@ -221,7 +219,7 @@ impl Req {
     ///     Ok(())
     /// }
     ///
-    /// #[russenger::main]
+    /// #[tokio::main]
     /// async fn main() -> Result<()> {
     ///     App::init().await?
     ///         .attach(router![

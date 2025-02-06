@@ -1,4 +1,3 @@
-use russenger::models::RussengerUser;
 use russenger::prelude::*;
 
 #[derive(FromRow, Clone, Model)]
@@ -75,9 +74,6 @@ async fn next_action(res: Res, req: Req) -> Result<()> {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let conn = Database::new().await?.conn;
-    migrate!([RussengerUser, Register], &conn);
-
     App::init()
         .await?
         .attach(

@@ -20,7 +20,6 @@
 //! ## Examples
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn index(res: Res, req: Req) -> Result<()> {
@@ -38,11 +37,8 @@
 //!     Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     let conn = Database::new().await?.conn;
-//!     migrate!([RussengerUser], &conn);
-//!
 //!     App::init().await?
 //!         .attach(router![
 //!             ("/index", index),
@@ -54,7 +50,7 @@
 //! }
 //! ```
 use crate::models::RussengerUser;
-use anyhow::Result;
+use anyhow::{Context, Result};
 
 use rusql_alchemy::prelude::*;
 
@@ -89,18 +85,11 @@ impl Query {
     ///
     /// Panics if the connection cannot be established.
     pub(crate) async fn new() -> Result<Self> {
-        let conn = Database::new().await?.conn;
-        Ok(Self { conn })
-    }
-
-    /// Runs database migrations.
-    ///
-    /// # Returns
-    ///
-    /// Returns `true` if the migrations are successful, `false` otherwise.
-    pub async fn migrate(&self) -> Result<()> {
-        migrate!([RussengerUser], &self.conn);
-        Ok(())
+        let database = Database::new().await?;
+        database.migrate().await?;
+        Ok(Self {
+            conn: database.conn.clone(),
+        })
     }
 
     /// Creates a new record in the database.
@@ -138,7 +127,6 @@ impl Query {
     /// # Examples
     ///
     /// ```rust
-    /// use russenger::models::RussengerUser;
     /// use russenger::prelude::*;
     ///
     /// async fn index(res: Res, req: Req) -> Result<()> {
@@ -155,10 +143,8 @@ impl Query {
     ///     Ok(())
     /// }
     ///
-    /// #[russenger::main]
+    /// #[tokio::main]
     /// async fn main() -> Result<()> {
-    ///     let conn = Database::new().await?.conn;
-    ///     migrate!([RussengerUser], &conn);
     ///     App::init().await?
     ///         .attach(
     ///             router![
@@ -172,14 +158,11 @@ impl Query {
     /// }
     /// ```
     pub(crate) async fn set_path(&self, user_id: &str, path: &str) -> Result<()> {
-        if let Some(mut user) =
-            RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn).await?
-        {
-            user.action_path = path.to_owned();
-            Ok(user.update(&self.conn).await?)
-        } else {
-            Err(anyhow::anyhow!("user not found"))
-        }
+        let mut user = RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
+            .await?
+            .context("user not found")?;
+        user.action_path = path.to_owned();
+        Ok(user.update(&self.conn).await?)
     }
 
     /// Retrieves the action for a user.

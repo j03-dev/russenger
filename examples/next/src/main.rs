@@ -1,5 +1,5 @@
 use const_data::DATAS;
-use russenger::{models::RussengerUser, prelude::*};
+use russenger::prelude::*;
 
 mod const_data;
 
@@ -30,8 +30,6 @@ async fn index(res: Res, req: Req) -> Result<()> {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let conn = Database::new().await?.conn;
-    migrate!([RussengerUser], &conn);
     App::init()
         .await?
         .attach(Router::new().add("/", index))

@@ -19,7 +19,6 @@
 //! Creating a `Payload` and getting its path and data:
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn index (res: Res, req: Req) -> Result<()> {
@@ -37,10 +36,8 @@
 //!    Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     let conn = Database::new().await?.conn;
-//!     migrate!([RussengerUser], &conn);
 //!     App::init().await?
 //!         .attach(router![("/", index), ("/hello_world", hello_world)])
 //!         .launch()

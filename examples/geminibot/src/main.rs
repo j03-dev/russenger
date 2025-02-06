@@ -1,4 +1,3 @@
-use russenger::models::RussengerUser;
 use russenger::prelude::*;
 
 mod gemini {
@@ -99,9 +98,6 @@ async fn ask_gemini(res: Res, req: Req) -> Result<()> {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let conn = Database::new().await?.conn;
-    migrate!([RussengerUser], &conn);
-
     App::init()
         .await?
         .attach(

@@ -98,8 +98,11 @@ impl Query {
     /// # Returns
     ///
     /// Returns `true` if the migrations are successful, `false` otherwise.
-    pub async fn migrate(&self) -> Result<()> {
-        migrate!([RussengerUser], &self.conn);
+    pub(crate) async fn migrate(&self) -> Result<()> {
+        for model in inventory::iter::<MigrationRegistrar> {
+            (model.migrate_fn)(self.conn.clone()).await?;
+        }
+
         Ok(())
     }
 

@@ -213,8 +213,12 @@ impl App {
             .ok()
             .and_then(|p| p.parse().ok())
             .unwrap_or(2453);
+
+        let query = Arc::new(Query::new().await?);
+        query.migrate().await?;
+
         Ok(Self {
-            query: Arc::new(Query::new().await?),
+            query,
             router: Arc::new(Router::new()),
             action_lock: ActionLock::default(),
             facebook_api_version,

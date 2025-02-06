@@ -62,7 +62,7 @@ use russenger::prelude::*;
 async fn get_name(res: Res, req: Req) -> Result<()> {
     let name: String = req.data.get_value();
     res.send(TextModel::new(&req.user, format!("Hello {name}")))
-        .await;
+        .await?;
     Ok(())
 }
 

@@ -204,6 +204,7 @@ pub struct App {
 impl App {
     /// `init` is method to create new `App` instance. in russenger
     pub async fn init() -> Result<Self> {
+        dotenv().ok();
         let facebook_api_version = std::env::var("FACEBOOK_API_VESION").unwrap_or("v19".into());
         let page_access_token = std::env::var("PAGE_ACCESS_TOKEN")
             .context("env variable `PAGE_ACCESS_TOKEN` should be set")?;
@@ -274,7 +275,6 @@ impl App {
     }
 
     pub async fn launch(self) -> Result<()> {
-        dotenv().ok();
         run_server(Arc::new(self)).await?;
         Ok(())
     }

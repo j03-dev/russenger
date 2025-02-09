@@ -153,8 +153,8 @@ impl<'p> PersistentMenuModel<'p> {
     /// ```
     ///
     /// This example shows how to create a new `PersistentMenuModel`.
-    pub fn new(sender: &'p str, buttons: Vec<Button>) -> Self {
-        let buttons: Vec<_> = buttons.iter().map(|btn| btn.to_value()).collect();
+    pub fn new(sender: &'p str, buttons: impl IntoIterator<Item = Button>) -> Self {
+        let buttons: Vec<_> = buttons.into_iter().map(|btn| btn.to_value()).collect();
 
         Self {
             psid: sender,

@@ -113,11 +113,13 @@ impl<'s> TextModel<'s> {
     /// ```
     ///
     /// [Facebook Documentation](https://developers.facebook.com/docs/messenger-platform/send-messages#sending_text)
-    pub fn new(sender: &'s str, text: impl Into<String>) -> Self {
+    pub fn new(sender: &'s str, text: impl ToString) -> Self {
         Self {
             recipient: Recipient { id: sender },
             messaging_type: "RESPONSE",
-            message: Text { text: text.into() },
+            message: Text {
+                text: text.to_string(),
+            },
         }
     }
 }

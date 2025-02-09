@@ -143,10 +143,10 @@ impl QuickReply {
     ///     Ok(())
     /// }
     /// ```
-    pub fn new(title: impl Into<String>, image_url: Option<&String>, payload: Payload) -> Self {
+    pub fn new(title: impl ToString, image_url: Option<&String>, payload: Payload) -> Self {
         Self {
             content_type: "text".to_owned(),
-            title: title.into(),
+            title: title.to_string(),
             payload: payload.to_string(),
             image_url: image_url.cloned(),
         }

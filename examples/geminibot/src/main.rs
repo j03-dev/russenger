@@ -60,7 +60,7 @@ async fn index(res: Res, req: Req) -> Result<()> {
     res.send(PersistentMenuModel::new(
         &req.user,
         [Button::Postback {
-            title: "AskGemini".into(),
+            title: "AskGemini",
             payload: Payload::new("/hello_world", None),
         }],
     ))

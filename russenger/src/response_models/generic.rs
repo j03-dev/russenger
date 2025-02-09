@@ -151,19 +151,19 @@ impl GenericElement {
     ///
     /// This example shows how to create a new `GenericElement`.
     pub fn new(
-        title: impl Into<String>,
-        image_url: impl Into<String>,
-        subtitle: impl Into<String>,
-        buttons: impl IntoIterator<Item = Button>,
+        title: impl ToString,
+        image_url: impl ToString,
+        subtitle: impl ToString,
+        buttons: impl IntoIterator<Item = Button<impl ToString>>,
     ) -> Self {
         let buttons: Vec<_> = buttons.into_iter().map(|btn| btn.to_value()).collect();
         if buttons.len() > 3 {
             panic!("Buttons must be three maximum")
         }
         Self {
-            title: title.into(),
-            image_url: image_url.into(),
-            subtitle: subtitle.into(),
+            title: title.to_string(),
+            image_url: image_url.to_string(),
+            subtitle: subtitle.to_string(),
             buttons,
         }
     }

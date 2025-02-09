@@ -15,7 +15,7 @@ async fn index(res: Res, req: Req) -> Result<()> {
 async fn start(res: Res, req: Req) -> Result<()> {
     res.send(PersistentMenuModel::new(
         &req.user,
-        vec![Button::Postback {
+        [Button::Postback {
             title: "hello world".to_string(),
             payload: Payload::new("/hello_world", None),
         }],

@@ -55,7 +55,7 @@ async fn get_user_input(res: Res, req: Req) -> Result<()> {
     let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value)));
 
     // QuickReply
-    let quick_replies: Vec<QuickReply> = vec![
+    let quick_replies = [
         QuickReply::new("blue", None, payload("blue")),
         QuickReply::new("red", None, payload("red")),
     ];

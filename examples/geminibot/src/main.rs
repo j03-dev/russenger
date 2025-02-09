@@ -59,7 +59,7 @@ async fn index(res: Res, req: Req) -> Result<()> {
         .await?;
     res.send(PersistentMenuModel::new(
         &req.user,
-        vec![Button::Postback {
+        [Button::Postback {
             title: "AskGemini".into(),
             payload: Payload::new("/hello_world", None),
         }],

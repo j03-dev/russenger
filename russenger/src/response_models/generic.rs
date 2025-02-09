@@ -296,7 +296,12 @@ impl<'g> GenericModel<'g> {
     /// ```
     ///
     /// This example shows how to create a new `GenericModel` and send it.
-    pub fn new(sender: &'g str, mut elements: Vec<GenericElement>, page: Option<Page>) -> Self {
+    pub fn new(
+        sender: &'g str,
+        elements: impl IntoIterator<Item = GenericElement>,
+        page: Option<Page>,
+    ) -> Self {
+        let mut elements: Vec<GenericElement> = elements.into_iter().collect();
         if let Some(p) = page {
             elements = elements.into_iter().skip(p.0).take(p.1 - p.0).collect();
         } else if elements.len() >= MAX_PAGE {

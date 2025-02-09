@@ -154,12 +154,12 @@ impl GenericElement {
         title: impl Into<String>,
         image_url: impl Into<String>,
         subtitle: impl Into<String>,
-        buttons: Vec<Button>,
+        buttons: impl IntoIterator<Item = Button>,
     ) -> Self {
+        let buttons: Vec<_> = buttons.into_iter().map(|btn| btn.to_value()).collect();
         if buttons.len() > 3 {
             panic!("Buttons must be three maximum")
         }
-        let buttons: Vec<_> = buttons.iter().map(|btn| btn.to_value()).collect();
         Self {
             title: title.into(),
             image_url: image_url.into(),

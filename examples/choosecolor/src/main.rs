@@ -18,7 +18,7 @@ async fn index(res: Res, req: Req) -> Result<()> {
     {
         res.send(TextModel::new(
             &req.user,
-            &format!("Hello {}", user_register.username),
+            format!("Hello {}", user_register.username),
         ))
         .await?;
     } else {

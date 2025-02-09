@@ -225,14 +225,14 @@ impl<'q> QuickReplyModel<'q> {
     /// ```
     pub fn new(
         sender: &'q str,
-        message: impl Into<String>,
+        message: impl ToString,
         quick_replies: impl IntoIterator<Item = QuickReply>,
     ) -> Self {
         Self {
             recipient: Recipient { id: sender },
             messaging_type: "RESPONSE",
             message: QuickMessage {
-                text: message.into(),
+                text: message.to_string(),
                 quick_replies: quick_replies.into_iter().collect(),
             },
         }

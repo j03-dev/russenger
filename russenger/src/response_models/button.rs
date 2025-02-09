@@ -105,23 +105,19 @@ pub enum Button<T: ToString> {
 }
 
 impl<T: ToString> Button<T> {
-    pub fn to_value(&self) -> Value {
+    pub(crate) fn to_value(&self) -> Value {
         match self {
-            Self::AccountLink { url } => {
-                json!({"type": "account_link", "url": url.to_string()})
-            }
-            Self::AccountUnlink => {
-                json!({"type": "account_unlink"})
-            }
-            Self::Postback { title, payload } | Self::PhoneNumber { title, payload } => json!({
-                "type": "postback",
-                "title": title.to_string(),
-                "payload": payload.to_string()
-            }),
+            Self::AccountUnlink => json!({"type": "account_unlink"}),
+            Self::AccountLink { url } => json!({"type": "account_link", "url": url.to_string()}),
             Self::WebUrl { title, url } => json!({
                 "type": "web_url",
                 "title": title.to_string(),
                 "url": url.to_string()
+            }),
+            Self::Postback { title, payload } | Self::PhoneNumber { title, payload } => json!({
+                "type": "postback",
+                "title": title.to_string(),
+                "payload": payload.to_string()
             }),
         }
     }

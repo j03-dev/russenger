@@ -8,7 +8,7 @@ publish = false
 
 
 [dependencies]
-russenger.path = "../../russenger"
+russenger = { path = "../../russenger", features = ["sqlite"] }
 sqlx.workspace = true
 
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

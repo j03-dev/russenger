@@ -16,7 +16,7 @@ async fn start(res: Res, req: Req) -> Result<()> {
     res.send(PersistentMenuModel::new(
         &req.user,
         [Button::Postback {
-            title: "hello world".to_string(),
+            title: "hello world",
             payload: Payload::new("/hello_world", None),
         }],
     ))

@@ -25,7 +25,7 @@
 //!     res.send(GetStartedButtonModel::new(Payload::default())).await?;
 //!     let buttons = vec![
 //!         Button::Postback {
-//!             title: "Option 1".to_owned(),
+//!             title: "Option 1",
 //!             payload: Payload::new("/option_1", None),
 //!         },
 //!         // More buttons
@@ -89,7 +89,7 @@ struct Menu<'m> {
 ///     res.send(GetStartedButtonModel::new(Payload::default())).await?;
 ///     let buttons = vec![
 ///         Button::Postback {
-///             title: "Option 1".to_owned(),
+///             title: "Option 1",
 ///             payload: Payload::new("/option_1", None),
 ///         },
 ///         // More buttons
@@ -137,7 +137,7 @@ impl<'p> PersistentMenuModel<'p> {
     ///
     /// let buttons = vec![
     ///     Button::Postback {
-    ///         title: "Option 1".to_owned(),
+    ///         title: "Option 1",
     ///         payload: Payload::new("/option_1", None),
     ///     },
     ///     // More buttons

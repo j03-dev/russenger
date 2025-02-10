@@ -30,7 +30,7 @@
 //! }
 //!
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
-//!    let value: String = req.data.get_value();
+//!    let value: String = req.data.get_value()?;
 //!    res.send(TextModel::new(&req.user, &value)).await?;
 //!
 //!    Ok(())
@@ -82,7 +82,7 @@ use super::data::Data;
 /// let payload = Payload::new("/hello_world", Some(data));
 ///
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-///    let value: String = req.data.get_value();
+///    let value: String = req.data.get_value()?;
 ///    res.send(TextModel::new(&req.user, &value)).await?;
 ///
 ///    Ok(())

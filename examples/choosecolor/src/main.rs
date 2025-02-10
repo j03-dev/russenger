@@ -33,7 +33,7 @@ async fn index(res: Res, req: Req) -> Result<()> {
 }
 
 async fn signup(res: Res, req: Req) -> Result<()> {
-    let username: String = req.data.get_value();
+    let username: String = req.data.get_value()?;
     let message = if Register::create(
         kwargs!(user_id = req.user, username = username),
         &req.query.conn,
@@ -66,7 +66,7 @@ async fn get_user_input(res: Res, req: Req) -> Result<()> {
 }
 
 async fn next_action(res: Res, req: Req) -> Result<()> {
-    let color: String = req.data.get_value();
+    let color: String = req.data.get_value()?;
     res.send(TextModel::new(&req.user, &color)).await?;
     index(res, req).await?; // goto index action
     Ok(())

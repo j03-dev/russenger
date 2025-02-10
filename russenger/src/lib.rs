@@ -62,7 +62,7 @@
 //!
 //! async fn signup(res: Res, req: Req) -> Result<()> {
 //!     // Get the username from the user input
-//!     let username: String = req.data.get_value();
+//!     let username: String = req.data.get_value()?;
 //!
 //!     // Try to create a new Register record for the user
 //!     let message = if Register::create(kwargs!(user_id = req.user, username = username), &req.query.conn).await {
@@ -99,7 +99,7 @@
 //!
 //! async fn next_action(res: Res, req: Req) -> Result<()> {
 //!     // Get the color chosen by the user
-//!     let color: String = req.data.get_value();
+//!     let color: String = req.data.get_value()?;
 //!
 //!     // Send a message to the user confirming their choice
 //!     res.send(TextModel::new(&req.user, &color)).await?;
@@ -235,7 +235,7 @@ impl App {
     /// }
     ///
     /// async fn next_action(res: Res, req: Req) -> Result<()> {
-    ///     let message: String = req.data.get_value();
+    ///     let message: String = req.data.get_value()?;
     ///     res.send(TextModel::new(&req.user, &message)).await?; // send the message to the user
     ///     Ok(())
     /// }

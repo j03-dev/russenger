@@ -38,7 +38,7 @@
 //! }
 //!
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
-//!     let hello_world: String = req.data.get_value();
+//!     let hello_world: String = req.data.get_value()?;
 //!     res.send(TextModel::new(&req.user, &hello_world)).await?;
 //!
 //!     Ok(())
@@ -92,7 +92,7 @@ use super::{
 ///
 ///
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-///     let hello_world: String = req.data.get_value();
+///     let hello_world: String = req.data.get_value()?;
 ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
 ///
 ///     Ok(())
@@ -142,7 +142,7 @@ impl GenericElement {
     /// );
     ///
     /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-    ///     let hello_world: String = req.data.get_value();
+    ///     let hello_world: String = req.data.get_value()?;
     ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
     ///
     ///     Ok(())
@@ -237,7 +237,7 @@ struct GenericMessage {
 /// }
 ///
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-///     let hello_world: String = req.data.get_value();
+///     let hello_world: String = req.data.get_value()?;
 ///    res.send(TextModel::new(&req.user, &hello_world)).await?;
 ///
 ///    Ok(())
@@ -288,7 +288,7 @@ impl<'g> GenericModel<'g> {
     /// let message = GenericModel::new("sender_id", elements, None);
     ///
     /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-    ///     let hello_world: String = req.data.get_value();
+    ///     let hello_world: String = req.data.get_value()?;
     ///    res.send(TextModel::new(&req.user, &hello_world)).await?;
     ///
     ///    Ok(())

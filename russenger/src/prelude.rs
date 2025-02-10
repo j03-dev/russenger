@@ -14,7 +14,7 @@
 //! use russenger::prelude::*;
 //!
 //! async fn index (res: Res, req: Req) -> Result<()> {
-//!     let message: String = req.data.get_value();
+//!     let message: String = req.data.get_value()?;
 //!     if message == "Hi" {
 //!         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await?;
 //!     }

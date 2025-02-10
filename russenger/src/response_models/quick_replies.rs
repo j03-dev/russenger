@@ -48,7 +48,7 @@
 //!
 //!
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
-//!     let hello_world: String = req.data.get_value();
+//!     let hello_world: String = req.data.get_value()?;
 //!     res.send(TextModel::new(&req.user, &hello_world)).await?;
 //!
 //!     Ok(())
@@ -103,7 +103,7 @@ use super::{payload::Payload, recipient::Recipient};
 /// let quick_reply = QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload);
 ///
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-///     let hello_world: String = req.data.get_value();
+///     let hello_world: String = req.data.get_value()?;
 ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
 ///
 ///     Ok(())

@@ -15,7 +15,7 @@
 //!
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!     let user: String = req.user;
-//!     let message: String  = req.data.get_value();
+//!     let message: String  = req.data.get_value()?;
 //!     res.send(TextModel::new(&user, "Hello, world!")).await?;
 //!
 //!     Ok(())
@@ -34,7 +34,7 @@
 //! }
 //!
 //! async fn name(res: Res, req: Req)  -> Result<()> {
-//!     let name: String = req.data.get_value();
+//!     let name: String = req.data.get_value()?;
 //!     res.send(TextModel::new(&req.user, &format!("Hello, {}!", name))).await?;
 //!
 //!     Ok(())
@@ -200,7 +200,7 @@ impl Req {
     /// use russenger::prelude::*;
     ///
     /// async fn home(res: Res, req: Req) -> Result<()> {
-    ///     let user_input: String = req.data.get_value(); // Extract the current data
+    ///     let user_input: String = req.data.get_value()?; // Extract the current data
     ///     res.send(TextModel::new(&req.user, &format!("User input received: {}", user_input)))
     ///         .await?;
     ///
@@ -213,7 +213,7 @@ impl Req {
     /// }
     ///
     /// async fn next_action(res: Res, req: Req) -> Result<()> {
-    ///     let user_input: String = req.data.get_value(); // Retrieve the updated data
+    ///     let user_input: String = req.data.get_value()?; // Retrieve the updated data
     ///     res.send(TextModel::new(&req.user, &format!("Processed user input: {}", user_input)))
     ///         .await?;
     ///     Ok(())

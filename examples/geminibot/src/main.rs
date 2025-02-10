@@ -78,7 +78,7 @@ async fn hello_world(res: Res, req: Req) -> Result<()> {
 }
 
 async fn ask_gemini(res: Res, req: Req) -> Result<()> {
-    let text: String = req.data.get_value();
+    let text: String = req.data.get_value()?;
     match gemini::ask_gemini(text).await {
         Ok(response) => {
             for part in response.candidates[0].content.parts.clone() {

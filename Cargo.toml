@@ -9,7 +9,7 @@ actix-files = "0.6.5"
 reqwest = "0.12.4"
 
 # Async utilities
-tokio = "1.38.0"
+tokio = "^1.43.0"
 
 # Database
 sqlx = "0.8"
@@ -25,4 +25,4 @@ dotenv = "0.15.0"
 anyhow = "1.0.95"
 
 # Orm
-rusql-alchemy = { version = "0.4.2-rc", default-features = false }
+rusql-alchemy = { version = "0.4.3-rc", default-features = false }

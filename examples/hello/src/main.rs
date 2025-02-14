@@ -1,8 +1,7 @@
-use russenger::models::RussengerUser;
 use russenger::prelude::*;
 
 async fn index(res: Res, req: Req) -> Result<()> {
-    let message: String = req.data.get_value();
+    let message: String = req.data.get_value()?;
     if message.to_lowercase() == "hello" {
         res.send(TextModel::new(&req.user, "Hello, welcome !"))
             .await?;
@@ -16,8 +15,8 @@ async fn index(res: Res, req: Req) -> Result<()> {
 async fn start(res: Res, req: Req) -> Result<()> {
     res.send(PersistentMenuModel::new(
         &req.user,
-        vec![Button::Postback {
-            title: "hello world".to_string(),
+        [Button::Postback {
+            title: "hello world",
             payload: Payload::new("/hello_world", None),
         }],
     ))
@@ -33,9 +32,6 @@ async fn hello_world(res: Res, req: Req) -> Result<()> {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let conn = Database::new().await?.conn;
-    migrate!([RussengerUser], &conn);
-
     App::init()
         .await?
         .attach(

@@ -66,6 +66,7 @@ pub trait ResponseModel: Serialize {
 }
 
 pub mod data {
+    use crate::error::Result;
     use serde::{Deserialize, Serialize};
 
     const MAX_VALUE_AUTHORIZED: usize = 500;
@@ -148,12 +149,12 @@ pub mod data {
         ///
         /// * `Data`: The created `Data`.
         ///
-        pub fn new<T: Serialize>(value: T) -> Self {
+        pub fn new(value: impl Serialize) -> Self {
             let value = serde_json::to_string(&value).unwrap_or_default().verify();
             Self { value, page: None }
         }
 
-        pub fn new_with_page<T: Serialize>(value: T, page: Option<Page>) -> Self {
+        pub fn new_with_page(value: impl Serialize, page: Option<Page>) -> Self {
             let value = serde_json::to_string(&value).unwrap_or_default().verify();
             Self { value, page }
         }
@@ -185,8 +186,8 @@ pub mod data {
         /// let data = Data::new("value"());
         /// let value: String = data.get_value();
         /// ```
-        pub fn get_value<T: for<'a> Deserialize<'a> + Default>(&self) -> T {
-            serde_json::from_str::<T>(&self.value).unwrap_or_default()
+        pub fn get_value<T: for<'a> Deserialize<'a> + Default>(&self) -> Result<T> {
+            Ok(serde_json::from_str::<T>(&self.value)?)
         }
 
         /// Returns the page of the data.

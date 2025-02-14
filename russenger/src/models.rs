@@ -25,7 +25,6 @@
 //! ### Examples
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn index(res: Res, req: Req) -> Result<()> {
@@ -36,17 +35,15 @@
 //! }
 //!
 //! async fn get_user_input(res: Res, req: Req) -> Result<()> {
-//!     let username: String = req.data.get_value();
+//!     let username: String = req.data.get_value()?;
 //!     res.send(TextModel::new(&req.user, &format!("Hello : {username}"))).await?;
 //!     index(res, req).await?; // go back to index Action
 //!
 //!     Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     let conn = Database::new().await?.conn;
-//!     migrate!([RussengerUser], &conn);
 //!     App::init().await?
 //!         .attach(
 //!             router![

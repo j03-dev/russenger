@@ -1,8 +1,6 @@
-use russenger::models::RussengerUser;
 use russenger::prelude::*;
 
 mod gemini {
-    use russenger::dotenv;
     use serde::Deserialize;
     use serde::Serialize;
     const URL: &str =
@@ -35,7 +33,6 @@ mod gemini {
     }
 
     pub async fn ask_gemini(text: String) -> Result<Response, reqwest::Error> {
-        dotenv().ok();
         let api_key = std::env::var("API_KEY").expect("pls check your env file");
         let api_url = format!("{URL}{api_key}");
         let body = Body {
@@ -62,8 +59,8 @@ async fn index(res: Res, req: Req) -> Result<()> {
         .await?;
     res.send(PersistentMenuModel::new(
         &req.user,
-        vec![Button::Postback {
-            title: "AskGemini".into(),
+        [Button::Postback {
+            title: "AskGemini",
             payload: Payload::new("/hello_world", None),
         }],
     ))
@@ -81,7 +78,7 @@ async fn hello_world(res: Res, req: Req) -> Result<()> {
 }
 
 async fn ask_gemini(res: Res, req: Req) -> Result<()> {
-    let text: String = req.data.get_value();
+    let text: String = req.data.get_value()?;
     match gemini::ask_gemini(text).await {
         Ok(response) => {
             for part in response.candidates[0].content.parts.clone() {
@@ -99,9 +96,6 @@ async fn ask_gemini(res: Res, req: Req) -> Result<()> {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let conn = Database::new().await?.conn;
-    migrate!([RussengerUser], &conn);
-
     App::init()
         .await?
         .attach(

@@ -24,7 +24,6 @@
 //! Creating a new action that sends a greeting message when the user input is "Hello":
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! #[derive(FromRow, Clone, Model)]
@@ -63,7 +62,7 @@
 //!
 //! async fn signup(res: Res, req: Req) -> Result<()> {
 //!     // Get the username from the user input
-//!     let username: String = req.data.get_value();
+//!     let username: String = req.data.get_value()?;
 //!
 //!     // Try to create a new Register record for the user
 //!     let message = if Register::create(kwargs!(user_id = req.user, username = username), &req.query.conn).await {
@@ -100,7 +99,7 @@
 //!
 //! async fn next_action(res: Res, req: Req) -> Result<()> {
 //!     // Get the color chosen by the user
-//!     let color: String = req.data.get_value();
+//!     let color: String = req.data.get_value()?;
 //!
 //!     // Send a message to the user confirming their choice
 //!     res.send(TextModel::new(&req.user, &color)).await?;
@@ -111,15 +110,8 @@
 //!     Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     // Connect to the database
-//!     let conn = Database::new().await?.conn;
-//!
-//!     // Migrate the database schema
-//!     migrate!([RussengerUser], &conn);
-//!
-//!     // Register the actions for the main application
 //!     App::init().await?
 //!        .attach(
 //!             Router::new()
@@ -150,7 +142,7 @@ pub use core::{
 };
 
 pub use anyhow;
-pub use dotenv::dotenv;
+use anyhow::Context;
 pub use rusql_alchemy;
 
 use error::Result;
@@ -162,13 +154,13 @@ use tokio::sync::Mutex;
 
 use std::{collections::HashSet, sync::Arc};
 
-#[derive(Clone)]
-pub struct ActionLock {
-    pub locked_users: Arc<Mutex<HashSet<String>>>,
+#[derive(Clone, Default)]
+struct ActionLock {
+    locked_users: Arc<Mutex<HashSet<String>>>,
 }
 
 impl ActionLock {
-    pub async fn lock(&self, user: &str) -> bool {
+    async fn lock(&self, user: &str) -> bool {
         let mut locked_user = self.locked_users.lock().await;
         if !locked_user.contains(user) {
             locked_user.insert(user.to_string());
@@ -178,7 +170,7 @@ impl ActionLock {
         }
     }
 
-    pub async fn unlock(&self, user: &str) {
+    async fn unlock(&self, user: &str) {
         let mut locked_users = self.locked_users.lock().await;
         locked_users.remove(user);
     }
@@ -193,21 +185,36 @@ impl ActionLock {
 /// * `query`: A `Query` that represents the query made by the user.
 #[derive(Clone)]
 pub struct App {
-    pub(crate) query: Query,
-    pub(crate) router: Arc<Router>,
-    pub(crate) action_lock: ActionLock,
+    query: Arc<Query>,
+    router: Arc<Router>,
+    action_lock: ActionLock,
+    facebook_api_version: String,
+    page_access_token: String,
+    addr: (String, u16),
 }
 
 impl App {
     /// `init` is method to create new `App` instance. in russenger
     pub async fn init() -> Result<Self> {
-        let query: Query = Query::new().await?;
+        let query = Arc::new(Query::new().await?);
+
+        let facebook_api_version = std::env::var("FACEBOOK_API_VERSION").unwrap_or("v19.0".into());
+        let page_access_token = std::env::var("PAGE_ACCESS_TOKEN")
+            .context("env variable `PAGE_ACCESS_TOKEN` should be set")?;
+
+        let host = std::env::var("HOST").unwrap_or_else(|_| "0.0.0.0".into());
+        let port = std::env::var("PORT")
+            .ok()
+            .and_then(|p| p.parse().ok())
+            .unwrap_or(2453);
+
         Ok(Self {
             query,
             router: Arc::new(Router::new()),
-            action_lock: ActionLock {
-                locked_users: Arc::new(Mutex::new(HashSet::new())),
-            },
+            action_lock: ActionLock::default(),
+            facebook_api_version,
+            page_access_token,
+            addr: (host, port),
         })
     }
 
@@ -228,7 +235,7 @@ impl App {
     /// }
     ///
     /// async fn next_action(res: Res, req: Req) -> Result<()> {
-    ///     let message: String = req.data.get_value();
+    ///     let message: String = req.data.get_value()?;
     ///     res.send(TextModel::new(&req.user, &message)).await?; // send the message to the user
     ///     Ok(())
     /// }
@@ -239,7 +246,7 @@ impl App {
     ///        .add("/next_action", next_action)
     /// }
     ///
-    /// #[russenger::main]
+    /// #[tokio::main]
     /// async fn main() -> Result<()> {
     ///     App::init().await?
     ///         .attach(group_actions()).await // Attach group actions to the application's router
@@ -257,9 +264,8 @@ impl App {
         self
     }
 
-    pub async fn launch(&self) -> Result<()> {
-        dotenv().ok();
-        run_server(self.clone()).await?;
+    pub async fn launch(self) -> Result<()> {
+        run_server(self).await?;
         Ok(())
     }
 }
@@ -272,12 +278,8 @@ fn print_info(host: &str, port: u16) {
 }
 
 async fn run_server(app: App) -> Result<()> {
-    let host = std::env::var("HOST").unwrap_or_else(|_| "0.0.0.0".into());
-    let port = std::env::var("PORT")
-        .ok()
-        .and_then(|p| p.parse().ok())
-        .unwrap_or(2453);
-    print_info(&host, port);
+    let addr = app.addr.clone();
+    print_info(&addr.0, addr.1);
     HttpServer::new(move || {
         ActixApp::new()
             .app_data(web::Data::new(app.clone()))
@@ -285,7 +287,7 @@ async fn run_server(app: App) -> Result<()> {
             .service(webhook_core)
             .service(fs::Files::new("/static", "static").show_files_listing())
     })
-    .bind((host, port))?
+    .bind(addr)?
     .run()
     .await?;
     Ok(())

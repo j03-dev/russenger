@@ -11,11 +11,10 @@
 //! Using the `prelude` module to include everything needed for a basic application:
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn index (res: Res, req: Req) -> Result<()> {
-//!     let message: String = req.data.get_value();
+//!     let message: String = req.data.get_value()?;
 //!     if message == "Hi" {
 //!         res.send(TextModel::new(&req.user, "Hello, welcome to our bot!")).await?;
 //!     }
@@ -23,10 +22,8 @@
 //!     Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     let conn = Database::new().await?.conn;
-//!     migrate!([RussengerUser], &conn);
 //!     App::init().await?
 //!         .attach(Router::new().add("/", index))
 //!         .launch().await?;

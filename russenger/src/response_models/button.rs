@@ -5,31 +5,28 @@
 //! Creating a new button:
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn index(res: Res, req: Req) -> Result<()> {
 //!     let payload = Payload::new("/hello_world", Some(Data::new("HelloWorld")));
 //!     let buttons = vec![
-//!         Button::Postback { title: "Click me".to_owned(), payload },
+//!         Button::Postback { title: "Click me", payload },
 //!     ];
 //!     let button_model = ButtonModel::new("sender_id", "Hello, user1!", buttons);
 //!     res.send(button_model).await?;
 //!
 //!     Ok(())
 //! }
-//! 
+//!
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
-//!     let value: String = req.data.get_value();
+//!     let value: String = req.data.get_value()?;
 //!     res.send(TextModel::new(&req.user, &value)).await?;
 //!
 //!     Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     let conn = Database::new().await?.conn;
-//!     migrate!([RussengerUser], &conn);
 //!     App::init().await?
 //!         .attach(router![
 //!             ("/", index),
@@ -68,63 +65,59 @@ use super::{payload::Payload, recipient::Recipient, ResponseModel};
 ///
 /// // Creating an AccountLink button
 /// let account_link_button = Button::AccountLink {
-///     url: "https://www.facebook.com/your_account_page".to_owned(),
+///     url: "https://www.facebook.com/your_account_page",
 /// };
 ///
 /// // Creating a WebUrl button
 /// let web_url_button = Button::WebUrl {
-///     title: "Visit Website".to_owned(),
+///     title: "Visit Website",
 ///     url: "https://example.com".to_owned(),
 /// };
 ///
 /// // Creating a Postback button
 /// let postback_button = Button::Postback {
-///     title: "Click me".to_owned(),
+///     title: "Click me",
 ///     payload: Payload::new(HelloWorld, Some(Data::new("HelloWorld", None))),
 /// };
 ///
 /// // Creating a PhoneNumber button
 /// let phone_number_button = Button::PhoneNumber {
-///     title: "Call me".to_owned(),
+///     title: "Call me",
 ///     payload: Payload::new(HelloWorld, Some(Data::new("<PhoneNumber>", None))),
 /// };
 ///
 /// use russenger::prelude::*;
 ///
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-///     let payload: String = req.data.get_value();
+///     let payload: String = req.data.get_value()?;
 ///     res.send(TextModel::new(&req.user, &payload)).await?;
 ///
 ///     Ok(())
 /// }
 /// ```
 #[derive(Clone, Debug, Serialize)]
-pub enum Button {
+pub enum Button<T: ToString> {
     AccountUnlink,
-    AccountLink { url: String },
-    WebUrl { title: String, url: String },
-    Postback { title: String, payload: Payload },
-    PhoneNumber { title: String, payload: Payload },
+    AccountLink { url: T },
+    WebUrl { title: T, url: T },
+    Postback { title: T, payload: Payload },
+    PhoneNumber { title: T, payload: Payload },
 }
 
-impl Button {
-    pub fn to_value(&self) -> Value {
-        match self.clone() {
-            Self::AccountLink { url } => {
-                json!({"type": "account_link", "url": url})
-            }
-            Self::AccountUnlink => {
-                json!({"type": "account_unlink"})
-            }
-            Self::Postback { title, payload } | Self::PhoneNumber { title, payload } => json!({
-                "type": "postback",
-                "title": title,
-                "payload": payload.to_string()
-            }),
+impl<T: ToString> Button<T> {
+    pub(crate) fn to_value(&self) -> Value {
+        match self {
+            Self::AccountUnlink => json!({"type": "account_unlink"}),
+            Self::AccountLink { url } => json!({"type": "account_link", "url": url.to_string()}),
             Self::WebUrl { title, url } => json!({
                 "type": "web_url",
-                "title": title,
-                "url": url
+                "title": title.to_string(),
+                "url": url.to_string()
+            }),
+            Self::Postback { title, payload } | Self::PhoneNumber { title, payload } => json!({
+                "type": "postback",
+                "title": title.to_string(),
+                "payload": payload.to_string()
             }),
         }
     }
@@ -205,8 +198,15 @@ impl<'b> ButtonModel<'b> {
     /// ];
     /// ButtonModel::new("sender_id", "Option", buttons);
     /// ```
-    pub fn new(sender: &'b str, text: &'b str, buttons: Vec<Button>) -> Self {
-        let buttons = buttons.iter().map(|button| button.to_value()).collect();
+    pub fn new(
+        sender: &'b str,
+        text: &'b str,
+        buttons: impl IntoIterator<Item = Button<impl ToString>>,
+    ) -> Self {
+        let buttons = buttons
+            .into_iter()
+            .map(|button| button.to_value())
+            .collect();
         Self {
             recipient: Recipient { id: sender },
             message: json!({

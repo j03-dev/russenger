@@ -15,7 +15,7 @@
 //!     Ok(())
 //! }
 //! ```
-use std::env;
+use std::sync::Arc;
 
 use anyhow::Result;
 use reqwest::Response;
@@ -46,8 +46,10 @@ use crate::{query::Query, response_models::ResponseModel};
 ///
 /// * `send`: Sends a response to a user. It takes a `ResponseModel` as an argument and returns a `SendResult`.
 pub struct Res {
-    query: Query,
+    query: Arc<Query>,
     sender_id: String,
+    facebook_api_version: String,
+    page_access_token: String,
 }
 
 impl Res {
@@ -65,12 +67,11 @@ impl Res {
     ///
     /// Returns `SendResult::Error` if the send operation fails.
     pub async fn send<T: ResponseModel>(&self, response_model: T) -> Result<String> {
-        let version = env::var("FACEBOOK_API_VERSION").unwrap_or("v16.0".into());
-        let page_access_token =
-            env::var("PAGE_ACCESS_TOKEN").expect("env variable `PAGE_ACCESS_TOKEN` should be set");
         let url_api = format!(
-            "https://graph.facebook.com/{version}/me/{endpoint}?access_token={page_access_token}",
-            endpoint = response_model.get_endpoint()
+            "https://graph.facebook.com/{version}/me/{endpoint}?access_token={token}",
+            endpoint = response_model.get_endpoint(),
+            version = self.facebook_api_version,
+            token = self.page_access_token
         );
 
         match fetch_post(&url_api, response_model).await {
@@ -85,10 +86,17 @@ impl Res {
         }
     }
 
-    pub fn new(sender_id: &str, query: Query) -> Self {
+    pub fn new(
+        sender_id: &str,
+        query: Arc<Query>,
+        facebook_api_version: String,
+        page_access_token: String,
+    ) -> Self {
         Self {
             query,
             sender_id: sender_id.to_owned(),
+            facebook_api_version,
+            page_access_token,
         }
     }
 

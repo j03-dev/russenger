@@ -31,8 +31,8 @@ pub async fn webhook_verify(web_query: web::Query<WebQuery>) -> HttpResponse {
 }
 
 enum Message<'a> {
-    Payload(&'a str, &'a str, &'a str, Query),
-    TextMessage(&'a str, &'a str, &'a str, Query),
+    Payload(&'a str, &'a str, &'a str, Arc<Query>, String, String),
+    TextMessage(&'a str, &'a str, &'a str, Arc<Query>, String, String),
 }
 
 async fn handle(
@@ -40,10 +40,10 @@ async fn handle(
     router: Arc<Router>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     match message {
-        Message::Payload(user, payload, host, query) => {
+        Message::Payload(user, payload, host, query, version, token) => {
             let payload = Payload::from_str(payload).unwrap_or_default();
             let data = payload.get_data();
-            let res = Res::new(user, query.clone());
+            let res = Res::new(user, query.clone(), version, token);
             let req = Req::new(user, query, data, host);
             let path = payload.get_path();
             let action = router
@@ -52,9 +52,9 @@ async fn handle(
                 .with_context(|| format!("Action not found for path: {}", path))?;
             action(res, req).await?
         }
-        Message::TextMessage(user, text_message, host, query) => {
+        Message::TextMessage(user, text_message, host, query, version, token) => {
             let path = query.get_path(user).await?.unwrap_or("/".to_string());
-            let res = Res::new(user, query.clone());
+            let res = Res::new(user, query.clone(), version, token);
             let req = Req::new(user, query, Data::new(text_message), host);
             let action = router
                 .routes
@@ -74,6 +74,10 @@ pub async fn webhook_core(
     conn: dev::ConnectionInfo,
 ) -> HttpResponse {
     let query = app_state.query.clone();
+    let router = app_state.router.clone();
+    let version = app_state.facebook_api_version.clone();
+    let token = app_state.page_access_token.clone();
+
     let user = data.get_sender();
     let host = conn.host();
 
@@ -83,21 +87,22 @@ pub async fn webhook_core(
         if let Some(message) = data.get_message() {
             if let Some(quick_reply) = message.get_quick_reply() {
                 let quick_reply_payload = quick_reply.get_payload();
-                let payload = Message::Payload(user, quick_reply_payload, host, query);
-                let result = handle(payload, app_state.router.clone()).await;
+                let payload =
+                    Message::Payload(user, quick_reply_payload, host, query, version, token);
+                let result = handle(payload, router).await;
                 result.unwrap_or_else(|err| {
                     eprintln!("Error handling quick reply payload: {:?}", err)
                 })
             } else {
                 let text = message.get_text();
-                let text_message = Message::TextMessage(user, &text, host, query);
-                let result = handle(text_message, app_state.router.clone()).await;
+                let text_message = Message::TextMessage(user, &text, host, query, version, token);
+                let result = handle(text_message, router).await;
                 result.unwrap_or_else(|err| eprintln!("Error handling text message: {:?}", err))
             }
         } else if let Some(postback) = data.get_postback() {
             let postback_payload = postback.get_payload();
-            let payload = Message::Payload(user, postback_payload, host, query);
-            let result = handle(payload, app_state.router.clone()).await;
+            let payload = Message::Payload(user, postback_payload, host, query, version, token);
+            let result = handle(payload, router).await;
             result.unwrap_or_else(|err| eprintln!("Error handling postback payload: {:?}", err))
         }
         app_state.action_lock.unlock(user).await;

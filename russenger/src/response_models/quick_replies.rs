@@ -34,7 +34,6 @@
 //! Creating a `QuickReply` and a `QuickReplyModel`:
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn index(res: Res, req: Req) -> Result<()> {
@@ -49,16 +48,14 @@
 //!
 //!
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
-//!     let hello_world: String = req.data.get_value();
+//!     let hello_world: String = req.data.get_value()?;
 //!     res.send(TextModel::new(&req.user, &hello_world)).await?;
 //!
 //!     Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     let conn = Database::new().await?.conn;
-//!     migrate!([RussengerUser], &conn);
 //!     App::init().await?
 //!         .attach(router![("/", index), ("/hello_world", hello_world)])
 //!         .launch()
@@ -106,7 +103,7 @@ use super::{payload::Payload, recipient::Recipient};
 /// let quick_reply = QuickReply::new("Button Title", Some(&"https://example.com/image.png".to_string()), payload);
 ///
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-///     let hello_world: String = req.data.get_value();
+///     let hello_world: String = req.data.get_value()?;
 ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
 ///
 ///     Ok(())
@@ -146,10 +143,10 @@ impl QuickReply {
     ///     Ok(())
     /// }
     /// ```
-    pub fn new(title: &str, image_url: Option<&String>, payload: Payload) -> Self {
+    pub fn new(title: impl ToString, image_url: Option<&String>, payload: Payload) -> Self {
         Self {
             content_type: "text".to_owned(),
-            title: title.to_owned(),
+            title: title.to_string(),
             payload: payload.to_string(),
             image_url: image_url.cloned(),
         }
@@ -226,13 +223,17 @@ impl<'q> QuickReplyModel<'q> {
     ///     Ok(())
     /// }
     /// ```
-    pub fn new(sender: &'q str, message: &str, quick_replies: Vec<QuickReply>) -> Self {
+    pub fn new(
+        sender: &'q str,
+        message: impl ToString,
+        quick_replies: impl IntoIterator<Item = QuickReply>,
+    ) -> Self {
         Self {
             recipient: Recipient { id: sender },
             messaging_type: "RESPONSE",
             message: QuickMessage {
-                text: message.into(),
-                quick_replies,
+                text: message.to_string(),
+                quick_replies: quick_replies.into_iter().collect(),
             },
         }
     }

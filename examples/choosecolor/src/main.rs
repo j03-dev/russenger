@@ -1,4 +1,3 @@
-use russenger::models::RussengerUser;
 use russenger::prelude::*;
 
 #[derive(FromRow, Clone, Model)]
@@ -19,7 +18,7 @@ async fn index(res: Res, req: Req) -> Result<()> {
     {
         res.send(TextModel::new(
             &req.user,
-            &format!("Hello {}", user_register.username),
+            format!("Hello {}", user_register.username),
         ))
         .await?;
     } else {
@@ -34,7 +33,7 @@ async fn index(res: Res, req: Req) -> Result<()> {
 }
 
 async fn signup(res: Res, req: Req) -> Result<()> {
-    let username: String = req.data.get_value();
+    let username: String = req.data.get_value()?;
     let message = if Register::create(
         kwargs!(user_id = req.user, username = username),
         &req.query.conn,
@@ -56,7 +55,7 @@ async fn get_user_input(res: Res, req: Req) -> Result<()> {
     let payload = |value: &str| Payload::new("/next_action", Some(Data::new(value)));
 
     // QuickReply
-    let quick_replies: Vec<QuickReply> = vec![
+    let quick_replies = [
         QuickReply::new("blue", None, payload("blue")),
         QuickReply::new("red", None, payload("red")),
     ];
@@ -67,7 +66,7 @@ async fn get_user_input(res: Res, req: Req) -> Result<()> {
 }
 
 async fn next_action(res: Res, req: Req) -> Result<()> {
-    let color: String = req.data.get_value();
+    let color: String = req.data.get_value()?;
     res.send(TextModel::new(&req.user, &color)).await?;
     index(res, req).await?; // goto index action
     Ok(())
@@ -75,9 +74,6 @@ async fn next_action(res: Res, req: Req) -> Result<()> {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let conn = Database::new().await?.conn;
-    migrate!([RussengerUser, Register], &conn);
-
     App::init()
         .await?
         .attach(

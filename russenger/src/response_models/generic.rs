@@ -24,7 +24,7 @@
 //!             "https://example.com/image.jpg",
 //!             "Subtitle",
 //!             vec![Button::Postback {
-//!                 title: "Hello World".to_owned(),
+//!                 title: "Hello World",
 //!                 payload: Payload::new("/hello_world", Some(Data::new("Hello World!"))),
 //!             }],
 //!         ),
@@ -38,7 +38,7 @@
 //! }
 //!
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
-//!     let hello_world: String = req.data.get_value();
+//!     let hello_world: String = req.data.get_value()?;
 //!     res.send(TextModel::new(&req.user, &hello_world)).await?;
 //!
 //!     Ok(())
@@ -85,14 +85,14 @@ use super::{
 ///     "https://example.com/image.jpg",
 ///     "Subtitle",
 ///     vec![Button::Postback {
-///         title: "Hello World".to_owned(),
+///         title: "Hello World",
 ///         payload: Payload::new("/hello_world", Some(Data::new("Hello World!"))),
 ///     }],
 /// );
 ///
 ///
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-///     let hello_world: String = req.data.get_value();
+///     let hello_world: String = req.data.get_value()?;
 ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
 ///
 ///     Ok(())
@@ -136,13 +136,13 @@ impl GenericElement {
     ///     "https://example.com/image.jpg",
     ///     "Subtitle",
     ///     vec![Button::Postback {
-    ///         title: "Hello World".to_owned(),
+    ///         title: "Hello World",
     ///         payload: Payload::new("/hello_world", Some(Data::new("Hello World!"))),
     ///     }],
     /// );
     ///
     /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-    ///     let hello_world: String = req.data.get_value();
+    ///     let hello_world: String = req.data.get_value()?;
     ///     res.send(TextModel::new(&req.user, &hello_world)).await?;
     ///
     ///     Ok(())
@@ -150,15 +150,20 @@ impl GenericElement {
     /// ```
     ///
     /// This example shows how to create a new `GenericElement`.
-    pub fn new(title: &str, image_url: &str, subtitle: &str, buttons: Vec<Button>) -> Self {
+    pub fn new(
+        title: impl ToString,
+        image_url: impl ToString,
+        subtitle: impl ToString,
+        buttons: impl IntoIterator<Item = Button<impl ToString>>,
+    ) -> Self {
+        let buttons: Vec<_> = buttons.into_iter().map(|btn| btn.to_value()).collect();
         if buttons.len() > 3 {
             panic!("Buttons must be three maximum")
         }
-        let buttons: Vec<_> = buttons.iter().map(|btn| btn.to_value()).collect();
         Self {
-            title: title.into(),
-            image_url: image_url.into(),
-            subtitle: subtitle.into(),
+            title: title.to_string(),
+            image_url: image_url.to_string(),
+            subtitle: subtitle.to_string(),
             buttons,
         }
     }
@@ -218,7 +223,7 @@ struct GenericMessage {
 ///             "https://example.com/image.jpg",
 ///             "Subtitle",
 ///             vec![Button::Postback {
-///                 title: "Hello World".to_owned(),
+///                 title: "Hello World",
 ///                 payload: Payload::new("/hello_world", Some(Data::new("Hello World!"))),
 ///             }],
 ///         ),
@@ -232,7 +237,7 @@ struct GenericMessage {
 /// }
 ///
 /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-///     let hello_world: String = req.data.get_value();
+///     let hello_world: String = req.data.get_value()?;
 ///    res.send(TextModel::new(&req.user, &hello_world)).await?;
 ///
 ///    Ok(())
@@ -273,7 +278,7 @@ impl<'g> GenericModel<'g> {
     ///         "https://example.com/image.jpg",
     ///         "Subtitle",
     ///         vec![Button::Postback {
-    ///             title: "Hello World".to_owned(),
+    ///             title: "Hello World",
     ///             payload: Payload::new("/hello_world", Some(Data::new("Hello World!"))),
     ///         }],
     ///     ),
@@ -283,7 +288,7 @@ impl<'g> GenericModel<'g> {
     /// let message = GenericModel::new("sender_id", elements, None);
     ///
     /// async fn hello_world(res: Res, req: Req) -> Result<()> {
-    ///     let hello_world: String = req.data.get_value();
+    ///     let hello_world: String = req.data.get_value()?;
     ///    res.send(TextModel::new(&req.user, &hello_world)).await?;
     ///
     ///    Ok(())
@@ -291,7 +296,12 @@ impl<'g> GenericModel<'g> {
     /// ```
     ///
     /// This example shows how to create a new `GenericModel` and send it.
-    pub fn new(sender: &'g str, mut elements: Vec<GenericElement>, page: Option<Page>) -> Self {
+    pub fn new(
+        sender: &'g str,
+        elements: impl IntoIterator<Item = GenericElement>,
+        page: Option<Page>,
+    ) -> Self {
+        let mut elements: Vec<GenericElement> = elements.into_iter().collect();
         if let Some(p) = page {
             elements = elements.into_iter().skip(p.0).take(p.1 - p.0).collect();
         } else if elements.len() >= MAX_PAGE {

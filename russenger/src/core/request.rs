@@ -11,12 +11,11 @@
 //! Use the `Req` to get the user and data from a request:
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn hello_world(res: Res, req: Req) -> Result<()> {
 //!     let user: String = req.user;
-//!     let message: String  = req.data.get_value();
+//!     let message: String  = req.data.get_value()?;
 //!     res.send(TextModel::new(&user, "Hello, world!")).await?;
 //!
 //!     Ok(())
@@ -25,7 +24,6 @@
 //! Use the `Req` to get the user and query from a request:
 //!
 //! ```rust
-//! use russenger::models::RussengerUser;
 //! use russenger::prelude::*;
 //!
 //! async fn index(res: Res, req: Req) -> Result<()> {
@@ -36,16 +34,14 @@
 //! }
 //!
 //! async fn name(res: Res, req: Req)  -> Result<()> {
-//!     let name: String = req.data.get_value();
+//!     let name: String = req.data.get_value()?;
 //!     res.send(TextModel::new(&req.user, &format!("Hello, {}!", name))).await?;
 //!
 //!     Ok(())
 //! }
 //!
-//! #[russenger::main]
+//! #[tokio::main]
 //! async fn main() -> Result<()> {
-//!     let conn = Database::new().await?.conn;
-//!     migrate!([RussengerUser], &conn);
 //!     App::init().await?
 //!        .attach(router![("/", index),("/name", name)])
 //!        .launch()
@@ -53,6 +49,8 @@
 //!     Ok(())
 //! }
 //! ```
+use std::sync::Arc;
+
 use crate::query::Query;
 use crate::response_models::data::Data;
 
@@ -115,7 +113,7 @@ pub struct Req {
     ///     Ok(())
     /// }
     /// ```
-    pub query: Query,
+    pub query: Arc<Query>,
 
     /// The `Data` struct represents a data object with a value and an optional page.
     ///
@@ -180,7 +178,7 @@ impl Req {
     /// # Returns
     ///
     /// A `Req` that contains the provided user, query, data, and host.
-    pub fn new(user: &str, query: Query, data: Data, host: &str) -> Self {
+    pub fn new(user: &str, query: Arc<Query>, data: Data, host: &str) -> Self {
         Self {
             user: user.to_owned(),
             query,
@@ -202,7 +200,7 @@ impl Req {
     /// use russenger::prelude::*;
     ///
     /// async fn home(res: Res, req: Req) -> Result<()> {
-    ///     let user_input: String = req.data.get_value(); // Extract the current data
+    ///     let user_input: String = req.data.get_value()?; // Extract the current data
     ///     res.send(TextModel::new(&req.user, &format!("User input received: {}", user_input)))
     ///         .await?;
     ///
@@ -215,13 +213,13 @@ impl Req {
     /// }
     ///
     /// async fn next_action(res: Res, req: Req) -> Result<()> {
-    ///     let user_input: String = req.data.get_value(); // Retrieve the updated data
+    ///     let user_input: String = req.data.get_value()?; // Retrieve the updated data
     ///     res.send(TextModel::new(&req.user, &format!("Processed user input: {}", user_input)))
     ///         .await?;
     ///     Ok(())
     /// }
     ///
-    /// #[russenger::main]
+    /// #[tokio::main]
     /// async fn main() -> Result<()> {
     ///     App::init().await?
     ///         .attach(router![

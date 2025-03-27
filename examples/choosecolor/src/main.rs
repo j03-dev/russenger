@@ -2,12 +2,12 @@ use russenger::prelude::*;
 
 #[derive(FromRow, Clone, Model)]
 pub struct Register {
-    #[model(primary_key = true)]
+    #[field(primary_key = true)]
     pub id: Serial,
-    #[model(foreign_key = "RussengerUser.facebook_user_id", unique = true)]
+    #[field(foreign_key = "RussengerUser.facebook_user_id", unique = true)]
     pub user_id: String,
 
-    #[model(size = 30, unique = true)]
+    #[field(size = 30, unique = true)]
     pub username: String,
 }
 
@@ -59,8 +59,8 @@ async fn get_user_input(res: Res, req: Req) -> Result<()> {
         QuickReply::new("blue", None, payload("blue")),
         QuickReply::new("red", None, payload("red")),
     ];
-    let quick_reply_model = QuickReplyModel::new(&req.user, "choose one color", quick_replies);
-    res.send(quick_reply_model).await?;
+    let quick_reply_field = QuickReplyModel::new(&req.user, "choose one color", quick_replies);
+    res.send(quick_reply_field).await?;
 
     Ok(())
 }

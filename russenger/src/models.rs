@@ -86,9 +86,9 @@ use rusql_alchemy::prelude::*;
 /// In this example, the `RussengerUser` struct is defined with two fields: `facebook_user_id` and `action`. The `facebook_user_id` field is marked as the primary key of the table and cannot be null. The `action` field has a default value of "Main". The `RussengerUser` struct implements the `FromRow` and `Model` traits from the `rusql_alchemy` crate, which allows it to be used with the `rusql_alchemy` ORM.
 #[derive(FromRow, Model, Clone, Default)]
 pub struct RussengerUser {
-    #[model(primary_key = true)]
+    #[field(primary_key = true)]
     pub facebook_user_id: String,
 
-    #[model(default = "/")]
+    #[field(default = "/")]
     pub action_path: String,
 }

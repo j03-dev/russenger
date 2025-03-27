@@ -86,8 +86,7 @@ async fn ask_gemini(res: Res, req: Req) -> Result<()> {
             }
         }
         Err(err) => {
-            res.send(TextModel::new(&req.user, &err.to_string()))
-                .await?;
+            res.send(TextModel::new(&req.user, err.to_string())).await?;
         }
     };
 

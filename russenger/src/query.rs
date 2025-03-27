@@ -49,6 +49,8 @@
 //!     Ok(())
 //! }
 //! ```
+use std::sync::Arc;
+
 use crate::models::RussengerUser;
 use anyhow::{Context, Result};
 
@@ -70,7 +72,7 @@ use rusql_alchemy::prelude::*;
 /// * `set_action`: This method updates the action of a user in the `russenger_user` table. It takes a user ID and an action as arguments and returns a boolean indicating whether the operation was successful.
 #[derive(Clone)]
 pub struct Query {
-    pub conn: Connection,
+    pub conn: Arc<Connection>,
 }
 
 /// Represents a query object used for database operations.
@@ -88,7 +90,7 @@ impl Query {
         let database = Database::new().await?;
         database.migrate().await?;
         Ok(Self {
-            conn: database.conn.clone(),
+            conn: Arc::new(database.conn.clone()),
         })
     }
 

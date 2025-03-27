@@ -75,10 +75,10 @@ use rusql_alchemy::prelude::*;
 ///
 /// #[derive(FromRow, Model, Clone, Default)]
 /// pub struct RussengerUser {
-///     #[model(primary_key = true)]
+///     #[field(primary_key = true)]
 ///     pub facebook_user_id: String,
 ///
-///     #[model(default = "/")]
+///     #[field(default = "/")]
 ///     pub action_path: String,
 /// }
 /// ```

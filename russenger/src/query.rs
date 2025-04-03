@@ -90,7 +90,7 @@ impl Query {
         let database = Database::new().await?;
         database.migrate().await?;
         Ok(Self {
-            conn: Arc::new(database.conn.clone()),
+            conn: Arc::new(database.conn),
         })
     }
 

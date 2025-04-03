@@ -91,4 +91,7 @@ pub struct RussengerUser {
 
     #[field(default = "/")]
     pub action_path: String,
+
+    #[field(default = "now")]
+    pub at: DateTime,
 }

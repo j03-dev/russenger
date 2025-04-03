@@ -25,4 +25,4 @@ dotenv = "0.15.0"
 anyhow = "1.0.95"
 
 # Orm
-rusql-alchemy = { version = "0.5.0-rc.4", default-features = false }
+rusql-alchemy = { version = "0.5.0-rc.4", git = "https://github.com/j03-dev/rusql-alachemy", branch = "debug", default-features = false }

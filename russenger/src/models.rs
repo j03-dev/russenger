@@ -89,7 +89,7 @@ pub struct RussengerUser {
     #[field(primary_key = true)]
     pub facebook_user_id: String,
 
-    #[field(default = "/")]
+    #[field(default = '/')]
     pub action_path: String,
 
     #[field(default = "now")]

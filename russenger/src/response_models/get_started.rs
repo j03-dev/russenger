@@ -96,7 +96,7 @@ impl GetStartedButtonModel {
     /// ```
     pub fn new(payload: Payload) -> Self {
         Self {
-            get_started: serde_json::json!({"payload": payload.to_string()}),
+            get_started: serde_json::json!({"payload": payload}),
         }
     }
 }

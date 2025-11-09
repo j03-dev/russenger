@@ -17,7 +17,7 @@
 //! ```
 use std::sync::Arc;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use reqwest::Response;
 use serde::Serialize;
 
@@ -101,7 +101,11 @@ impl Res {
     }
 
     pub async fn redirect(&self, path: &str) -> Result<()> {
-        self.query.set_path(&self.sender_id, path).await?;
+        self.query
+            .set_path(&self.sender_id, path)
+            .await
+            .ok()
+            .context("Failed to set path")?;
         Ok(())
     }
 }

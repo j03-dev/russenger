@@ -13,8 +13,9 @@ pub struct Register {
 
 async fn index(res: Res, req: Req) -> Result<()> {
     res.send(TextModel::new(&req.user, "Hello!")).await?;
-    if let Some(user_register) =
-        Register::get(kwargs!(user_id == req.user), &req.query.conn).await?
+    if let Some(user_register) = Register::get(kwargs!(user_id == req.user), &req.query.conn)
+        .await
+        .map_err(|err| std::io::Error::other(err.to_string()))?
     {
         res.send(TextModel::new(
             &req.user,

@@ -49,12 +49,11 @@
 //!     Ok(())
 //! }
 //! ```
+use anyhow::{Context, Result};
+use rusql_alchemy::prelude::*;
 use std::sync::Arc;
 
 use crate::models::RussengerUser;
-use anyhow::{Context, Result};
-
-use rusql_alchemy::prelude::*;
 
 /// The `Query` struct represents a database query.
 ///
@@ -86,9 +85,14 @@ impl Query {
     /// # Panics
     ///
     /// Panics if the connection cannot be established.
-    pub(crate) async fn new() -> Result<Self> {
-        let database = Database::new().await?;
-        database.migrate().await?;
+    pub(crate) async fn new(database_url: &str) -> Result<Self> {
+        let database = Database::new(database_url)
+            .await
+            .map_err(|err| anyhow::anyhow!(err))?;
+        database
+            .migrate()
+            .await
+            .map_err(|err| anyhow::anyhow!(err))?;
         Ok(Self {
             conn: Arc::new(database.conn),
         })
@@ -105,12 +109,13 @@ impl Query {
     /// Returns `true` if the record is successfully created, `false` otherwise.
     pub async fn create(&self, user_id: &str) -> Result<()> {
         if RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
-            .await?
+            .await
+            .map_err(|err| anyhow::anyhow!(err))?
             .is_none()
         {
-            return Ok(
-                RussengerUser::create(kwargs!(facebook_user_id = user_id), &self.conn).await?,
-            );
+            return RussengerUser::create(kwargs!(facebook_user_id = user_id), &self.conn)
+                .await
+                .map_err(|err| anyhow::anyhow!(err));
         }
         Ok(())
     }
@@ -161,10 +166,13 @@ impl Query {
     /// ```
     pub(crate) async fn set_path(&self, user_id: &str, path: &str) -> Result<()> {
         let mut user = RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
-            .await?
+            .await
+            .map_err(|err| anyhow::anyhow!(err))?
             .context("user not found")?;
         user.action_path = path.to_owned();
-        Ok(user.update(&self.conn).await?)
+        user.update(&self.conn)
+            .await
+            .map_err(|err| anyhow::anyhow!(err))
     }
 
     /// Retrieves the action for a user.
@@ -179,7 +187,8 @@ impl Query {
     pub async fn get_path(&self, user_id: &str) -> Result<Option<String>> {
         Ok(
             RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
-                .await?
+                .await
+                .map_err(|err| anyhow::anyhow!(err))?
                 .map(|user| user.action_path),
         )
     }

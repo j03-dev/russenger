@@ -1,7 +1,7 @@
 use std::{collections::HashMap, future::Future, pin::Pin};
 
 use crate::core::{request::Req, response::Res};
-use crate::error::Result;
+use crate::error::{Result};
 
 type FutureResult = Pin<Box<dyn Future<Output = Result<()>> + Send>>;
 

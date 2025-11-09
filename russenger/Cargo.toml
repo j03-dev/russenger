@@ -16,9 +16,8 @@ categories = ["web-programming", "api-bindings"]
 sqlite = ["rusql-alchemy/sqlite"]
 postgres = ["rusql-alchemy/postgres"]
 mysql = ["rusql-alchemy/mysql"]
+turso = ["rusql-alchemy/turso"]
 
-[dependencies.rusql-alchemy]
-workspace = true
 
 [dependencies]
 # Web framework and HTTP handling
@@ -30,6 +29,7 @@ reqwest = { workspace = true, features = ["json"] }
 tokio.workspace = true
 
 # Database
+rusql-alchemy.workspace = true
 sqlx.workspace = true # Consider specifying database features (e.g., ["runtime-tokio-rustls", "postgres"])
 
 # Serialization and Templating

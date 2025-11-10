@@ -211,6 +211,8 @@ impl App {
                 Database::new_remote_replicate(&path, &turso_db_url, &turso_auth_token).await?
             }
         };
+        
+        database.migrate().await?;
 
         let query = Query {
             conn: Arc::new(database.conn),

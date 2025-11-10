@@ -18,8 +18,9 @@ use super::{
     router::Router,
 };
 
+use anyhow::Context;
+
 use crate::{
-    error::Context,
     query::Query,
     response_models::{data::Data, payload::Payload},
     App,
@@ -38,7 +39,7 @@ enum Message<'a> {
 async fn handle(
     message: Message<'_>,
     router: Arc<Router>,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
     match message {
         Message::Payload(user, payload, host, query, version, token) => {
             let payload = Payload::from_str(payload).unwrap_or_default();

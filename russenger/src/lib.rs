@@ -133,7 +133,8 @@ pub mod prelude;
 pub mod query;
 pub mod response_models;
 pub mod error {
-    pub use anyhow::*;
+    pub type Error = Box<dyn std::error::Error + Send + Sync>;
+    pub type Result<T, E = Error> = std::result::Result<T, E>;
 }
 
 pub use core::{
@@ -141,7 +142,6 @@ pub use core::{
     services::{webhook_core, webhook_verify}, // core services
 };
 
-pub use anyhow;
 pub use rusql_alchemy;
 
 use anyhow::Context;
@@ -266,7 +266,7 @@ impl App {
         self
     }
 
-    pub async fn launch(self) -> Result<(), error::Error> {
+    pub async fn launch(self) -> error::Result<()> {
         run_server(self).await?;
         Ok(())
     }
@@ -279,7 +279,7 @@ fn print_info(host: &str, port: u16) {
     println!("  POST: {}/webhook - Webhook core endpoint", url);
 }
 
-async fn run_server(app: App) -> Result<()> {
+async fn run_server(app: App) -> error::Result<()> {
     let addr = app.addr.clone();
     print_info(&addr.0, addr.1);
     HttpServer::new(move || {

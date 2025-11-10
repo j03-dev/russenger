@@ -49,12 +49,14 @@
 //!     Ok(())
 //! }
 //! ```
-use rusql_alchemy::prelude::*;
+//!
+mod models;
 
+use models::RussengerUser;
+use rusql_alchemy::prelude::*;
 use std::sync::Arc;
 
 use crate::error::Result;
-use crate::models::RussengerUser;
 
 /// The `Query` struct represents a database query.
 ///
@@ -77,23 +79,6 @@ pub struct Query {
 
 /// Represents a query object used for database operations.
 impl Query {
-    /// Creates a new Query object.
-    ///
-    /// # Returns
-    ///
-    /// Returns a Query object if the connection is successfully established.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the connection cannot be established.
-    pub(crate) async fn new(database_url: &str) -> Result<Self> {
-        let database = Database::new(database_url).await?;
-        database.migrate().await?;
-        Ok(Self {
-            conn: Arc::new(database.conn),
-        })
-    }
-
     /// Creates a new record in the database.
     ///
     /// # Arguments

@@ -128,29 +128,23 @@
 //!
 //! These examples demonstrate how to define an action, use custom models, and register actions for the main application.
 pub mod core;
-pub mod models;
+pub mod db;
 pub mod prelude;
-pub mod query;
 pub mod response_models;
+pub mod services;
 pub mod error {
     pub type Error = Box<dyn std::error::Error + Send + Sync>;
     pub type Result<T, E = Error> = std::result::Result<T, E>;
 }
 
-pub use core::{
-    router::Router,
-    services::{webhook_core, webhook_verify}, // core services
-};
-
-pub use rusql_alchemy;
-
-use error::Result;
-use query::Query;
+use crate::db::Query;
 use actix_files as fs;
 use actix_web::{web, App as ActixApp, HttpServer};
-use tokio::sync::Mutex;
-
+pub use core::router::Router;
+use error::Result;
+pub use rusql_alchemy::{self, Database};
 use std::{collections::HashSet, sync::Arc};
+use tokio::sync::Mutex;
 
 #[derive(Clone, Default)]
 struct ActionLock {
@@ -194,9 +188,6 @@ pub struct App {
 impl App {
     /// `init` is method to create new `App` instance. in russenger
     pub async fn init() -> Result<Self> {
-        
-        let database_url = std::env::var("DATABASE_URL")?;
-
         let facebook_api_version = std::env::var("FACEBOOK_API_VERSION").unwrap_or("v19.0".into());
         let page_access_token = std::env::var("PAGE_ACCESS_TOKEN")?;
 
@@ -205,11 +196,28 @@ impl App {
             .ok()
             .and_then(|p| p.parse().ok())
             .unwrap_or(2453);
-            
-        let query = Arc::new(Query::new(&database_url).await.unwrap());
+
+        let database = {
+            #[cfg(not(feature = "turso"))]
+            {
+                let database_url = std::env::var("DATABASE_URL")?;
+                Database::new(&database_url).await?
+            }
+            #[cfg(feature = "turso")]
+            {
+                let path = std::env::var("DB_PATH")?;
+                let turso_db_url = std::env::var("TURSO_DB_URL")?;
+                let turso_auth_token = std::env::var("TURSO_AUTH_TOKEN")?;
+                Database::new_remote_replicate(&path, &turso_db_url, &turso_auth_token).await?
+            }
+        };
+
+        let query = Query {
+            conn: Arc::new(database.conn),
+        };
 
         Ok(Self {
-            query,
+            query: query.into(),
             router: Arc::new(Router::new()),
             action_lock: ActionLock::default(),
             facebook_api_version,
@@ -283,12 +291,14 @@ async fn run_server(app: App) -> error::Result<()> {
     HttpServer::new(move || {
         ActixApp::new()
             .app_data(web::Data::new(app.clone()))
-            .service(webhook_verify)
-            .service(webhook_core)
+            .service(services::handlers::webhook_verify)
+            .service(services::handlers::webhook_core)
             .service(fs::Files::new("/static", "static").show_files_listing())
     })
-    .bind(addr).unwrap()
+    .bind(addr)
+    .unwrap()
     .run()
-    .await.unwrap();
+    .await
+    .unwrap();
     Ok(())
 }

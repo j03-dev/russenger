@@ -1,34 +1,16 @@
-//! The `services` contains the actix-web handlers for the webhook endpoints.
-//!
-//! # Functions
-//!
-//! * `webhook_verify`: This function verifies the webhook.
-//! * `webhook_core`: This function handles the webhook core.
-//!
-//! Endpoints:
-//!
-//! * `GET /webhook`: This endpoint verifies the webhook.
-//! * `POST /webhook`: This endpoint handles the webhook core.
-use std::{str::FromStr, sync::Arc};
+use std::{io, str::FromStr, sync::Arc};
 
 use actix_web::{dev, get, post, web, HttpResponse};
 
-use super::{
-    incoming_data::InComingData, request::Req, request_handler::WebQuery, response::Res,
-    router::Router,
-};
-
 use crate::{
+    core::{request::Req, response::Res, router::Router},
+    db::Query,
     error::Result,
-    query::Query,
     response_models::{data::Data, payload::Payload},
     App,
 };
 
-#[get("/webhook")]
-pub async fn webhook_verify(web_query: web::Query<WebQuery>) -> HttpResponse {
-    web_query.get_hub_challenge()
-}
+use super::{InComingData, WebQuery};
 
 enum Message<'a> {
     Payload(&'a str, &'a str, &'a str, Arc<Query>, String, String),
@@ -44,8 +26,8 @@ async fn handle(message: Message<'_>, router: Arc<Router>) -> Result<()> {
             let req = Req::new(user, query, data, host);
             let path = payload.get_path();
             let action = router.routes.get(&path).ok_or_else(|| {
-                std::io::Error::new(
-                    std::io::ErrorKind::NotFound,
+                io::Error::new(
+                    io::ErrorKind::NotFound,
                     format!("Action not found  for path {path}"),
                 )
             })?;
@@ -56,8 +38,8 @@ async fn handle(message: Message<'_>, router: Arc<Router>) -> Result<()> {
             let res = Res::new(user, query.clone(), version, token);
             let req = Req::new(user, query, Data::new(text_message), host);
             let action = router.routes.get(&path).ok_or_else(|| {
-                std::io::Error::new(
-                    std::io::ErrorKind::NotFound,
+                io::Error::new(
+                    io::ErrorKind::NotFound,
                     format!("Action not found  for path {path}"),
                 )
             })?;
@@ -66,6 +48,11 @@ async fn handle(message: Message<'_>, router: Arc<Router>) -> Result<()> {
     }
 
     Ok(())
+}
+
+#[get("/webhook")]
+pub async fn webhook_verify(web_query: web::Query<WebQuery>) -> HttpResponse {
+    web_query.get_hub_challenge()
 }
 
 #[post("/webhook")]

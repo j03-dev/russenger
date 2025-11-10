@@ -27,9 +27,5 @@
 //! ```
 
 pub mod request;
-pub mod request_handler;
 pub mod response;
 pub mod router;
-pub mod services;
-
-mod incoming_data;

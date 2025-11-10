@@ -15,12 +15,12 @@
 //!     Ok(())
 //! }
 //! ```
-use std::sync::Arc;
 use reqwest::Response;
 use serde::Serialize;
+use std::sync::Arc;
 
 use crate::error::Result;
-use crate::{query::Query, response_models::ResponseModel};
+use crate::{db::Query, response_models::ResponseModel};
 
 /// The `Res` struct represents a response that can be sent to a user.
 ///
@@ -78,10 +78,10 @@ impl Res {
                 if response.status().is_success() {
                     Ok(response.text().await.unwrap())
                 } else {
-                   Err(response.text().await.unwrap())
+                    Err(response.text().await.unwrap())
                 }
             }
-            Err(err) => Err(err.to_string())
+            Err(err) => Err(err.to_string()),
         }
     }
 
@@ -100,9 +100,7 @@ impl Res {
     }
 
     pub async fn redirect(&self, path: &str) -> Result<()> {
-        self.query
-            .set_path(&self.sender_id, path)
-           .await?;
+        self.query.set_path(&self.sender_id, path).await?;
         Ok(())
     }
 }

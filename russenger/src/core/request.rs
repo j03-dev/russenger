@@ -51,7 +51,7 @@
 //! ```
 use std::sync::Arc;
 
-use crate::query::Query;
+use crate::db::Query;
 use crate::response_models::data::Data;
 
 /// The `Req` struct represents a request from a user.

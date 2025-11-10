@@ -50,9 +50,10 @@
 //! }
 //! ```
 use rusql_alchemy::prelude::*;
-use rusql_alchemy::Error;
+
 use std::sync::Arc;
 
+use crate::error::Result;
 use crate::models::RussengerUser;
 
 /// The `Query` struct represents a database query.
@@ -85,7 +86,7 @@ impl Query {
     /// # Panics
     ///
     /// Panics if the connection cannot be established.
-    pub(crate) async fn new(database_url: &str) -> Result<Self, Error> {
+    pub(crate) async fn new(database_url: &str) -> Result<Self> {
         let database = Database::new(database_url).await?;
         database.migrate().await?;
         Ok(Self {
@@ -102,7 +103,7 @@ impl Query {
     /// # Returns
     ///
     /// Returns `true` if the record is successfully created, `false` otherwise.
-    pub async fn create(&self, user_id: &str) -> Result<(), Error> {
+    pub async fn create(&self, user_id: &str) -> Result<()> {
         if RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
             .await?
             .is_none()
@@ -156,7 +157,7 @@ impl Query {
     ///     Ok(())
     /// }
     /// ```
-    pub(crate) async fn set_path(&self, user_id: &str, path: &str) -> Result<(), Error> {
+    pub(crate) async fn set_path(&self, user_id: &str, path: &str) -> Result<()> {
         let mut user = RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
             .await?
             .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "user not found"))?;
@@ -173,7 +174,7 @@ impl Query {
     /// # Returns
     ///
     /// Returns the action as an `Option<String>`. Returns `None` if the user is not found.
-    pub async fn get_path(&self, user_id: &str) -> Result<Option<String>, Error> {
+    pub async fn get_path(&self, user_id: &str) -> Result<Option<String>> {
         Ok(
             RussengerUser::get(kwargs!(facebook_user_id == user_id), &self.conn)
                 .await?

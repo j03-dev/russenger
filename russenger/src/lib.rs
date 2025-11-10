@@ -144,7 +144,6 @@ pub use core::{
 
 pub use rusql_alchemy;
 
-use anyhow::Context;
 use error::Result;
 use query::Query;
 use actix_files as fs;
@@ -196,11 +195,10 @@ impl App {
     /// `init` is method to create new `App` instance. in russenger
     pub async fn init() -> Result<Self> {
         
-        let database_url = std::env::var("DATABASE_URL").context("env variable `DATABASE_URl` should be set")?;
+        let database_url = std::env::var("DATABASE_URL")?;
 
         let facebook_api_version = std::env::var("FACEBOOK_API_VERSION").unwrap_or("v19.0".into());
-        let page_access_token = std::env::var("PAGE_ACCESS_TOKEN")
-            .context("env variable `PAGE_ACCESS_TOKEN` should be set")?;
+        let page_access_token = std::env::var("PAGE_ACCESS_TOKEN")?;
 
         let host = std::env::var("HOST").unwrap_or_else(|_| "0.0.0.0".into());
         let port = std::env::var("PORT")

@@ -16,11 +16,10 @@
 //! }
 //! ```
 use std::sync::Arc;
-
-use anyhow::{Context, Result};
 use reqwest::Response;
 use serde::Serialize;
 
+use crate::error::Result;
 use crate::{query::Query, response_models::ResponseModel};
 
 /// The `Res` struct represents a response that can be sent to a user.
@@ -66,7 +65,7 @@ impl Res {
     /// # Errors
     ///
     /// Returns `SendResult::Error` if the send operation fails.
-    pub async fn send<T: ResponseModel>(&self, response_model: T) -> Result<String> {
+    pub async fn send<T: ResponseModel>(&self, response_model: T) -> Result<String, String> {
         let url_api = format!(
             "https://graph.facebook.com/{version}/me/{endpoint}?access_token={token}",
             endpoint = response_model.get_endpoint(),
@@ -76,13 +75,13 @@ impl Res {
 
         match fetch_post(&url_api, response_model).await {
             Ok(response) => {
-                if response.status().is_client_error() {
-                    Err(anyhow::anyhow!(response.text().await?))
+                if response.status().is_success() {
+                    Ok(response.text().await.unwrap())
                 } else {
-                    Ok(response.text().await?)
+                   Err(response.text().await.unwrap())
                 }
             }
-            Err(err) => Err(anyhow::anyhow!(err)),
+            Err(err) => Err(err.to_string())
         }
     }
 
@@ -103,9 +102,7 @@ impl Res {
     pub async fn redirect(&self, path: &str) -> Result<()> {
         self.query
             .set_path(&self.sender_id, path)
-            .await
-            .ok()
-            .context("Failed to set path")?;
+           .await?;
         Ok(())
     }
 }

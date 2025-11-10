@@ -18,9 +18,8 @@ use super::{
     router::Router,
 };
 
-use anyhow::Context;
-
 use crate::{
+    error::Result,
     query::Query,
     response_models::{data::Data, payload::Payload},
     App,
@@ -36,10 +35,7 @@ enum Message<'a> {
     TextMessage(&'a str, &'a str, &'a str, Arc<Query>, String, String),
 }
 
-async fn handle(
-    message: Message<'_>,
-    router: Arc<Router>,
-) -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
+async fn handle(message: Message<'_>, router: Arc<Router>) -> Result<()> {
     match message {
         Message::Payload(user, payload, host, query, version, token) => {
             let payload = Payload::from_str(payload).unwrap_or_default();
@@ -47,20 +43,24 @@ async fn handle(
             let res = Res::new(user, query.clone(), version, token);
             let req = Req::new(user, query, data, host);
             let path = payload.get_path();
-            let action = router
-                .routes
-                .get(&path)
-                .with_context(|| format!("Action not found for path: {}", path))?;
+            let action = router.routes.get(&path).ok_or_else(|| {
+                std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    format!("Action not found  for path {path}"),
+                )
+            })?;
             action(res, req).await?
         }
         Message::TextMessage(user, text_message, host, query, version, token) => {
             let path = query.get_path(user).await?.unwrap_or("/".to_string());
             let res = Res::new(user, query.clone(), version, token);
             let req = Req::new(user, query, Data::new(text_message), host);
-            let action = router
-                .routes
-                .get(&path)
-                .with_context(|| format!("Action not found for path: {}", path))?;
+            let action = router.routes.get(&path).ok_or_else(|| {
+                std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    format!("Action not found  for path {path}"),
+                )
+            })?;
             action(res, req).await?
         }
     }

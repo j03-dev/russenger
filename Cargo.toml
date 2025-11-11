@@ -23,3 +23,6 @@ dotenv = "0.15.0"
 
 # Orm
 rusql-alchemy = { version = "0.5.3", default-features = false }
+
+# Dev Deps
+russenger.path = "russenger"

@@ -8,9 +8,8 @@ publish = false
 
 
 [dependencies]
-russenger = { path = "../../russenger", features = ["sqlite"] }
+russenger = { workspace = true, features = ["sqlite"] }
 sqlx.workspace = true
-
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
-reqwest = { version = "0.12.4", features = ["json"] }
-serde = { version = "1.0.198", features = ["derive"] }
+reqwest = { workspace = true, features = ["json"] }
+serde = { workspace = true, features = ["derive"] }
